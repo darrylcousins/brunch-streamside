@@ -1,0 +1,39 @@
+{
+  "name": "brunch-streamside",
+  "description": "Brunch application for Streamside Organics",
+  "private": false,
+  "author": "darryljcousins@gmail.com",
+  "version": "0.0.1",
+  "repository": "git@github.com:darrylcousins/brunch-streamside.git",
+  "scripts": {
+    "start": "brunch watch --server --port 3334",
+    "build": "brunch build --production"
+  },
+  "browserslist": [
+    "last 2 versions"
+  ],
+  "dependencies": {
+    "tachyons": "^4.12.0"
+  },
+  "devDependencies": {
+    "@bikeshaving/crank": "^0.3.6",
+    "babel-brunch": "~6.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-latest": "^6",
+    "babel-preset-react": "^6.24.1",
+    "body-parser": "^1.19.0",
+    "brunch": "^2",
+    "clean-css-brunch": "^2",
+    "cookie-parser": "^1.4.5",
+    "crossroads": "^0.12.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "hasher": "^1.2.0",
+    "morgan": "^1.10.0",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
+    "sass-brunch": "^3.0.0",
+    "signals": "^1.0.0",
+    "uglify-js-brunch": "^2"
+  }
+}

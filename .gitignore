@@ -12,6 +12,10 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Brunch build / generate output
 public
 
+# temp files during development
+*.bak.js
+bak
+
 # npm lock file
 package-lock.json
 

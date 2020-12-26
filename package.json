@@ -13,6 +13,7 @@
     "last 2 versions"
   ],
   "dependencies": {
+    "memorystore": "^1.6.4",
     "tachyons": "^4.12.0"
   },
   "devDependencies": {
@@ -24,16 +25,24 @@
     "body-parser": "^1.19.0",
     "brunch": "^2",
     "clean-css-brunch": "^2",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.5",
     "crossroads": "^0.12.2",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "hasher": "^1.2.0",
+    "isomorphic-fetch": "^3.0.0",
+    "mongodb": "^3.6.3",
     "morgan": "^1.10.0",
+    "oboe": "^2.1.5",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "pg": "^8.5.1",
     "sass-brunch": "^3.0.0",
     "signals": "^1.0.0",
-    "uglify-js-brunch": "^2"
+    "uglify-js-brunch": "^2",
+    "ws": "^7.4.1"
   }
 }

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+
+  <body class="sans-serif w-100">
+
+    <%- include('../partials/header'); %>
+
+    <% if (message) { %>
+      <div class="dark-blue pt2 pl2 bb b--dark-blue bg-washed-blue">
+        <p class="tc"><%= message %></p>
+      </div>
+    <% } %>
+
+    <!-- open main content -->
+    <main class="w-100 bg-white black-70 center">
+
+      <div id="app" class="pa4"></div>
+
+    </main>
+    <!-- close main content -->
+
+    <%- include('../partials/footer'); %>
+
+    <script src="/app.js"></script>
+    <script src="/vendor.js"></script>
+    <script>require('initialize');</script>
+
+  </body>
+</html>

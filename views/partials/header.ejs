@@ -1,14 +1,17 @@
-<nav class="flex justify-between bb b--streamside-maroon bg-streamside-blue">
-  <a class="link white-70 hover-white no-underline flex items-center pa3" href="/">
-    Streamside Organics
-  </a>
-  <div class="flex-grow pa3 flex items-center">
-    <!--
-    <a class="f6 link dib white dim mr3 mr4-ns" href="/boxes">Boxes</a>
-    -->
-    <a class="f6 link dib white dim mr3 mr4-ns" href="/logout">Logout</a>
-  <% if (user) { %>
-    <span class="f6 link dib white dim mr3 mr4-ns"><%= user.username %></a>
-  <% } %>
-  </div>
-</nav>
+<header class="bg-streamside-blue w-100">
+  <nav class="flex justify-between">
+    <a class="link white-70 hover-white no-underline flex items-center pa3" href="/">
+      Streamside Organics
+    </a>
+    <div class="flex-grow pa3 flex items-center">
+      <a class="f6 link dib white dim mr3 mr4-ns" href="/logout">Logout</a>
+    <% if (user) { %>
+      <span class="f6 link dib white dim mr3 mr4-ns"><%= user.username %></a>
+    <% } %>
+    </div>
+  </nav>
+  <nav class="f6 fw6 ttu tracked ph3 pv2 pv3-ns ph4-m ph5-l">
+    <a class="link dim white dib mr3" href="/orders" title="Orders">Orders</a>
+    <a class="link dim white dib mr3" href="/boxes" title="Boxes">Boxes</a>
+  </nav>
+</header>

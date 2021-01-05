@@ -134,7 +134,7 @@ const processOrders = (data, deliveryDate) => {
   let pickingList = new Map();
   data.forEach(el => {
     if (el.errors) {
-      console.log('ERRORS', el.errors);
+      console.log('ERRORS api/shopify-orders', el.errors);
       return;
     }
     const length = Object.keys(el).length;
@@ -253,6 +253,9 @@ module.exports = async () => {
     let count = (i/chunk) + 1;
     promises.push(makeThrottledPromise(getOrders(query), count));
   }
+  // NB trying to work over promises to make streamed data
+  return promises;
+
   const deliveryDate = 'Thu Dec 24 2020';
   const deliveryString = deliveryDate.replace(/ /g, '-');
 

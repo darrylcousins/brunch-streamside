@@ -8,6 +8,7 @@ module.exports = async (src) => {
       if (response.status !== 200) {
         throw { msg: 'Fetch Error.', err: JSON.stringify(await response.json()) };
       }
+      console.log('Got this response in fetch', response);
       return response.json();
     })
     .then((json) => {
@@ -15,7 +16,12 @@ module.exports = async (src) => {
       return { error: null, json };
     })
     .catch(function(error) {
-      return { error, json: null };
+      console.log('Got error in fetch:', error);
+      if (error.hasOwnProperty('err')) {
+        return { error: error.err, json: null };
+      };
+
+      return { error: error, json: null };
     })
 };
 

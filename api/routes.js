@@ -15,7 +15,10 @@ routes.get('/', function (req, res) {
 //routes.get('/boxes', queries.getBoxes);
 routes.get('/current-boxes', queries.getCurrentBoxes);
 routes.get('/current-orders', queries.getCurrentOrders);
+routes.get('/order/:id', queries.getOrder);
 routes.get('/sync-boxes', queries.syncBoxes);
+routes.get('/picking-list/:timestamp', queries.downloadPickingList);
+routes.get('/orders-download/:timestamp', queries.downloadOrders);
 
 module.exports = routes;
 

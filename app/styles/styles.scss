@@ -1,4 +1,11 @@
 @import '_lds-ring.scss';
+@import '_micromodal.scss';
+@import '_bar-loader.scss';
+
+/*Hide info of no checked inputs for tabbed display */
+.tabs__content input:not(:checked) ~ .tabs__content__info {
+  display: none;
+}
 
 .fg-streamside-blue {
   color: #162842;

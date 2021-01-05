@@ -12,6 +12,7 @@ const passport = require('passport');
 const MemoryStore = require('memorystore')(session);
 const MongoClient = require('mongodb').MongoClient;
 const api = require('./api');
+const webhooks = require('./webhooks');
 const auth = require('./auth');
 const handleError = require('./middleware/error');
 
@@ -78,10 +79,13 @@ module.exports = function startServer(PORT, PATH, callback) {
   // db api routes
   app.use('/api', api.routes);
 
-  // bruch compiled static files
+  // shopify webhook routes
+  app.use('/webhook', webhooks.routes);
+
+  // brunch compiled static files
   app.use(express.static(path.join(__dirname, PATH)));
 
-  app.get('/*', 
+  app.get('/', 
     (req, res, next) => {
       //if (!req.user) return res.redirect('/login');
       res.render('pages/index', { 
@@ -95,6 +99,10 @@ module.exports = function startServer(PORT, PATH, callback) {
       )
     }
   );
+
+  app.use(function (req, res, next) {
+    res.status(404).send("Sorry can't find that!")
+  })
 
   app.use(handleError);
 

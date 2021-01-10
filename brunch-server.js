@@ -5,16 +5,21 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash');
+const fileUpload = require('express-fileupload');
 const http = require('http');
-const logger = require('morgan');
+const morgan = require('morgan'); // http request logger
+const winston = require('./winston-config'); // logger
 const path = require('path');
 const passport = require('passport');
 const MemoryStore = require('memorystore')(session);
 const MongoClient = require('mongodb').MongoClient;
+
 const api = require('./api');
 const webhooks = require('./webhooks');
 const auth = require('./auth');
-const handleError = require('./middleware/error');
+
+// make logger available globally
+global._logger = winston;
 
 module.exports = function startServer(PORT, PATH, callback) {
   const app = express();
@@ -24,18 +29,22 @@ module.exports = function startServer(PORT, PATH, callback) {
 
   // create mongo client connection
   let dbClient;
-  let dbCollection;
+  let orderCollection;
+  let boxCollection;
   const mongo_uri = 'mongodb://localhost';
 
   // assign the client from MongoClient
   MongoClient
     .connect(mongo_uri, { useNewUrlParser: true, poolSize: 10, useUnifiedTopology: true })
     .then(client => {
-      const db = client.db('test');
+      const db = client.db('streamside');
       dbClient = client;
-      dbCollection = db.collection('streamside');
+      orderCollection = db.collection('orders');
+      boxCollection = db.collection('boxes');
+
       // make collection available globally
-      app.locals.dbCollection = dbCollection;
+      app.locals.orderCollection = orderCollection;
+      app.locals.boxCollection = boxCollection;
 
       // listen for the signal interruption (ctrl-c)
       process.on('SIGINT', () => {
@@ -51,6 +60,7 @@ module.exports = function startServer(PORT, PATH, callback) {
 
   auth.configurePassport();
 
+  // templating
   app.set('view engine', 'ejs');
 
   // session options for express session
@@ -65,12 +75,21 @@ module.exports = function startServer(PORT, PATH, callback) {
   };
 
   // Middleware
-  //app.use(logger('combined'));
-  app.use(logger('dev'));
+  //app.use(morgan('combined', { stream: winston.stream })); // standard Apache log format with ip, user-agent etc
+  app.use(morgan('dev', { stream: winston.stream })); // simple
+  //app.use(morgan('dev')); // simple
   app.use(session(sessionOpts));
   app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(fileUpload());
+    /*
+  app.use(fileUpload({ // be sure to delete temp files
+    useTempFiles : true, // but prevents memory overload with large files
+    tempFileDir : path.join(__dirname,'tmp'),
+  }));
+  */
   app.use(flash());
 
   // login/logout auth routes
@@ -85,26 +104,45 @@ module.exports = function startServer(PORT, PATH, callback) {
   // brunch compiled static files
   app.use(express.static(path.join(__dirname, PATH)));
 
-  app.get('/', 
-    (req, res, next) => {
-      //if (!req.user) return res.redirect('/login');
-      res.render('pages/index', { 
-        message: req.flash('success')[0],
-        user: req.user
-      },
-        (err, html) => {
-          if (err) next(err);
-          res.send(html);
-        }
-      )
-    }
-  );
+  const loadCrank = (req, res, next) => {
+    //if (!req.user) return res.redirect('/login');
+    res.render('pages/index', { 
+      message: req.flash('success')[0],
+      user: req.user
+    },
+      (err, html) => {
+        if (err) next(err);
+        res.send(html);
+      }
+    )
+  };
 
+  app.get('/orders', loadCrank);
+  app.get('/boxes', loadCrank);
+  app.get('/', loadCrank);
+
+  // render 404 page
   app.use(function (req, res, next) {
-    res.status(404).send("Sorry can't find that!")
+    res.status(404).render('pages/404', {user: null},
+      (err, html) => {
+        if (err) next(err);
+        res.send(html);
+      }
+    )
   })
 
-  app.use(handleError);
+  // app.use(handleError); // first error handler - now using that below
+
+  // error handler https://www.digitalocean.com/community/tutorials/how-to-use-winston-to-log-node-js-applications
+  app.use(function(err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page - see above code for 404 to render a view
+    res.status(err.status || 500);
+    res.render('error');
+  });
 
   server.listen(PORT, callback);
 };

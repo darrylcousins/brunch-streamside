@@ -39,7 +39,7 @@ const boxProducts = `
     ORDER BY "Products".shopify_title
 `;
 
-module.exports = async () => {
+const collectBoxes = async () => {
   // Collect current boxes and push into mongodb
   let boxDocuments = [];
   await pool
@@ -72,4 +72,17 @@ module.exports = async () => {
       });
     });
   return boxDocuments;
+};
+
+module.exports = async function (req, res, next) {
+  const boxDocuments = await collectBoxes();
+  const collection = req.app.locals.boxCollection;
+  // insert into mongodb
+  collection.insertMany(boxDocuments)
+    .then(result => {
+      res.status(200).json({ success: 'success' });
+    })
+    .catch(e => {
+      res.status(400).json({ error: e.toString() });
+    });
 };

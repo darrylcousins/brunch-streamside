@@ -8,6 +8,7 @@ routes.get('/', function (req, res) {
 })
 
 routes.post('/order-created', webhooks.orderCreated);
+routes.post('/order-fulfilled', webhooks.orderFulfilled);
 
 module.exports = routes;
 

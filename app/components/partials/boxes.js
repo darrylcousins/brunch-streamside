@@ -1,9 +1,8 @@
 /** @jsx createElement */
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
-import {renderer} from '@bikeshaving/crank/cjs/dom';
 import BarLoader from '../lib/bar-loader';
 import Error from '../lib/error';
-import Fetch from '../lib/fetch';
+import { Fetch } from '../lib/fetch';
 import Button from './button';
 
 let weekday=new Array(7);

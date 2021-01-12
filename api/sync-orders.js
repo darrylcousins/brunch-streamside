@@ -3,7 +3,7 @@
 require('dotenv').config();
 require('isomorphic-fetch');
 
-const { processOrderJson, insertOrder } = require('./order-lib');
+const { processOrderJson, insertOrder, updateOrderTag } = require('./order-lib');
 
 const fetchOrder = async (url) => {
   const data = await fetch(url, {
@@ -74,6 +74,8 @@ module.exports = async function (req, res, next) {
     const collection = req.app.locals.orderCollection;
     orders.forEach(order => {
       insertOrder(collection, order);
+      _logger.info(JSON.stringify(order, null, 2));
+      //updateOrderTag(order._id.toString(), order.delivered);
     });
 
     res.set('Content-Type', 'application/json');

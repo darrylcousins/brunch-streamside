@@ -22,6 +22,9 @@ function *UploadOrders() {
     if (ev.target.tagName === 'INPUT' && ev.target.type === 'file') {
       selected = ev.target.files[0];
       error = false;
+
+      console.log(selected);
+
       if (selected.type !== 'text/csv' && selected.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
         selected = null;
@@ -65,13 +68,13 @@ function *UploadOrders() {
   while (true) {
     yield (
       <Fragment>
-        <nav class="ph3 pv0 tr">
+        <div class="ph1 pv0 tr dib">
           <input type="file" id="order-upload" hidden />
           <label
             for="order-upload"
-            class="pointer link dim mid-gray f6 fw6 ttu tracked dib mr3 ba b--mid-gray br1 pa2"
+            class="pointer link dim mid-gray f6 fw6 ttu tracked dib mr3 ba b--mid-gray br2 pa2"
             title="Import Orders">Import Orders</label>
-        </nav>
+        </div>
         { selected && (
           <div class="dark-gray mv2 pa3 br3 ba b--dark-gray bg-washed-blue">
             { loading ? <BarLoader />  : (
@@ -90,7 +93,9 @@ function *UploadOrders() {
           </div>
         )}
         { error && (
-          <Error msg={ error } />
+          <div class="mt5">
+            <Error msg={ error } />
+          </div>
         )}
       </Fragment>
     );

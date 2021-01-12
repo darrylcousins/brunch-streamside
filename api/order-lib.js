@@ -17,6 +17,23 @@ const LABELKEYS = [
 
 const NODELIVER_STRING = "No delivery date";
 
+const orderFields = {
+  'Box': 'text',
+  'Order #': 'number',
+  'First Name': 'text',
+  'Last Name': 'text',
+  'Address Line': 'text',
+  'Suburb': 'text',
+  'City': 'text',
+  'Postcode': 'number',
+  'Email': 'email',
+  'Telephone': 'text',
+  'Source': 'text',
+  'Delivery Note': 'text',
+  'Excluding': 'text',
+  'Extras': 'text'
+};
+
 const headersFull = [
   'Logo',
   'Box',
@@ -71,6 +88,16 @@ const insertOrder = (collection, order) => {
   );
 };
 
+const mongoInsert = (collection, data) => {
+  const { _id, ...parts } = data;
+  collection.updateOne(
+    { _id },
+    { $setOnInsert: { ...parts } },
+    { upsert: true }
+  );
+};
+
+
 const getNZDeliveryDay = (timestamp) => {
   const d = new Date(parseInt(timestamp)).toLocaleString("en-NZ", {timeZone: "Pacific/Auckland"});
   const parts = d.split(',')[0].split('/');
@@ -93,6 +120,7 @@ const matchNumberedString = (str) => {
 };
 
 const processOrderJson = (json) => {
+  // process order as received from Shopify api
   const {
     id,
     order_number,
@@ -192,6 +220,7 @@ const orderImportCSV = (data, collection) => {
     const stream = parse({ headers: true })
         .on('error', error => _logger.error(error))
         .on('data', row => {
+          console.log(row);
           delivered = new Date(Date.parse(row['Delivery Date'])).toDateString();
           json = {
             _id: parseInt(row['Package Number']),
@@ -318,6 +347,7 @@ const orderImportXLSX = (data, collection) => {
 module.exports = {
   processOrderJson,
   insertOrder,
+  mongoInsert,
   orderImportCSV,
   orderImportXLSX,
   matchNumberedString,
@@ -326,5 +356,6 @@ module.exports = {
   LABELKEYS,
   NODELIVER_STRING,
   headersPartial,
-  headersFull
+  headersFull,
+  orderFields
 };

@@ -11,9 +11,12 @@ const {
   getNZDeliveryDay,
   headersPartial,
   headersFull,
+  orderFields,
   NODELIVER_STRING,
   orderImportCSV,
-  orderImportXLSX
+  orderImportXLSX,
+  insertOrder,
+  mongoInsert
 } = require('./order-lib');
 
 const sortObjectByKeys = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
@@ -44,6 +47,22 @@ exports.getOrderSources = async function (req, res, next) {
   };
 };
 
+exports.saveOrder = async function (req, res, next) {
+  const data = req.body;
+  const collection = req.app.locals.orderCollection;
+  _logger.info(JSON.stringify(data, null, 2));
+  try {
+    insertOrder(collection, data);
+    res.status(200).json(JSON.stringify({ success: true }));
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.getOrderFields = async function (req, res, next) {
+  res.status(200).json(JSON.stringify(orderFields));
+};
+
 exports.deleteOrders = async function (req, res, next) {
   const collection = req.app.locals.orderCollection;
   const { sources, delivered } = req.body;
@@ -57,6 +76,31 @@ exports.deleteOrders = async function (req, res, next) {
     });
   } catch(e) {
     _logger.warn(e.toString());
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.getCurrentTodos = async function (req, res, next) {
+  const collection = req.app.locals.todoCollection;
+  const response = Object();
+  try {
+    collection.find().toArray((err, result) => {
+      if (err) throw err;
+      res.json(result);
+    });
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.saveTodo = async function (req, res, next) {
+  const data = req.body;
+  const collection = req.app.locals.todoCollection;
+  _logger.info(JSON.stringify(data, null, 2));
+  try {
+    mongoInsert(collection, data);
+    res.status(200).json(JSON.stringify({ success: true }));
+  } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
 };
@@ -138,6 +182,8 @@ exports.importOrders = async function (req, res, next) {
       return res.status(400).json({ error: 'Could not parse data. Uploaded file is of wrong mimetype.' });
     };
     let result = true;
+    console.log(orders.mimetype);
+    console.log(JSON.stringify(orders.data, null, 2));
     if (orders.mimetype === 'text/csv') {
       result = orderImportCSV(orders.data, collection);
     } else {

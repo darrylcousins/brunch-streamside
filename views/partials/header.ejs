@@ -3,15 +3,10 @@
     <a class="link white-70 hover-white no-underline flex items-center pa3" href="/">
       Streamside Organics
     </a>
-    <div class="flex-grow pa3 flex items-center">
-      <a class="f6 link dib white dim mr3 mr4-ns" href="/logout">Logout</a>
-    <% if (user) { %>
-      <span class="f6 link dib white dim mr3 mr4-ns"><%= user.username %></a>
-    <% } %>
+    <div class="f6 fw6 ttu tracked flex-grow pa3 flex items-center">
+      <a class="link dim white dib mr3" href="/orders" title="Orders">Orders</a>
+      <a class="link dim white dib mr3" href="/boxes" title="Boxes">Boxes</a>
+      <a class="link dim white dib mr3" href="/todos" title="Todos">Todos</a>
     </div>
-  </nav>
-  <nav class="f6 fw6 ttu tracked ph3 pv2 pv3-ns ph4-m ph5-l">
-    <a class="link dim white dib mr3" href="/orders" title="Orders">Orders</a>
-    <a class="link dim white dib mr3" href="/boxes" title="Boxes">Boxes</a>
   </nav>
 </header>

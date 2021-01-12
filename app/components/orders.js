@@ -1,14 +1,20 @@
 /** @jsx createElement */
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
-import CurrentOrders from './partials/orders';
-import UploadOrders from './partials/upload-orders';
+import {renderer} from '@bikeshaving/crank/cjs/dom';
+import CurrentOrders from './partials/orders-current';
+import UploadOrders from './partials/orders-upload';
+import SyncOrders from './partials/orders-sync';
+
 
 module.exports = function () {
+
   return (
     <Fragment>
-      <UploadOrders />
+      <div class="tr db">
+        <UploadOrders />
+        <SyncOrders />
+      </div>
       <CurrentOrders />
     </Fragment>
   )
 };
-

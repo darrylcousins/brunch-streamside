@@ -1,10 +1,19 @@
-@import '_lds-ring.scss';
-@import '_micromodal.scss';
 @import '_bar-loader.scss';
 
 /*Hide info of no checked inputs for tabbed display */
 .tabs__content input:not(:checked) ~ .tabs__content__info {
   display: none;
+}
+
+/* form elements */
+input:valid {
+  border-color: green;
+}
+input.invalid {
+  border-color: #b55103;
+}
+.hidden {
+  visibility: hidden;
 }
 
 .fg-streamside-blue {

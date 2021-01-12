@@ -1,7 +1,7 @@
 /** @jsx createElement */
 import {createElement, isElement} from '@bikeshaving/crank/cjs';
 
-module.exports = ({msg}) => {
+module.exports = ({ msg }) => {
   console.log(msg, typeof msg, isElement(msg));
   if (typeof msg === 'string' || isElement(msg)) {
     return (

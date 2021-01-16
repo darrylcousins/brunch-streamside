@@ -12,6 +12,12 @@ input:valid {
 input.invalid {
   border-color: #b55103;
 }
+textarea:valid {
+  border-color: green;
+}
+textarea.invalid {
+  border-color: #b55103;
+}
 .hidden {
   visibility: hidden;
 }

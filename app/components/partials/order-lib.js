@@ -2,6 +2,7 @@
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import {renderer} from '@bikeshaving/crank/cjs/dom';
 
+import EditOrderModal from './order-edit';
 import {
   DownloadIcon,
   HelpIcon,
@@ -61,53 +62,6 @@ const OrderDetail = ({order}) => {
       </div>
     </div>
   );
-};
-
-function *HelpSection({ children}) {
-  let visible = false;
-
-  const remove = () => {
-    visible = false;
-    this.refresh();
-  };
-  this.addEventListener("click", async (ev) => {
-    const name = ev.target.tagName.toUpperCase();
-    if (name === "SVG" || name === 'PATH') {
-      visible = !visible;
-      this.refresh();
-    } else {
-      remove();
-    };
-  });
-
-  while (true) {
-    yield (
-      <Fragment>
-        { !visible ? (
-        <a
-          class="no-underline mid-gray dim o-70 absolute top-1 right-1"
-          name="open"
-          href="#"
-          title="Get further info">
-          <HelpIcon />
-          <span class="dn">Get info</span>
-        </a>
-        ) : (
-          <Fragment>
-            <a
-              class="no-underline mid-gray dim o-70 absolute top-1 right-1"
-              name="close"
-              href="#"
-              title="Close info">
-              <CloseIcon />
-              <span class="dn">Close info</span>
-            </a>
-            { children }
-          </Fragment>
-        )}
-      </Fragment>
-    )
-  };
 };
 
 function *OrderModal({ row }) {
@@ -193,6 +147,7 @@ const Order = ({order, index}) => {
       </td>
       <td class="pv1 ph1 bb b--black-20 v-top">
          <OrderModal crank-key={index} row={ order }></OrderModal>
+         <EditOrderModal order={ order } delivered={ order.delivered } />
      </td>
     </tr>
   );
@@ -295,6 +250,54 @@ const PickingTable = ({items}) => {
       </table>
     </Fragment>
   )
+};
+
+function *HelpSection({ children}) {
+  let visible = false;
+
+  const remove = () => {
+    visible = false;
+    this.refresh();
+  };
+
+  this.addEventListener("click", async (ev) => {
+    const name = ev.target.tagName.toUpperCase();
+    if (name === "SVG" || name === 'PATH') {
+      visible = !visible;
+      this.refresh();
+    } else {
+      remove();
+    };
+  });
+
+  while (true) {
+    yield (
+      <Fragment>
+        { !visible ? (
+        <a
+          class="no-underline mid-gray dim o-70 absolute top-1 right-1"
+          name="open"
+          href="#"
+          title="Get further info">
+          <HelpIcon />
+          <span class="dn">Get info</span>
+        </a>
+        ) : (
+          <Fragment>
+            <a
+              class="no-underline mid-gray dim o-70 absolute top-1 right-1"
+              name="close"
+              href="#"
+              title="Close info">
+              <CloseIcon />
+              <span class="dn">Close info</span>
+            </a>
+            { children }
+          </Fragment>
+        )}
+      </Fragment>
+    )
+  };
 };
 
 module.exports = {

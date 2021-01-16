@@ -6,7 +6,7 @@ exports.Fetch = async (src) => {
   return await fetch(src)
     .then(async response => {
       if (response.status !== 200) {
-        throw { msg: 'Fetch Error.', err: JSON.stringify(await response.json()) };
+        throw { msg: 'Fetch Error', err: JSON.stringify(await response.json()) };
       }
       return response.json();
     })

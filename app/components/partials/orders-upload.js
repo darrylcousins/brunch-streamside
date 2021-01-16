@@ -25,10 +25,16 @@ function *UploadOrders() {
 
       console.log(selected);
 
+      if (!selected.name.endsWith('csv') && !selected.name.endsWith('xlsx')) {
+        error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
+        selected = null;
+      }
+      /*
       if (selected.type !== 'text/csv' && selected.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
         selected = null;
       }
+      */
     };
     this.refresh();
   });

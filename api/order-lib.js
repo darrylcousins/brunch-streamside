@@ -79,16 +79,32 @@ const updateOrderTag = async (id, tags) => {
   _logger.info(`Updated order ${id} with tag ${tags}`);
 };
 
-const insertOrder = (collection, order) => {
-  const { _id, ...parts } = order;
-  collection.updateOne(
+const mongoRemove = async (collection, data) => {
+  const { _id, ...parts } = data;
+  return await collection.deleteOne(
+    { _id }
+  );
+};
+
+const mongoUpdate = async (collection, data) => {
+  const { _id, ...parts } = data;
+  return await collection.updateOne(
+    { _id },
+    { $set: { ...parts } },
+    { upsert: true }
+  );
+};
+
+const mongoInsert = async (collection, data) => {
+  const { _id, ...parts } = data;
+  return await collection.updateOne(
     { _id },
     { $setOnInsert: { ...parts } },
     { upsert: true }
   );
 };
 
-const mongoInsert = (collection, data) => {
+const insertOrder = (collection, data) => {
   const { _id, ...parts } = data;
   collection.updateOne(
     { _id },
@@ -96,7 +112,6 @@ const mongoInsert = (collection, data) => {
     { upsert: true }
   );
 };
-
 
 const getNZDeliveryDay = (timestamp) => {
   const d = new Date(parseInt(timestamp)).toLocaleString("en-NZ", {timeZone: "Pacific/Auckland"});
@@ -216,11 +231,12 @@ const orderImportCSV = (data, collection) => {
   let json;
   let delivered;
   var count;
+  let id = new Date().getTime();
   try {
+    // note: no Package Number nor Delivery Date
     const stream = parse({ headers: true })
         .on('error', error => _logger.error(error))
         .on('data', row => {
-          console.log(row);
           delivered = new Date(Date.parse(row['Delivery Date'])).toDateString();
           json = {
             _id: parseInt(row['Package Number']),
@@ -267,12 +283,11 @@ const orderImportCSV = (data, collection) => {
   }
 };
 
-const findNextThursday = () => {
+const findNextWeekday = (day) => {
   // return the date of next Thursday as 14/01/2021 for example
-  // Thursday day is 4
-  const thurs = 4;
+  // Thursday day is 4, Saturday is 6
   let now = new Date();
-  now.setDate(now.getDate() + (thurs + (7-now.getDay())) % 7);
+  now.setDate(now.getDate() + (day + (7-now.getDay())) % 7);
   return now;
 };
 
@@ -284,58 +299,73 @@ const getAttribute = (obj, key, def) => {
 }
 
 const orderImportXLSX = (data, collection) => {
+  //_logger.error('Not importing because of non-duplicate ids which will make a mess');
+  //return false;
   let count = 0;
   try {
     const wb = xlsx.read(data);
-    const thursdayDate = findNextThursday();
-    const thursdayString = thursdayDate.toLocaleDateString().replace(/-/g, '/');
-    // generate array of arrays
-    output = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1});
-    const headers = output.shift();
-    const result = Array();
-    output.forEach(row => {
-      rowObj = Object();
-      row.forEach((el, index) => {
-        rowObj[headers[index]] = el;
-      });
-      result.push(rowObj);
-    });
-    result.forEach((row, index) => {
-      delivered = thursdayDate.toDateString();
-      if (row.hasOwnProperty(thursdayString)) {
-        json = {
-          _id: thursdayDate.getTime() + index,
-          addons: getAttribute(row, 'Extras', '')
-                    .split('\r\n')
-                    .map(el => el.trim())
-                    .filter(el => el !== ''),
-          address1: row['Address Line'],
-          address2: row['Suburb'],
-          city: row['City'],
-          contact_email: getAttribute(row, 'email', ''),
-          delivered,
-          including: [],
-          first_name: row['First Name'],
-          last_name: row['Last Name'],
-          name: `${row['First Name']} ${row['Last Name']}`,
-          note: getAttribute(row, 'Delivery Note', ''),
-          order_number: null,
-          phone: getAttribute(row, 'Telephone', '').toString(),
-          removed: getAttribute(row, 'Excluding', '')
-                    .split('\r\n')
-                    .map(el => el.trim())
-                    .filter(el => el !== ''),
-          sku: row[thursdayString],
-          subtotal_price: '',
-          zip: getAttribute(row, 'Postcode', '').toString(),
-          shop_note: getAttribute(row, 'Shop Note', ''),
-          source: 'CSA'
-        };
-        insertOrder(collection, json);
-        count = count + 1;
-        //_logger.info(JSON.stringify(json, null, 2));
+    let targetDate;
+
+
+    for (let i=0; i<2; i++) {
+      if (i === 0) {
+        targetDate = findNextWeekday(4); // thursday
+      } else if (i === 1) {
+        targetDate = findNextWeekday(6); // saturday
       };
-    });
+      const targetString = targetDate.toLocaleDateString().replace(/-/g, '/');
+      // generate array of arrays
+      output = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, raw:true, defval:''});
+      const headers = output.shift();
+      const result = Array();
+      output.forEach(row => {
+        rowObj = Object();
+        row.forEach((el, index) => {
+          //console.log(headers[index], el);
+          rowObj[headers[index]] = el;
+        });
+        result.push(rowObj);
+      });
+      result.forEach((row, index) => {
+        delivered = targetDate.toDateString();
+        //console.log(delivered, index);
+        //console.log(JSON.stringify(row, null, 2));
+        if (row.hasOwnProperty(targetString) && row[targetString] !== '') {
+          console.log(JSON.stringify(row, null, 2));
+          json = {
+            _id: targetDate.getTime() + index,
+            addons: getAttribute(row, 'Extras', '')
+                      .split('\r\n')
+                      .map(el => el.trim())
+                      .filter(el => el !== ''),
+            address1: row['Address Line'],
+            address2: row['Suburb'],
+            city: row['City'],
+            contact_email: getAttribute(row, 'email', ''),
+            delivered,
+            including: [],
+            first_name: row['First Name'],
+            last_name: row['Last Name'],
+            name: `${row['First Name']} ${row['Last Name']}`,
+            note: getAttribute(row, 'Delivery Note', ''),
+            order_number: null,
+            phone: getAttribute(row, 'Telephone', '').toString(),
+            removed: getAttribute(row, 'Excluding', '')
+                      .split('\r\n')
+                      .map(el => el.trim())
+                      .filter(el => el !== ''),
+            sku: row[targetString],
+            subtotal_price: '',
+            zip: getAttribute(row, 'Postcode', '').toString(),
+            shop_note: getAttribute(row, 'Shop Note', ''),
+            source: 'CSA'
+          };
+          insertOrder(collection, json);
+          count = count + 1;
+          _logger.info(JSON.stringify(json, null, 2));
+        };
+      });
+    };
     _logger.info(`Parsed ${count} rows from CSA insert for ${delivered}`);
   } catch(err) {
     _logger.error(err);
@@ -348,6 +378,8 @@ module.exports = {
   processOrderJson,
   insertOrder,
   mongoInsert,
+  mongoUpdate,
+  mongoRemove,
   orderImportCSV,
   orderImportXLSX,
   matchNumberedString,

@@ -17,9 +17,11 @@
     "tachyons": "^4.12.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.10",
     "@bikeshaving/crank": "^0.3.6",
     "app-root-path": "^3.0.0",
     "babel-brunch": "~6.0",
+    "babel-preset-crank": "^0.2.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-latest": "^6",
     "babel-preset-react": "^6.24.1",

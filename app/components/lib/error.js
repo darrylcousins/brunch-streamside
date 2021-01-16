@@ -12,8 +12,7 @@ module.exports = ({ msg }) => {
   } else {
     return (
       <div class="dark-red mv2 pt2 pl2 br3 ba b--dark-red bg-washed-red">
-        <p class="tc">{msg.msg}</p>
-        <p class="tc">{msg.err}</p>
+        <p class="tc">{msg.msg}: {msg.err}</p>
       </div>
     );
   }

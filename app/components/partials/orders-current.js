@@ -2,7 +2,7 @@
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import {renderer} from '@bikeshaving/crank/cjs/dom';
 
-import AddModal from './order-add';
+import AddOrderModal from './order-add';
 import RemoveModal from './order-remove';
 import {
   HelpSection,
@@ -132,7 +132,7 @@ function *CurrentOrders() {
                       { key }&nbsp;
                       ({ fetchOrders[key].length })
                     </h2>
-                        <AddModal delivered={ key } index={ index } />
+                        <AddOrderModal delivered={ key } index={ index } />
                         <RemoveModal delivered={ key } index={ index } />
                       { ( new Date(key).toString() !== 'Invalid Date' ) && 
                         <a

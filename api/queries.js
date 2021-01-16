@@ -16,6 +16,8 @@ const {
   orderImportCSV,
   orderImportXLSX,
   insertOrder,
+  mongoUpdate,
+  mongoRemove,
   mongoInsert
 } = require('./order-lib');
 
@@ -47,13 +49,21 @@ exports.getOrderSources = async function (req, res, next) {
   };
 };
 
-exports.saveOrder = async function (req, res, next) {
-  const data = req.body;
-  const collection = req.app.locals.orderCollection;
-  _logger.info(JSON.stringify(data, null, 2));
+exports.addOrder = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
   try {
-    insertOrder(collection, data);
-    res.status(200).json(JSON.stringify({ success: true }));
+    const result = await mongoInsert(req.app.locals.orderCollection, req.body);
+    res.status(200).json(JSON.stringify(result));
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.editOrder = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+  try {
+    const result = await mongoUpdate(req.app.locals.orderCollection, req.body);
+    res.status(200).json(JSON.stringify(result));
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
@@ -93,13 +103,31 @@ exports.getCurrentTodos = async function (req, res, next) {
   };
 };
 
-exports.saveTodo = async function (req, res, next) {
-  const data = req.body;
-  const collection = req.app.locals.todoCollection;
-  _logger.info(JSON.stringify(data, null, 2));
+exports.addTodo = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
   try {
-    mongoInsert(collection, data);
-    res.status(200).json(JSON.stringify({ success: true }));
+    const result = await mongoInsert(req.app.locals.todoCollection, req.body);
+    res.status(200).json(JSON.stringify(result));
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.editTodo = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+  try {
+    const result = await mongoUpdate(req.app.locals.todoCollection, req.body);
+    res.status(200).json(JSON.stringify(result));
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.removeTodo = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+  try {
+    const result = await mongoRemove(req.app.locals.todoCollection, req.body);
+    res.status(200).json(JSON.stringify(result));
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
@@ -183,7 +211,6 @@ exports.importOrders = async function (req, res, next) {
     };
     let result = true;
     console.log(orders.mimetype);
-    console.log(JSON.stringify(orders.data, null, 2));
     if (orders.mimetype === 'text/csv') {
       result = orderImportCSV(orders.data, collection);
     } else {

@@ -14,7 +14,10 @@ routes.get('/', function (req, res) {
 routes.get('/current-boxes', queries.getCurrentBoxes);
 routes.get('/current-orders', queries.getCurrentOrders);
 routes.post('/order-sources', queries.getOrderSources);
-routes.post('/save-order', queries.saveOrder);
+
+routes.post('/add-order', queries.addOrder);
+routes.post('/edit-order', queries.editOrder);
+
 routes.get('/order-fields', queries.getOrderFields);
 routes.post('/delete-orders', queries.deleteOrders);
 routes.post('/import-orders', queries.importOrders);
@@ -22,7 +25,9 @@ routes.get('/picking-list/:timestamp', queries.downloadPickingList);
 routes.get('/orders-download/:timestamp', queries.downloadOrders);
 
 routes.get('/current-todos', queries.getCurrentTodos);
-routes.post('/save-todo', queries.saveTodo);
+routes.post('/add-todo', queries.addTodo);
+routes.post('/edit-todo', queries.editTodo);
+routes.post('/remove-todo', queries.removeTodo);
 
 routes.get('/sync-boxes', syncBoxes);
 routes.get('/sync-orders', syncOrders);

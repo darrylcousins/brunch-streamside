@@ -227,19 +227,17 @@ const skuTranslate = (str) => {
   return str;
 };
 
-const orderImportCSV = (data, collection) => {
+const orderImportCSV = (data, delivered, collection) => {
   let json;
-  let delivered;
-  var count;
+  let count = 0;
   let id = new Date().getTime();
   try {
     // note: no Package Number nor Delivery Date
     const stream = parse({ headers: true })
         .on('error', error => _logger.error(error))
         .on('data', row => {
-          delivered = new Date(Date.parse(row['Delivery Date'])).toDateString();
           json = {
-            _id: parseInt(row['Package Number']),
+            _id: parseInt(id) + count,
             addons: row['Box Extra Line Items']
                       .split(',')
                       .map(el => el.trim())
@@ -266,8 +264,9 @@ const orderImportCSV = (data, collection) => {
             zip: row['Delivery Address Postcode'],
             source: 'BuckyBox'
           };
-          //_logger.info(JSON.stringify(json, null, 2));
+          _logger.info(JSON.stringify(json, null, 2));
           insertOrder(collection, json);
+          count += 1;
         })
         .on('end', (rowCount, number) => {
           _logger.info(`Parsed ${rowCount} rows from BuckyBox insert for ${delivered}`);
@@ -298,24 +297,20 @@ const getAttribute = (obj, key, def) => {
   return def;
 }
 
-const orderImportXLSX = (data, collection) => {
+const orderImportXLSX = (data, delivered, collection) => {
   //_logger.error('Not importing because of non-duplicate ids which will make a mess');
   //return false;
   let count = 0;
+  let targetDate = new Date(Date.parse(delivered));
+  let targetString = targetDate.toLocaleDateString().replace(/-/g, '/');
+  _logger.info(targetString);
   try {
     const wb = xlsx.read(data);
-    let targetDate;
 
-
+    // check through both sheets
     for (let i=0; i<2; i++) {
-      if (i === 0) {
-        targetDate = findNextWeekday(4); // thursday
-      } else if (i === 1) {
-        targetDate = findNextWeekday(6); // saturday
-      };
-      const targetString = targetDate.toLocaleDateString().replace(/-/g, '/');
       // generate array of arrays
-      output = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, raw:true, defval:''});
+      output = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[i]], {header:1, raw:true, defval:''});
       const headers = output.shift();
       const result = Array();
       output.forEach(row => {
@@ -327,11 +322,8 @@ const orderImportXLSX = (data, collection) => {
         result.push(rowObj);
       });
       result.forEach((row, index) => {
-        delivered = targetDate.toDateString();
-        //console.log(delivered, index);
-        //console.log(JSON.stringify(row, null, 2));
+        //_logger.info(JSON.stringify(row, null, 2));
         if (row.hasOwnProperty(targetString) && row[targetString] !== '') {
-          console.log(JSON.stringify(row, null, 2));
           json = {
             _id: targetDate.getTime() + index,
             addons: getAttribute(row, 'Extras', '')

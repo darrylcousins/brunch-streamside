@@ -18,7 +18,11 @@ function Multiple(props) {
 
   if (value && typeof value !== 'undefined') {
     optionsValues = datalist;
-    valueCount = value.split(separator).length;
+    if (typeof value === 'string') {
+      valueCount = value.split(separator).length;
+    } else {
+      valueCount = value.length;
+    }
   } else {
     // initialize
     valueCount = null;

@@ -23,12 +23,20 @@ exports.Fetch = async (src) => {
     })
 };
 
-exports.PostFetch = async ({src, data}) => {
-  return await fetch(src, {
+exports.PostFetch = async ({src, data, headers}) => {
+
+  // use json if according to content-type
+  const formdata = (headers['Content-Type'] === 'application/json') ? JSON.stringify(data) : data;
+
+  const opts = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
+    body: formdata
+  };
+
+  // add headers if set in arguments - i.e. using none if sending files
+  if (headers) opts.headers = headers;
+
+  return await fetch(src, opts)
     .then(async response => {
       if (response.status !== 200) {
         throw { msg: 'Fetch Error.', err: JSON.stringify(await response.json()) };

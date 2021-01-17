@@ -15,7 +15,7 @@ const ShowLink = (opts) => {
       name={ name }
       title={ title }>
       <RemoveIcon />
-      <span class="dn">Remove Todo</span>
+      <span class="dn">{ title }</span>
     </a>
   );
 };

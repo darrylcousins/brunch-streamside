@@ -18,7 +18,6 @@ function *Form(props) {
     for (let i=0; i<elements.length; i++) {
       el = elements[i];
       if (el.tagName !== 'FIELDSET' && el.type !== 'hidden') {
-        console.log(el.tagName);
         if (!el.checkValidity()) {
           //el.dispatchEvent(new Event('onblur')); // NOT WORKING BUT WAS?
           el.classList.add('invalid');
@@ -30,7 +29,6 @@ function *Form(props) {
         } else if (el.checkValidity()) {
           //el.dispatchEvent(new Event('onfocus')); // NOT WORKING BUT WAS?
           el.classList.remove('invalid');
-          console.log(el.nextSibling);
           if (el.nextSibling) {
             el.nextSibling.innerHTML = '';
             el.nextSibling.classList.add('hidden');
@@ -46,7 +44,7 @@ function *Form(props) {
       })
     );
     formError = error;
-    if (!formError) this.refresh();
+    if (formError) this.refresh();
   });
 
   while (true) (

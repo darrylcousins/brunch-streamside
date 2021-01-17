@@ -7,7 +7,7 @@ import Form from '../form';
 function *UpsertOrderModal(props) {
   // and this is all that we need to make a form modal
 
-  let { doSave, closeModal, title, order, delivered, formId } = props;
+  let { doSave, closeModal, title, order, delivered, formId, index } = props;
 
   const findNextWeekday = (day) => {
     // return the date of next Thursday as 14/01/2021 for example
@@ -20,7 +20,7 @@ function *UpsertOrderModal(props) {
   const getUpcoming = () => {
     const dates = [4,6].map(el => findNextWeekday(el).toDateString());
     dates.unshift(delivered);
-    console.log(dates);
+    //console.log(dates);
     return dates;
   };
 
@@ -165,11 +165,10 @@ function *UpsertOrderModal(props) {
           result[value['id']] = '';
         }
         result['delivered'] = delivered;
+        result['_id'] = new Date().getTime();
         return result;
       }
     };
-
-    console.log(JSON.stringify(getInitialData(), null, 2));
 
     yield (
       <Fragment>

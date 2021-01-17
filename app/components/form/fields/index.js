@@ -7,6 +7,7 @@ import TextArea from './textarea';
 import Hidden from './hidden';
 import Select from './select';
 import Multiple from './multiple';
+import File from './file';
 
 function Field(props) {
 
@@ -50,6 +51,17 @@ function Field(props) {
     return (
       <Hidden
         value={ value }
+        name={ id }
+        type={ type }
+        id={ id }
+        datatype={ datatype }
+      />
+    )
+  }
+
+  if (type === 'file') {
+    return (
+      <File
         name={ id }
         type={ type }
         id={ id }
@@ -146,7 +158,7 @@ function Field(props) {
     )
   }
 
-  return <div>Faild to find input element to render</div>
+  return <div class="b">Failed to find input element to render</div>
 };
 
 module.exports = Field;

@@ -110,6 +110,7 @@ module.exports = function startServer(PORT, PATH, callback) {
   app.get('/orders', loadCrank);
   app.get('/boxes', loadCrank);
   app.get('/todos', loadCrank);
+  app.get('/packing-lists', loadCrank);
   app.get('/', loadCrank);
 
   // render 404 page

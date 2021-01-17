@@ -1,6 +1,10 @@
 'use strict';
 
 require('dotenv').config();
+require('isomorphic-fetch');
+const {
+  mongoInsert
+} = require('./order-lib');
 const Pool = require('pg').Pool;
 
 const pool = new Pool({
@@ -10,6 +14,19 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
+
+const getBoxSKU = async (id) => {
+  // update tags with comma separated string
+  const url = `https://${process.env.SHOP_NAME}.myshopify.com/admin/api/${process.env.API_VERSION}/variants/${id}.json?fields=sku`;
+  return await fetch(url, {
+    method: 'GET',
+    headers: {
+      'X-Shopify-Access-Token': process.env.SHOPIFY_API_PASSWORD 
+    }
+  })
+    .then(response => response.json())
+    .then(data => data);
+};
 
 const currentBoxes = `
   SELECT
@@ -46,22 +63,26 @@ const collectBoxes = async () => {
     .query(currentBoxes)
     //.query(productAddOns, [271, 't'])
     .then(res => {
-      res.rows.forEach((row) => {
+      res.rows.forEach(async (row) => {
         let boxDoc = row;
         let boxId = boxDoc.id;
         delete boxDoc.id;
         // figure out the unique doc identifier: timestamp in days + shopify_product_id
-        boxDoc._id = (boxDoc.delivered.getTime()/(1000 * 60 * 60 * 24)).toString() + boxDoc.shopify_product_id;
+        boxDoc._id = parseInt(boxDoc.delivered.getTime()/(1000 * 60 * 60 * 24) + parseInt(boxDoc.shopify_product_id));
+        boxDoc.delivered = boxDoc.delivered.toDateString();
+
+        boxDoc.shopify_product_id = parseInt(boxDoc.shopify_product_id);
+        boxDoc.shopify_variant_id = parseInt(boxDoc.shopify_variant_id);
 
         // get box products
         pool
           .query(boxProducts, [boxId, 't'])
           .then(res => {
-            boxDoc.addOnProducts = res.rows;
+            boxDoc.addOnProducts = res.rows.map(el => el.shopify_title);
             pool
               .query(boxProducts, [boxId, 'f'])
               .then(res => {
-                boxDoc.includedProducts = res.rows;
+                boxDoc.includedProducts = res.rows.map(el => el.shopify_title);
               });
           });
         boxDocuments.push(boxDoc);
@@ -74,15 +95,34 @@ const collectBoxes = async () => {
   return boxDocuments;
 };
 
+const addSKUAndSave = async (boxDocuments, collection) => {
+  const final = await boxDocuments.map(async (boxDoc) => {
+    const variant = await getBoxSKU(boxDoc.shopify_variant_id.toString())
+      .then(res => res.variant.sku);
+    boxDoc.shopify_sku = variant;
+    console.log(boxDoc);
+    await mongoInsert(boxDoc, collection);
+    return boxDoc;
+  });
+  return final;
+};
+
 module.exports = async function (req, res, next) {
   const boxDocuments = await collectBoxes();
   const collection = req.app.locals.boxCollection;
-  // insert into mongodb
-  collection.insertMany(boxDocuments)
-    .then(result => {
-      res.status(200).json({ success: 'success' });
-    })
-    .catch(e => {
-      res.status(400).json({ error: e.toString() });
-    });
+  boxDocuments.forEach(async (boxDoc) => {
+    const variant = await getBoxSKU(boxDoc.shopify_variant_id.toString())
+      .then(res => res.variant.sku);
+    boxDoc.shopify_sku = variant;
+    //console.log(boxDoc);
+    const { _id, ...parts } = boxDoc;
+    const res = await collection.updateOne(
+      { _id },
+      { $setOnInsert: { ...parts } },
+      { upsert: true }
+    );
+    _logger.info(`Inserted box with id: ${res.upsertedId._id}`);
+  });
+
+  res.status(200).json({ success: true });
 };

@@ -27,23 +27,3 @@ const TextField = (props) => {
 }
 
 module.exports = TextField;
-/*
-    label,
-    name,
-    id,
-    value,
-    size,
-    required,
-    valid,
-    onBlur,
-    onFocus,
-    datatype
-        id={id} 
-        name={id} 
-        type="text" 
-        value={value} 
-        required={required} 
-        onfocus={ onFocus }
-        onblur={ onBlur }
-        datatype={datatype}
-        */

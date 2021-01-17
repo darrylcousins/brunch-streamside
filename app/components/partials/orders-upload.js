@@ -1,111 +1,100 @@
 /** @jsx createElement */
-require('isomorphic-fetch');
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
-import BarLoader from '../lib/bar-loader';
-import Error from '../lib/error';
+import {renderer} from '@bikeshaving/crank/cjs/dom';
 
-function *UploadOrders() {
+import { RemoveIcon } from '../lib/icon';
+import Button from '../lib/button';
+import FormModalWrapper from '../wrappers/form-modal';
+import Form from '../form';
 
-  let loading;
-  let error;
-  let selected;
-  let success;
-
-  const reset = () => {
-    loading = false;
-    error = null;
-    selected = null;
-  };
-  reset();
-
-  this.addEventListener('change', async (ev) => {
-    if (ev.target.tagName === 'INPUT' && ev.target.type === 'file') {
-      selected = ev.target.files[0];
-      error = false;
-
-      console.log(selected);
-
-      if (!selected.name.endsWith('csv') && !selected.name.endsWith('xlsx')) {
-        error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
-        selected = null;
-      }
-      /*
-      if (selected.type !== 'text/csv' && selected.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-        error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
-        selected = null;
-      }
-      */
-    };
-    this.refresh();
-  });
-
-  this.addEventListener('click', async (ev) => {
-    if (ev.target.tagName === 'BUTTON') {
-      const data = new FormData();
-      data.append('orders', selected);
-      loading = true;
-      this.refresh();
-
-      fetch('/api/import-orders', {
-        method: 'POST',
-        body: data
-      })
-        .then(async response => {
-          if (response.status === 400) {
-            throw await response.json();
-          };
-          return response.json();
-        })
-        .then(data => {
-          console.log(data);
-          reset();
-          success = data.count; // can't get this result from xlsx so only reads true
-          setTimeout(function(){ window.location.reload(); }, 2000);
-          this.refresh();
-        })
-        .catch(err => {
-          reset();
-          error = <div>Upload failed. { err.error }</div>;
-          this.refresh();
-        });
-    };
-  });
-
-  while (true) {
-    yield (
-      <Fragment>
-        <div class="ph1 pv0 tr dib">
-          <input type="file" id="order-upload" hidden />
-          <label
-            for="order-upload"
-            class="pointer link dim mid-gray f6 fw6 ttu tracked dib mr3 ba b--mid-gray br2 pa2"
-            title="Import Orders">Import Orders</label>
-        </div>
-        { selected && (
-          <div class="dark-gray mv2 pa3 br3 ba b--dark-gray bg-washed-blue">
-            { loading ? <BarLoader />  : (
-              <Fragment>
-                Selected file for import: <span class="code">{ selected.name }</span>.
-                <button
-                  class="pointer br2 ba b--navy bg-dark-blue white pa2 ml5 mv1 bg-animate hover-bg-navy border-box"
-                  name="submit">Import now</button>
-              </Fragment>
-            )}
-          </div>
-        )}
-        { (success > 0 || success === true) && (
-          <div class="dark-gray pa3 mv2 br3 ba b--dark-gray bg-washed-green">
-            Successfully imported { Number.isInteger(success) ? success : '' } orders, reloading page.
-          </div>
-        )}
-        { error && (
-          <div class="mt5">
-            <Error msg={ error } />
-          </div>
-        )}
-      </Fragment>
-    );
-  };
+const ShowLink = (opts) => {
+  const { name, title, color, showModal } = opts;
+  return (
+    <nav class="f6 fw6 ttu tracked ph3 pv2 pv3-ns tr">
+      <a
+        class="link dim mid-gray dib mr3 ba b--mid-gray br1 pa2"
+        onclick={ showModal }
+        href="#"
+        title={ title }>{ title }</a>
+    </nav>
+  );
 };
 
-module.exports = UploadOrders;
+const options = {
+  id: 'import-orders', // form id
+  title: 'Import Orders',
+  color: 'dark-gray',
+  src: '/api/import-orders',
+  ShowLink: ShowLink,
+  saveMsg: 'Upload orders ...',
+  successMsg: 'Successfully uploaded orders, reloading page.'
+};
+
+function *UploadOrdersModal(props) {
+
+  let { doSave, closeModal, title, formId } = props;
+
+  const findNextWeekday = (day) => {
+    // return the date of next Thursday as 14/01/2021 for example
+    // Thursday day is 4, Saturday is 6
+    let now = new Date();
+    now.setDate(now.getDate() + (day + (7-now.getDay())) % 7);
+    return now;
+  };
+
+  const getUpcoming = () => {
+    const dates = [4,6].map(el => findNextWeekday(el).toDateString());
+    console.log(dates);
+    return dates;
+  };
+
+  for (const _  of this) {
+
+    const fields = {
+      'orders': {
+        type: 'file',
+        datatype: 'file',
+        required: true
+      },
+      'Delivered': {
+        id: 'delivered',
+        type: 'select',
+        size: 'third',
+        datatype: 'string',
+        required: true,
+        datalist: getUpcoming() // find upcoming days?
+      },
+    }
+
+    const getInitialData = () => (
+      {
+        file: null,
+        delivered: ''
+      }
+    );
+
+    yield (
+      <Fragment>
+        <Form
+          data={getInitialData()}
+          fields={fields}
+          title={title}
+          id={formId}
+        />
+        <div class="w-90 center ph1">
+          <Button
+            onclick={ doSave }>
+            Upload
+          </Button>
+          <Button
+            onclick={ closeModal }>
+            Cancel
+          </Button>
+        </div>
+      </Fragment>
+    );
+  }
+
+};
+
+module.exports = FormModalWrapper(UploadOrdersModal, options);

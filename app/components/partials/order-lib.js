@@ -3,6 +3,7 @@ import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import {renderer} from '@bikeshaving/crank/cjs/dom';
 
 import EditOrderModal from './order-edit';
+import RemoveOrderModal from './order-remove';
 import {
   DownloadIcon,
   HelpIcon,
@@ -12,6 +13,17 @@ import {
 import Button from '../lib/button';
 
 const sortObjectByKeys = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
+
+const sortObjectByKey = (o, key) => {
+  o.sort((a, b) => {
+    var nameA = a[key].toUpperCase(); // ignore upper and lowercase
+    var nameB = b[key].toUpperCase(); // ignore upper and lowercase
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
+  });
+  return o;
+};
 
 const OrderDetail = ({order}) => {
   return (
@@ -148,6 +160,7 @@ const Order = ({order, index}) => {
       <td class="pv1 ph1 bb b--black-20 v-top">
          <OrderModal crank-key={index} row={ order }></OrderModal>
          <EditOrderModal order={ order } delivered={ order.delivered } />
+         <RemoveOrderModal order={ order } />
      </td>
     </tr>
   );
@@ -307,5 +320,6 @@ module.exports = {
   PickingTable,
   TableHeader,
   TableBody,
+  sortObjectByKey,
   sortObjectByKeys
 };

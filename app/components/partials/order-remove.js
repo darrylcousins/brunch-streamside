@@ -2,202 +2,74 @@
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import {renderer} from '@bikeshaving/crank/cjs/dom';
 
-import BarLoader from '../lib/bar-loader';
-import Error from '../lib/error';
-import { Fetch, PostFetch } from '../lib/fetch';
-import {
-  DeleteIcon,
-  CloseIcon,
-} from '../lib/icon';
+import { RemoveIcon } from '../lib/icon';
 import Button from '../lib/button';
+import FormModalWrapper from '../wrappers/form-modal';
+import Form from '../form';
 
-function *RemoveModal({ delivered, index }) {
-  let visible = false;
-  let loading = true;
-  let fetchError = null;
-  let fetchSources =[];
-  let selected = [];
-  let success = 0;
-  let active = false; // try to keep button visible on refresh
-  const key = delivered.replace(/ /g, '-').toLowerCase();
-
-  const closeModal = () => {
-    visible = false;
-    active = true;
-    this.refresh();
-  };
-
-  const loadSources = () => {
-    active = true;
-    PostFetch({ src: `/api/order-sources`, data: { delivered } })
-      .then(result => {
-        const { error, json } = result;
-        if (error !== null) {
-          fetchError = error;
-          console.log('fetch error:', fetchError);
-          loading = false;
-          this.refresh();
-        } else {
-          fetchSources = JSON.parse(json);
-          selected = fetchSources.map(s => s.toLowerCase().replace(/ /g, '-'));
-          loading = false;
-          this.refresh();
-        };
-      })
-      .catch(err => {
-        fetchError = err;
-        loading = false;
-        this.refresh();
-      });
-  };
-
-  const doDelete = () => {
-    loading = true;
-    this.refresh();
-    const sources = fetchSources.filter(el => selected.includes(el.toLowerCase().replace(/ /g, '-')));
-    const data = { sources, delivered };
-    PostFetch({ src: `/api/delete-orders`, data })
-      .then(result => {
-        const { error, json } = result;
-        if (error !== null) {
-          fetchError = error;
-          console.log('fetch error:', fetchError);
-          loading = false;
-          this.refresh();
-        } else {
-          console.log(JSON.stringify(json, null, 2));
-          loading = false;
-          success = parseInt(JSON.parse(json).count);
-          setTimeout(function(){ window.location.reload(); }, 2000);
-          this.refresh();
-        };
-      })
-      .catch(err => {
-        fetchError = err;
-        loading = false;
-        this.refresh();
-      });
-  };
-
-  const updateSelected = (id, remove) => {
-    if (id === '') return;
-    const idx = selected.indexOf(id);
-    if (idx === -1 && !remove) {
-      selected.push(id);
-    } else if (idx > -1 && remove) {
-      selected.splice(idx, 1);
-    };
-  };
-
-  this.addEventListener("click", async (ev) => {
-    const name = ev.target.tagName.toUpperCase();
-    if (name === "SVG" || name === 'PATH') {
-      visible = !visible;
-      this.refresh();
-      loadSources();
-    } else if (name === "LABEL" || name === 'INPUT') {
-      if (ev.target.value && ev.target.value === 'allsources') {
-        let remove = !ev.target.checked;
-        document.querySelectorAll("input[name='sources']").forEach(el => {
-          updateSelected(el.id, !ev.target.checked);
-        });
-      } else if (ev.target.value) {
-        updateSelected(ev.target.id, !ev.target.checked);
-      };
-      this.refresh();
-    };
-  });
-
-  while (true) {
-    yield (
-      <Fragment>
-        <a
-          name={ delivered.replace(/ /g, '-') + '-key' }
-          class={ `no-underline dark-red dim ${ (index !== 0 && !active) ? 'dn' : 'dib'}` }
-          href="#"
-          title="Delete Orders">
-          <DeleteIcon />
-        </a>
-        { visible && (
-        <div class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4"
-             style={ `top: ${ Math.round(window.scrollY).toString() }px; cursor: default` }>
-          <div class="bg-white pa4 br3">
-            <a
-              class="no-underline mid-gray dim o-70 absolute top-1 right-1"
-              name="close"
-              onclick={ closeModal }
-              href="#"
-              style="margin-right: 30px; margin-top: 30px;"
-              title="Close delete modal">
-              <CloseIcon />
-              <span class="dn">Close delete modal</span>
-            </a>
-            { fetchError && <Error msg={fetchError} /> }
-            <h2 class="fw4">Removing orders from '{ delivered }'.</h2>
-            <p class="lh-copy near-black tl">
-              Use the checkboxes to filter orders by sources.  Removing orders
-              here makes <b>no</b> changes to the orders on Shopify nor to the
-              original imported files from BuckyBox or CSA.
-            </p>
-            <p class="lh-copy near-black tl">
-              It would not be advised to delete any orders matching 'Shopify'
-              as they are automatically inserted when created on the store.
-              Later we wil have some sort of 'sync from store' functionlity.
-              See <a href="todo" class="link dim">todos</a>.
-            </p>
-            <p class="lh-copy near-black tl bb b--gray pb2">
-              As yet there is no option to remove individual orders prior to export.
-              See <a href="todo" class="link dim">todos</a>.
-            </p>
-            { loading && <BarLoader /> }
-            { fetchSources.length > 0 && (
-              <Fragment>
-                <div class="mt2">
-                  <div class="flex items-center mb2 dark-gray" id={ key }>
-                    <input 
-                      class="mr2 hidden"
-                      type="checkbox"
-                      id="allsources"
-                      value="allsources"
-                      checked={ selected.length > 0 }
-                    />
-                    <label for="allsources" class="lh-copy">
-                      { selected.length === 0 ? 'Select all' : 'Deselect all' }
-                    </label>
-                  </div>
-                  { fetchSources.map(source => (
-                    <div class="flex items-center mb1 dark-gray">
-                      <input
-                        class="mr2" type="checkbox"
-                        id={ source.toLowerCase() }
-                        value={ source.toLowerCase() }
-                        name="sources"
-                        checked={ selected.includes(source.toLowerCase()) }
-                      />
-                      <label for={ source.toLowerCase() } class="lh-copy">{ source }</label>
-                    </div>
-                  ))}
-                </div>
-                { (success > 0) ? (
-                  <div class="lh-copy dark-gray pa3 br3 ba b--dark-gray bg-washed-green">
-                    Successfully deleted { success } orders, reloading page.
-                  </div>
-                ) : (
-                  <Button
-                    onclick={ doDelete }
-                    style={ selected.length === 0 ? 'opacity: 0.3' : '' }
-                    disabled={ selected.length === 0 }>
-                  Do delete
-                </Button>
-                )}
-              </Fragment>
-            )}
-          </div>
-        </div>
-        )}
-      </Fragment>
-    )
-  };
+const ShowLink = (opts) => {
+  const { name, title, color } = opts;
+  return (
+    <a
+      class={ `pointer no-underline ${color} dib dim` }
+      name={ name }
+      title={ title }>
+      <RemoveIcon />
+      <span class="dn">{ title }</span>
+    </a>
+  );
 };
 
-module.exports = RemoveModal;
+const options = {
+  id: 'remove-order', // form id
+  title: 'Remove Order',
+  color: 'dark-red',
+  src: '/api/remove-order',
+  ShowLink: ShowLink,
+  saveMsg: 'Removing order ...',
+  successMsg: 'Successfully removed order, reloading page.'
+};
+
+function *RemoveOrderModal(props) {
+
+  let { doSave, closeModal, title, order, formId } = props;
+
+  for (const _  of this) {
+
+    const fields = {
+      '_id': {
+        type: 'hidden',
+        datatype: 'integer'
+      },
+    }
+
+    const getInitialData = () => ({ _id: order._id });
+
+    yield (
+      <Fragment>
+        <p class="lh-copy tl">
+          Are you sure you want to remove <b>{ order.sku }</b> for <b>{ order.contact_email }</b> from <b>{ order.source }</b>?
+        </p>
+        <Form
+          data={getInitialData()}
+          fields={fields}
+          title={title}
+          id={formId}
+        />
+        <div class="w-90 center ph1">
+          <Button
+            onclick={ doSave }>
+            Remove
+          </Button>
+          <Button
+            onclick={ closeModal }>
+            Cancel
+          </Button>
+        </div>
+      </Fragment>
+    );
+  }
+
+};
+
+module.exports = FormModalWrapper(RemoveOrderModal, options);

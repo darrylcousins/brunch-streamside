@@ -3,7 +3,7 @@ import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import {renderer} from '@bikeshaving/crank/cjs/dom';
 
 import AddOrderModal from './order-add';
-import RemoveModal from './order-remove';
+import RemoveOrdersModal from './orders-remove';
 import {
   HelpSection,
   Order,
@@ -63,16 +63,21 @@ function *CurrentOrders() {
         const color = 'dark-green';
         const bgcolor = 'bg-near-white';
         const opacity = 'o-40';
-        console.log(id);
+        console.log('selecting tab', id);
         document.querySelectorAll("label[name='tabs']>a").forEach(el => {
           //el.classList.add('dib');
-          if (el.name === id) {
+          // damn, not getting this to work
+          /*
+          if (el.name === id || el.name === 'add-order') {
+            console.log('show me:', el.name);
             el.classList.remove('dn');
             el.classList.add('dib');
-          } else {
+          } else if (el.name !== id && el.name !== 'add-order') {
+            console.log('hide me:', el.name);
             el.classList.remove('dib');
             el.classList.add('dn');
           };
+          */
         });
         document.querySelectorAll("label[name='tabs']").forEach(el => {
           el.classList.remove(color);
@@ -133,11 +138,11 @@ function *CurrentOrders() {
                       ({ fetchOrders[key].length })
                     </h2>
                         <AddOrderModal delivered={ key } index={ index } />
-                        <RemoveModal delivered={ key } index={ index } />
+                        <RemoveOrdersModal delivered={ key } index={ index } />
                       { ( new Date(key).toString() !== 'Invalid Date' ) && 
                         <a
                           name={ key.replace(/ /g, '-') + '-key' }
-                          class={ `no-underline green ${ (index !== 0) ? 'dn' : 'dib'}` }
+                          class="no-underline green dib"
                           href={ `/api/orders-download/${ new Date(key).getTime() }` }
                           title="Download as xlsx">
                           <DownloadIcon />

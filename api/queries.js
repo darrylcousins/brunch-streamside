@@ -18,7 +18,8 @@ const {
   insertOrder,
   mongoUpdate,
   mongoRemove,
-  mongoInsert
+  mongoInsert,
+  updateOrderTag
 } = require('./order-lib');
 
 const sortObjectByKeys = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
@@ -63,6 +64,23 @@ exports.editOrder = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
   try {
     const result = await mongoUpdate(req.app.locals.orderCollection, req.body);
+    if (req.body.source === 'Shopify') {
+      _logger.info(`Updating order tag for ${req.body.delivered}`);
+      // TODO actually not good enough
+      // 1. will add new tag and not replace tag
+      // 2. not checking for actual change in value
+      updateOrderTag(req.body._id.toString(), req.body.delivered);
+    }
+    res.status(200).json(JSON.stringify(result));
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.removeOrder = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+  try {
+    const result = await mongoRemove(req.app.locals.orderCollection, req.body);
     res.status(200).json(JSON.stringify(result));
   } catch(e) {
     res.status(400).json({ error: e.toString() });
@@ -115,6 +133,7 @@ exports.addTodo = async function (req, res, next) {
 
 exports.editTodo = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
+
   try {
     const result = await mongoUpdate(req.app.locals.todoCollection, req.body);
     res.status(200).json(JSON.stringify(result));
@@ -136,15 +155,19 @@ exports.removeTodo = async function (req, res, next) {
 exports.getCurrentBoxes = async function (req, res, next) {
   const collection = req.app.locals.boxCollection;
   const response = Object();
+  const now = new Date();
   try {
-    collection.find({ delivered: { $gte: new Date() }}).toArray((err, result) => {
+    collection.find().toArray((err, result) => {
       if (err) throw err;
       result.forEach(el => {
-        const delivery = el.delivered.toDateString();
-        if (!response.hasOwnProperty(delivery)) {
-          response[delivery] = Array();
+        const d = new Date(Date.parse(el.delivered));
+        if (d >= now) {
+          const delivery = el.delivered;
+          if (!response.hasOwnProperty(delivery)) {
+            response[delivery] = Array();
+          };
+          response[delivery].push(el);
         };
-        response[delivery].push(el);
       });
       res.set('Content-Type', 'application/json');
       res.write(JSON.stringify(response));
@@ -155,16 +178,67 @@ exports.getCurrentBoxes = async function (req, res, next) {
   };
 };
 
+exports.getCurrentBoxDates = async function (req, res, next) {
+  const collection = req.app.locals.boxCollection;
+  const response = Array();
+  const now = new Date();
+  try {
+    collection.distinct('delivered', (err, result) => {
+      if (err) throw err;
+      result.forEach(el => {
+        const d = new Date(Date.parse(el));
+        if (d >= now) response.push(d);
+      });
+      response.sort((d1, d2) => {
+        if (d1 < d2) return -1;
+        if (d1 > d2) return 1;
+        return 0;
+      });
+      res.status(200).json(response.map(el => el.toDateString()));
+    });
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+const conformSKU = (str) => {
+  // mixed up titles with Big Veg on Shopify and Big Vege elsewhere
+  if (str.startsWith('Big')) return 'Big Vege';
+  return str;
+};
+
 exports.getCurrentOrders = async function (req, res, next) {
   const collection = req.app.locals.orderCollection;
   const response = Object();
   const finalOrders = Object();
   const pickingLists = Object();
+  const boxCounts = Object();
+  const boxes = Object();  // later need to read directly from boxes
   try {
     collection.find().toArray((err, result) => {
       if (err) throw err;
       result.forEach(el => {
         const delivery = el.delivered;
+        const box = conformSKU(el.sku);
+
+        if (!boxCounts.hasOwnProperty(delivery)) {
+          boxCounts[delivery] = Object();
+        };
+        if (!boxCounts[delivery].hasOwnProperty(box)) {
+          boxCounts[delivery][box] = Object();
+          boxCounts[delivery][box]['count'] = 1;
+        } else {
+          boxCounts[delivery][box]['count'] += 1;
+        };
+
+        if (el.source === 'Shopify') {
+          // should always be set by now???
+          boxCounts[delivery][box]['including'] = el.including;
+          if (!boxes.hasOwnProperty(box)) {
+            boxes[box] = el.including;
+          }
+        };
+
         if (!finalOrders.hasOwnProperty(delivery)) {
           finalOrders[delivery] = Array();
         };
@@ -175,15 +249,19 @@ exports.getCurrentOrders = async function (req, res, next) {
           };
           el.addons.forEach(product => {
             let { str, count } = matchNumberedString(product);
-            if (count == 0) count = 1;
+            if (count === 0) count = 1;
+
             if (!pickingLists[delivery].hasOwnProperty(str)) {
               pickingLists[delivery][str] = count;
             } else {
               pickingLists[delivery][str] += count;
             };
+
           });
         };
       });
+      response.boxes = boxes;
+      response.boxCounts = boxCounts;
       response.pickingList = pickingLists;
       response.orders = finalOrders;
       response.headers = headersPartial;
@@ -205,21 +283,23 @@ exports.importOrders = async function (req, res, next) {
   };
   if (req.files.hasOwnProperty('orders')) {
     const orders = req.files.orders;
+    const delivered = req.body.delivered; // uploading to this date only
     const collection = req.app.locals.orderCollection;
     if (orders.mimetype !== 'text/csv' && orders.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
       return res.status(400).json({ error: 'Could not parse data. Uploaded file is of wrong mimetype.' });
     };
     let result = true;
-    console.log(orders.mimetype);
+    _logger.info(`Uploading order for ${delivered} using ${orders.mimetype}`);
     if (orders.mimetype === 'text/csv') {
-      result = orderImportCSV(orders.data, collection);
+      result = orderImportCSV(orders.data, delivered, collection);
     } else {
-      result = orderImportXLSX(orders.data, collection);
+      result = orderImportXLSX(orders.data, delivered, collection);
     };
     if (result) {
       return res.json(({
         mimetype: orders.mimetype,
         count: result.count ? result.count : true,
+        delivered,
         success: 'Got file' }));
     } else {
       return res.status(400).json({ error: 'Import failed.' });
@@ -292,6 +372,52 @@ exports.downloadOrders = async function (req, res, next) {
     return; // do we need this??
   };
 
+};
+
+exports.getPackingList = async function (req, res, next) {
+  const deliveryDay = getNZDeliveryDay(req.params.timestamp);
+  _logger.info(deliveryDay);
+  let response = Object();
+
+  let collection = req.app.locals.boxCollection;
+
+  const stuff = await req.app.locals.boxCollection.find({ delivered: deliveryDay}).toArray();
+  const boxes = stuff.map(el => ({box: el.shopify_sku, including: el.includedProducts}));
+
+  const final = boxes.map(async el => {
+    const regex = new RegExp(`^${el.box}`)
+    const orders = await req.app.locals.orderCollection.find({
+      sku: { $regex: regex },
+      delivered: deliveryDay
+    }).toArray();
+    el.order_length = orders.length;
+    el.extras = Object();
+    orders.forEach(order => {
+      if (order.addons.length) {
+        order.addons.forEach(product => {
+          let { str, count } = matchNumberedString(product);
+          if (count == 0) count = 1;
+          if (!el.extras.hasOwnProperty(str)) {
+            el.extras[str] = count;
+          } else {
+            el.extras[str] += count;
+          };
+        });
+      };
+    });
+    return el;
+  });
+
+  const getData = async (map) => {
+    return Promise.all(map);
+  }
+
+  getData(final).then(data => {
+    console.log(data);
+    res.status(200).json(data);
+  });
+
+  return;
 };
 
 exports.downloadPickingList = async function (req, res, next) {

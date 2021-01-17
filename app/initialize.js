@@ -7,11 +7,13 @@ import Home from 'components/home';
 import Orders from 'components/orders';
 import Boxes from 'components/boxes';
 import Todos from 'components/todos';
+import PackingLists from 'components/packing-lists';
 
 const index = crossroads.addRoute('/', () =>  renderer.render(<Home />, document.querySelector('#app')));
 const boxes = crossroads.addRoute('/boxes', () =>  renderer.render(<Boxes />, document.querySelector('#app')));
 const orders = crossroads.addRoute('/orders', () =>  renderer.render(<Orders />, document.querySelector('#app')));
 const todos = crossroads.addRoute('/todos', () =>  renderer.render(<Todos />, document.querySelector('#app')));
+const packingLists = crossroads.addRoute('/packing-lists', () =>  renderer.render(<PackingLists />, document.querySelector('#app')));
 
 document.addEventListener('DOMContentLoaded', () => {
 

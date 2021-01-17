@@ -18,7 +18,8 @@ function FormModalWrapper(Component, options) {
       ShowLink,
       color,
       saveMsg,
-      successMsg
+      successMsg,
+      index
     } = options;
     let name = title.toLowerCase().replace(/ /g, '-');
 
@@ -35,18 +36,41 @@ function FormModalWrapper(Component, options) {
 
     const showModal = () => {
       visible = !visible;
-      console.log('was called', visible);
       this.refresh();
     };
 
-    const saveData = (data) => {
+    const saveData = (json) => {
       loading = true;
       saving = true;
       this.refresh();
 
-      console.log(JSON.stringify(data, null, 2));
-      return;
-      PostFetch({ src, data })
+      let hasFile = false;
+      let data;
+      let headers = { 'Content-Type': 'application/json' };
+
+      // check to find if we have a file upload
+      for (const [key, value] of Object.entries(json)) {
+        if (typeof value.name === 'string') {
+          hasFile = true;
+          break;
+        }
+      }
+      // we have a file so need to use FormData and not json encode data
+      // see PostFetch
+      if (hasFile) {
+        data = new FormData();
+        for (const [key, value] of Object.entries(json)) {
+          data.set(key, value);
+        }
+        headers = false;
+      } else {
+        // no file - use json encoding
+        data = json;
+      }
+
+      console.log(headers, data);
+
+      PostFetch({ src, data, headers })
         .then(result => {
           const { error, json } = result;
           if (error !== null) {
@@ -56,7 +80,7 @@ function FormModalWrapper(Component, options) {
             saving = false;
             this.refresh();
           } else {
-            console.log(JSON.stringify(JSON.parse(json), null, 2))
+            console.log(JSON.stringify(json));
             loading = false;
             saving = false;
             success = true;
@@ -85,7 +109,14 @@ function FormModalWrapper(Component, options) {
       let data = {};
       Array.from(form.elements).forEach(el => {
         if (el.tagName !== 'FIELDSET') {
-          let value = el.type === 'checkbox' ? el.checked : el.value;
+          let value;
+          if (el.type === 'checkbox') {
+            value = el.checked;
+          } else if (el.type === 'file') {
+            value = el.files[0];
+          } else {
+            value = el.value;
+          }
           if (el.getAttribute('datatype') === 'integer') {
             value = parseInt(value);
           }

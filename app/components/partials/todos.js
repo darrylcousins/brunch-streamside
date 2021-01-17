@@ -58,13 +58,13 @@ function *CurrentTodos() {
                         <div class="dtc tr">
                           <h2 class="f5 mv0"><small class="fw3 ttu tracked fg-streamside-orange">{ todo.author }</small></h2>
                           <h2 class="f5 mv0"><small class="fw3 ttu tracked fg-streamside-maroon">{ todo.created }</small></h2>
-                          <h2 class="f5 mv0"><small class="fw3 ttu tracked fg-streamside-blue">
-                              { todo.tags.split(',').map((el) => (
-                                <Fragment>
-                                  <span>{ el }</span><br />
-                                </Fragment>
-                              ))}
-                          </small></h2>
+                          <h2 class="f5 mv0">
+                            <small class="fw3 ttu tracked fg-streamside-blue">
+                              { (todo.tags.length === 0) ? '' : (
+                                todo.tags.map(el => <span class="db">{ el }</span>)
+                              ) }
+                            </small>
+                          </h2>
                           <EditTodoModal todo={ todo } />
                           <RemoveTodoModal todo={ todo } />
                         </div>
@@ -87,4 +87,16 @@ function *CurrentTodos() {
   };
 };
 
+/*
+                              { todo.tags.split(',').map((el) => (
+                                <Fragment>
+                                  <span>{ el }</span><br />
+                                </Fragment>
+                              ))}
+        <div>
+          { (todo.tags.length === 0) ? <span class="gray db pv1">None</span> : (
+            todo.tags.map(el => <span class="gray db pv1">{ el }</span>)
+          ) }
+        </div>
+        */
 module.exports = CurrentTodos;

@@ -4,7 +4,8 @@ require('isomorphic-fetch');
 const MongoClient = require('mongodb').MongoClient;
 const uri = 'mongodb://localhost';
 const mongoClient = new MongoClient(uri, { useUnifiedTopology: true });
-const xlsx = require('json-as-xlsx')
+const xlsx = require('json-as-xlsx');
+const Excel = require('exceljs');
 const syncBoxes = require('./sync-boxes');
 const {
   matchNumberedString,
@@ -21,6 +22,12 @@ const {
   mongoInsert,
   updateOrderTag
 } = require('./order-lib');
+const {
+  getPickingList,
+  getBoxPromises,
+  isFruit,
+  isBread
+} = require('./lib');
 
 const sortObjectByKeys = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
 
@@ -43,7 +50,7 @@ exports.getOrderSources = async function (req, res, next) {
   try {
     collection.distinct('source', query, (err, result) => {
       if (err) throw err;
-      res.status(200).json(JSON.stringify(result));
+      res.status(200).json(result);
     });
   } catch(e) {
     res.status(400).json({ error: e.toString() });
@@ -54,7 +61,7 @@ exports.addOrder = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
   try {
     const result = await mongoInsert(req.app.locals.orderCollection, req.body);
-    res.status(200).json(JSON.stringify(result));
+    res.status(200).json(result);
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
@@ -62,6 +69,7 @@ exports.addOrder = async function (req, res, next) {
 
 exports.editOrder = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
+  // are we updating the date?
   try {
     const result = await mongoUpdate(req.app.locals.orderCollection, req.body);
     if (req.body.source === 'Shopify') {
@@ -71,7 +79,7 @@ exports.editOrder = async function (req, res, next) {
       // 2. not checking for actual change in value
       updateOrderTag(req.body._id.toString(), req.body.delivered);
     }
-    res.status(200).json(JSON.stringify(result));
+    res.status(200).json(result);
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
@@ -81,14 +89,14 @@ exports.removeOrder = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
   try {
     const result = await mongoRemove(req.app.locals.orderCollection, req.body);
-    res.status(200).json(JSON.stringify(result));
+    res.status(200).json(result);
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
 };
 
 exports.getOrderFields = async function (req, res, next) {
-  res.status(200).json(JSON.stringify(orderFields));
+  res.status(200).json(orderFields);
 };
 
 exports.deleteOrders = async function (req, res, next) {
@@ -100,7 +108,7 @@ exports.deleteOrders = async function (req, res, next) {
     collection.deleteMany(query, (err, result) => {
       if (err) throw err;
       _logger.info(result.result.n, 'objects deleted');
-      res.status(200).json(JSON.stringify({ count: result.result.n }));
+      res.status(200).json({ count: result.result.n });
     });
   } catch(e) {
     _logger.warn(e.toString());
@@ -111,8 +119,23 @@ exports.deleteOrders = async function (req, res, next) {
 exports.getCurrentTodos = async function (req, res, next) {
   const collection = req.app.locals.todoCollection;
   const response = Object();
+  let query = {};
+
+  // build query
+  if (Array.isArray(req.query.completed)) {
+    query.completed = { $in: req.query.completed.map(el => Boolean(parseInt(el))) };
+  } else {
+    query.completed = Boolean(parseInt(req.query.completed));
+  };
+  if (req.query.author) {
+    query.author = Array.isArray(req.query.author) ? { $in: req.query.author } : req.query.author;
+  };
+  if (req.query.tags) {
+    query.tags = Array.isArray(req.query.tags) ? { $all: req.query.tags } : { $all: [req.query.tags] };
+  };
+
   try {
-    collection.find().toArray((err, result) => {
+    collection.find(query).toArray((err, result) => {
       if (err) throw err;
       res.json(result);
     });
@@ -125,7 +148,7 @@ exports.addTodo = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
   try {
     const result = await mongoInsert(req.app.locals.todoCollection, req.body);
-    res.status(200).json(JSON.stringify(result));
+    res.status(200).json(result);
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
@@ -136,7 +159,7 @@ exports.editTodo = async function (req, res, next) {
 
   try {
     const result = await mongoUpdate(req.app.locals.todoCollection, req.body);
-    res.status(200).json(JSON.stringify(result));
+    res.status(200).json(result);
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
@@ -146,7 +169,7 @@ exports.removeTodo = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
   try {
     const result = await mongoRemove(req.app.locals.todoCollection, req.body);
-    res.status(200).json(JSON.stringify(result));
+    res.status(200).json(result);
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
@@ -156,6 +179,11 @@ exports.getCurrentBoxes = async function (req, res, next) {
   const collection = req.app.locals.boxCollection;
   const response = Object();
   const now = new Date();
+
+  // consider defining fields to avoid the inner product documents
+  //https://docs.mongodb.com/drivers/node/fundamentals/crud/read-operations/project
+  //
+  // filter by dates later than now
   try {
     collection.find().toArray((err, result) => {
       if (err) throw err;
@@ -169,10 +197,26 @@ exports.getCurrentBoxes = async function (req, res, next) {
           response[delivery].push(el);
         };
       });
-      res.set('Content-Type', 'application/json');
-      res.write(JSON.stringify(response));
-      res.end();
+      res.status(200).json(response);
     });
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.getCurrentBoxTitles = async function (req, res, next) {
+  // get current box titles by selected date
+  const collection = req.app.locals.boxCollection;
+  const response = Array();
+  const now = new Date();
+  const deliveryDay = getNZDeliveryDay(req.params.timestamp);
+  try {
+    collection.find({ delivered: deliveryDay })
+      .sort({shopify_sku: 1})
+      .toArray((err, result) => {
+        if (err) throw err;
+        res.status(200).json(result.map(el => el.shopify_sku));
+      });
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
@@ -211,11 +255,10 @@ exports.getCurrentOrders = async function (req, res, next) {
   const collection = req.app.locals.orderCollection;
   const response = Object();
   const finalOrders = Object();
-  const pickingLists = Object();
   const boxCounts = Object();
   const boxes = Object();  // later need to read directly from boxes
   try {
-    collection.find().toArray((err, result) => {
+    collection.find().sort({delivered: -1}).toArray((err, result) => {
       if (err) throw err;
       result.forEach(el => {
         const delivery = el.delivered;
@@ -243,26 +286,10 @@ exports.getCurrentOrders = async function (req, res, next) {
           finalOrders[delivery] = Array();
         };
         finalOrders[delivery].push(el);
-        if (!delivery.startsWith('No')) {
-          if (!pickingLists.hasOwnProperty(delivery)) {
-            pickingLists[delivery] = Object();
-          };
-          el.addons.forEach(product => {
-            let { str, count } = matchNumberedString(product);
-            if (count === 0) count = 1;
-
-            if (!pickingLists[delivery].hasOwnProperty(str)) {
-              pickingLists[delivery][str] = count;
-            } else {
-              pickingLists[delivery][str] += count;
-            };
-
-          });
-        };
       });
       response.boxes = boxes;
       response.boxCounts = boxCounts;
-      response.pickingList = pickingLists;
+      //response.pickingList = pickingLists;
       response.orders = finalOrders;
       response.headers = headersPartial;
       res.set('Content-Type', 'application/json');
@@ -358,9 +385,9 @@ exports.downloadOrders = async function (req, res, next) {
 
         var buffer = xlsx(columns, content, settings, false)
         res.writeHead(200, {
-              'Content-Type': 'application/octet-stream',
-              'Content-disposition': `attachment; filename=${settings.fileName}.xlsx`
-            })
+          'Content-Type': 'application/octet-stream',
+          'Content-disposition': `attachment; filename=packing-list-${deliveryDay.replace(/ /g, '-')}.xlsx`
+        })
         res.end(buffer)
       } catch(e) {
         res.status(400).json({ error: e.toString() });
@@ -376,106 +403,297 @@ exports.downloadOrders = async function (req, res, next) {
 
 exports.getPackingList = async function (req, res, next) {
   const deliveryDay = getNZDeliveryDay(req.params.timestamp);
-  _logger.info(deliveryDay);
-  let response = Object();
 
-  let collection = req.app.locals.boxCollection;
-
-  const stuff = await req.app.locals.boxCollection.find({ delivered: deliveryDay}).toArray();
-  const boxes = stuff.map(el => ({box: el.shopify_sku, including: el.includedProducts}));
-
-  const final = boxes.map(async el => {
-    const regex = new RegExp(`^${el.box}`)
-    const orders = await req.app.locals.orderCollection.find({
-      sku: { $regex: regex },
-      delivered: deliveryDay
-    }).toArray();
-    el.order_length = orders.length;
-    el.extras = Object();
-    orders.forEach(order => {
-      if (order.addons.length) {
-        order.addons.forEach(product => {
-          let { str, count } = matchNumberedString(product);
-          if (count == 0) count = 1;
-          if (!el.extras.hasOwnProperty(str)) {
-            el.extras[str] = count;
-          } else {
-            el.extras[str] += count;
-          };
-        });
-      };
-    });
-    return el;
-  });
+  const fullBoxes = await req.app.locals.boxCollection.find({ delivered: deliveryDay}).toArray();
+  // slim down array to the essentials i.e. just the title and included products
+  const boxes = fullBoxes.map(el => ({box: el.shopify_sku, including: el.includedProducts}));
+  const final = getBoxPromises(boxes, deliveryDay, req.app.locals.orderCollection);
 
   const getData = async (map) => {
     return Promise.all(map);
   }
 
   getData(final).then(data => {
-    console.log(data);
-    res.status(200).json(data);
+    /* finally we add in totals for for the picking list
+     * we need the boxes so that the standard items are included
+     * NB the excluded products are not accounted for
+     * NOTE
+     * data object has: 
+     * box: sku + the count
+     * including: the string array of included products (picking list is product * count)
+     * extras: the object array of product name: pick count
+     */
+    const response = Object();
+    data = data.filter(el => el.order_count !== 0);
+    data = data.map(el => {
+      el.box += ` (${el.order_count})`;
+      return el;
+    });
+    response.total_boxes = data.map(el => el.order_count).reduce(function(a, b){
+     return a + b;
+    }, 0);
+
+    response.boxes = data;
+    response.picking = getPickingList(data);
+    res.status(200).json(response);
   });
 
   return;
 };
 
-exports.downloadPickingList = async function (req, res, next) {
+exports.downloadPackingList= async function (req, res, next) {
   const deliveryDay = getNZDeliveryDay(req.params.timestamp);
-  const collection = req.app.locals.orderCollection;
-  try {
-    collection.find({ delivered: { $in: [deliveryDay, NODELIVER_STRING]}}).toArray((err, result) => {
-      if (err) throw err;
+  const fullBoxes = await req.app.locals.boxCollection.find({ delivered: deliveryDay}).toArray();
+  // slim down array to the essentials i.e. just the title and included products
+  const boxes = fullBoxes.map(el => ({box: el.shopify_sku, including: el.includedProducts}));
+  const final = getBoxPromises(boxes, deliveryDay, req.app.locals.orderCollection);
 
-      try {
-        var settings = {
-          sheetName: 'Picking List', // The name of the sheet
-          fileName: `picking-list-${ deliveryDay.replace(' ', '-') }`, // The name of the spreadsheet
-          extraLength: 3, // A bigger number means that columns should be wider
-          writeOptions: {} // Style options from https://github.com/SheetJS/sheetjs#writing-options
-        };
+  const getData = async (map) => {
+    return Promise.all(map);
+  }
 
-        var download = true // If true will download the xlsx file, otherwise will return a buffer
+  getData(final).then(data => {
+    data.sort((a, b) => (a.box < b.box) ? 1 : -1);
 
-        var columns = [
-          { label: 'Item', value: 'item' }, // Top level data
-          { label: 'Quantity', value: 'qty' }, // More configuration available
-          // see https://github.com/LuisEnMarroquin/json-as-xlsx
-        ];
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet('Packing');
 
-        var content = Array();
-        let pickingList = Object();
-        result.forEach(row => {
-          row.addons.forEach(product => {
-            let { str, count } = matchNumberedString(product);
-            if (count == 0) count = 1;
-            if (!pickingList.hasOwnProperty(str)) {
-              pickingList[str] = count;
-            } else {
-              pickingList[str] += count;
-            };
-          });
-        });
-        pickingList = sortObjectByKeys(pickingList);
-        for (const [key, value] of Object.entries(pickingList)) {
-          content.push(
-            { 'item': key, 'qty': value }
-          );
-        };
-
-        var buffer = xlsx(columns, content, settings, false)
-        res.writeHead(200, {
-              'Content-Type': 'application/octet-stream',
-              'Content-disposition': `attachment; filename=${settings.fileName}.xlsx`
-            })
-        res.end(buffer)
-      } catch(e) {
-        res.status(400).json({ error: e.toString() });
-        return;
+    const rows = Array();
+    const columns = Array();
+    // make array of arrays
+    const products = Object();
+    let customBoxCount;
+    const rowkeys = Array();
+    
+    data.forEach(el => {
+      if (!el.box.startsWith('Custom')) {
+        const key = el.box.toLowerCase().replace(/ /g, '-');
+        products[key] = el.including.map(name => name.replace(/^- /, ''));
+        const emptykey = el.box.toLowerCase().replace(/ /g, '-') + '-empty';
+        columns.push(
+          { header: el.box, key: key, width: 40 }
+        );
+        rowkeys.push(key);
+        columns.push(
+          { header: el.order_count, key: emptykey, width: 4 }
+        );
+        rowkeys.push(emptykey);
+      } else {
+        customBoxCount = el.order_count;
       };
     });
-  } catch(e) {
-    res.status(400).json({ error: e.toString() });
-    return; // do we need this??
-  };
+
+    // find elements common to all and store in 'common'
+    const arraySet = Object.values(products);
+    arraySet.sort((a, b) => (a.length > b.length) ? 1 : -1);
+    const smallest = arraySet[0];
+    let common = arraySet[0];
+    const therest = arraySet.slice(1);
+    therest.forEach(arr => {
+      const intersect = arr.filter(x => smallest.includes(x));
+      common = common.filter(x => intersect.includes(x));
+    });
+    common.sort();
+
+    Object.keys(products).forEach(key => {
+      // add common to the rows
+      // split out bread and apples
+      const fruit = products[key].filter(el => isFruit(el));
+      const bread = products[key].filter(el => isBread(el));
+      const test = [...common, ...fruit, ...bread];
+      const vege = products[key]
+        .filter(item => !test.includes(item)).sort();
+      // in a new array, put common first then sort the rest with empty lines between fruit and bread
+      const newSet = [...common, ...vege, false, ...fruit, false, ...bread];
+      newSet.forEach((el, index) => {
+        if (!(index in rows)) {
+          rows[index] = Object();
+        };
+        if (el) {
+          rows[index][key] = el;
+        };
+      });
+    });
+
+    // some meta info
+    rows.push({
+      [rowkeys[0]]: `Custom Boxes: ${customBoxCount}`
+      })
+    const total_boxes = data.map(el => el.order_count).reduce(function(a, b){
+     return a + b;
+    }, 0);
+    rows.push({
+      [rowkeys[0]]: `Total Boxes: ${total_boxes}`
+      })
+    worksheet.columns = columns;
+
+    // finally the bread list
+    const pickingList = getPickingList(data);
+
+    const breadPicking = Object.keys(pickingList)
+      .filter(el => isBread(el))
+      .reduce((obj, key) => {
+        obj[key] = pickingList[key];
+        return obj;
+      }, {});
+
+    const holdCount = rows.length;
+
+    rows.push(null);
+    Object.keys(breadPicking).forEach(el => {
+      rows.push({
+        [rowkeys[0]]: el,
+        [rowkeys[1]]: breadPicking[el].total
+        })
+    })
+
+    rows.forEach(el => {
+      const row = worksheet.addRow({...el});
+      row.font = { name: 'Arial' };
+    });
+
+    worksheet.getRow(1).font = {bold: true, name: 'Arial'};
+    worksheet.getRow(holdCount).font = {bold: true, name: 'Arial'};
+    worksheet.getRow(holdCount + 1).font = {bold: true, name: 'Arial'};
+
+    // align center
+    for (let i=1; i<=worksheet.actualColumnCount-2; i++) {
+      if (i%2 === 0) worksheet.getColumn(i).alignment = {horizontal: 'center'}
+    }
+
+    const insideColumns = Array();
+    for (var i = 2; i < rowkeys.length; i++) {
+          insideColumns.push(String.fromCharCode(i + 64));
+    }
+    const lastColumn = String.fromCharCode(rowkeys.length + 64);
+
+    // loop through all of the rows and set the outline style.
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber < holdCount -1) {
+        worksheet.getCell(`A${rowNumber}`).border = {
+          top: {style: 'thin'},
+          left: {style: 'thin'},
+          bottom: {style: 'thin'},
+          right: {style: 'none'}
+        };
+
+        insideColumns.forEach((v) => {
+          worksheet.getCell(`${v}${rowNumber}`).border = {
+            top: {style: 'thin'},
+            bottom: {style: 'thin'},
+            left: {style: 'thin'},
+            right: {style: 'none'}
+          }
+        });
+
+        worksheet.getCell(`${lastColumn}${rowNumber}`).border = {
+          top: {style: 'thin'},
+          left: {style: 'thin'},
+          bottom: {style: 'thin'},
+          right: {style: 'thin'}
+        };
+      }
+    });
+
+    res.writeHead(200, {
+      'Content-Type': 'application/octet-stream',
+      'Content-disposition': `attachment; filename=packing-list-${deliveryDay.replace(/ /g, '-')}.xlsx`
+    })
+    workbook.xlsx.write(res).then(function(){
+      res.end();
+    });
+  });
 };
+
+exports.downloadPickingList = async function (req, res, next) {
+
+  const deliveryDay = getNZDeliveryDay(req.params.timestamp);
+  const fullBoxes = await req.app.locals.boxCollection.find({ delivered: deliveryDay}).toArray();
+  // slim down array to the essentials i.e. just the title and included products
+  const boxes = fullBoxes.map(el => ({box: el.shopify_sku, including: el.includedProducts}));
+  const final = getBoxPromises(boxes, deliveryDay, req.app.locals.orderCollection);
+
+  const getData = async (map) => {
+    return Promise.all(map);
+  }
+
+  getData(final).then(data => {
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet('Packing');
+
+    data = data.filter(el => el.order_count !== 0);
+    const pickingList = getPickingList(data);
+
+    worksheet.columns = [
+      { header: 'Item', key: 'item', width: 44 },
+      { header: 'Standard', key: 'standard', width: 8 },
+      { header: 'Extras', key: 'extras', width: 8 },
+      { header: 'Total', key: 'total', width: 8 },
+    ];
+
+    const productKeys = Object.keys(pickingList);
+    const fruit = productKeys.filter(el => isFruit(el)).sort();
+    const bread = productKeys.filter(el => isBread(el)).sort();
+    const vege = productKeys
+      .filter(item => ![...fruit, ...bread].includes(item)).sort();
+
+    const pushRow = (key) => {
+      const row = worksheet.addRow(
+        {
+          'item': key,
+          'standard': pickingList[key].standard,
+          'extras': pickingList[key].extras,
+          'total': pickingList[key].total
+        }
+      );
+      [1, 2, 3].forEach(num => row.getCell(num).font = { name: 'Arial' });
+      row.getCell(4).font = { bold: true, name: 'Arial' };
+    }
+    bread.forEach(key => pushRow(key));
+    worksheet.addRow(null);
+    fruit.forEach(key => pushRow(key));
+    worksheet.addRow(null);
+    vege.forEach(key => pushRow(key));
+
+    worksheet.getRow(1).font = {bold: true, name: 'Arial'};
+
+    // align center
+    for (let i=2; i<=worksheet.actualColumnCount; i++) {
+      worksheet.getColumn(i).alignment = {horizontal: 'center'}
+    }
+
+    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      worksheet.getCell(`A${rowNumber}`).border = {
+        top: {style: 'thin'},
+        left: {style: 'thin'},
+        bottom: {style: 'thin'},
+        right: {style: 'none'}
+      };
+
+      ['B', 'C'].forEach((v) => {
+        worksheet.getCell(`${v}${rowNumber}`).border = {
+          top: {style: 'thin'},
+          bottom: {style: 'thin'},
+          left: {style: 'thin'},
+          right: {style: 'none'}
+        }
+      });
+
+      worksheet.getCell(`D${rowNumber}`).border = {
+        top: {style: 'thin'},
+        left: {style: 'thin'},
+        bottom: {style: 'thin'},
+        right: {style: 'thin'}
+      };
+    });
+
+    res.writeHead(200, {
+          'Content-Type': 'application/octet-stream',
+          'Content-disposition': `attachment; filename=picking-list-${deliveryDay.replace(/ /g, '-')}.xlsx`
+        })
+    workbook.xlsx.write(res).then(function(){
+      res.end();
+    });
+  });
+};
+

@@ -1,6 +1,6 @@
 'use strict';
 
-const { processOrderJson, insertOrder, updateOrderTag } = require('../api/order-lib');
+const { mongoUpdate, processOrderJson, insertOrder, updateOrderTag } = require('../api/order-lib');
 
 // method to add orders to local mongodb
 exports.orderCreated = async function (req, res, next) {
@@ -20,6 +20,41 @@ exports.orderCreated = async function (req, res, next) {
 
   //console.log(JSON.stringify(order, null, 2));
   _logger.info(`Webhook received and order updated: \n${ JSON.stringify(order, null, 2) }`);
+
+};
+
+// method to update orders to local mongodb
+exports.orderUpdated = async function (req, res, next) {
+  // primary pupose to update delivery date if tag has been changed
+
+  // send receipt notification to avoid timeouts and errors
+  res.status(200).json({ success: 'order create webhook received' });
+
+  const collection = req.app.locals.orderCollection;
+
+  _logger.info(`Webhook received updating delivered date from tag: \n${ req.body.id }\n${ req.body.tags }\n${ req.body.name }`);
+
+  // Updating 
+  try {
+    req.body.tags.split(',').forEach(tag => {
+      const parsed = Date.parse(tag.trim());
+      if (Boolean(parsed)) {
+        const date = new Date(parsed);
+        const data = {
+          _id: req.body.id,
+          delivered: date.toDateString()
+        }
+        mongoUpdate(collection, data);
+      } else {
+        _logger.info(tag, 'is not a date string');
+      }
+    })
+  } catch(err) {
+    _logger.info(`Webhook error on update: \n${ req.body.name }\n${ req.body.tags }`);
+  }
+
+  //console.log(JSON.stringify(order, null, 2));
+  //_logger.info(`Webhook received and order updated: \n${ JSON.stringify(req.body, null, 2) }`);
 
 };
 

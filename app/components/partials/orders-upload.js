@@ -83,10 +83,12 @@ function *UploadOrdersModal(props) {
         />
         <div class="w-90 center ph1">
           <Button
+            type="primary"
             onclick={ doSave }>
             Upload
           </Button>
           <Button
+            type="secondary"
             onclick={ closeModal }>
             Cancel
           </Button>

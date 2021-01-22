@@ -2,16 +2,6 @@
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import FieldWrapper from './field-wrapper';
 
-/*
-        value={ value }
-        name={ id }
-        label={ label }
-        id={ id }
-        size={ size }
-        required={ required }
-        valid={ valid }
-        datetype={ datatype }
-  */
 const Checkbox = (props) => {
   const { label, valid, size, id, value, datatype } = props;
   return (

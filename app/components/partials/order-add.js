@@ -6,6 +6,11 @@ import { AddIcon } from '../lib/icon';
 import FormModalWrapper from '../wrappers/form-modal';
 import UpsertOrderModal from './order-upsert';
 
+/* TODO
+ * check date list in order-upsert to collect from upcoming boxes - /api/current-box-dates
+ * make box a list to collect from available boxes for selected date - /api/current-boxes
+ */
+
 const ShowLink = (opts) => {
   const { name, title, color } = opts;
   return (

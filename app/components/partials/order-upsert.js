@@ -5,7 +5,6 @@ import Button from '../lib/button';
 import Form from '../form';
 
 function *UpsertOrderModal(props) {
-  // and this is all that we need to make a form modal
 
   let { doSave, closeModal, title, order, delivered, formId, index } = props;
 
@@ -18,9 +17,10 @@ function *UpsertOrderModal(props) {
   };
 
   const getUpcoming = () => {
+    // TODO change this to collect from upcoming boxes - /api/current-box-dates
     const dates = [4,6].map(el => findNextWeekday(el).toDateString());
     dates.unshift(delivered);
-    //console.log(dates);
+    console.log(dates);
     return dates;
   };
 
@@ -180,10 +180,12 @@ function *UpsertOrderModal(props) {
             id={formId}
           />
           <Button
+            type="primary"
             onclick={ doSave }>
             Save
           </Button>
           <Button
+            type="secondary"
             onclick={ closeModal }>
             Cancel
           </Button>

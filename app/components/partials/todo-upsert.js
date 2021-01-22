@@ -3,6 +3,7 @@ import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 
 import Button from '../lib/button';
 import Form from '../form';
+import fields from './todo-fields';
 
 function *UpsertTodoModal(props) {
   // and this is all that we need to make a form modal
@@ -11,58 +12,7 @@ function *UpsertTodoModal(props) {
 
   for (const _  of this) {
 
-    // form fields - required
-    const fields = {
-      '_id': {
-        type: 'hidden',
-        datatype: 'integer'
-      },
-      'Title': {
-        type: 'text',
-        size: 'third',
-        datatype: 'string',
-        required: true
-      },
-      'Author': {
-        type: 'select',
-        size: 'third',
-        required: true,
-        datatype: 'string',
-        datalist: [
-          'Lilly', 'Dominique', 'Darryl'
-        ]
-      },
-      'Tags': {
-        type: 'multiple',
-        size: 'third',
-        required: true,
-        datatype: 'array',
-        datalist: [
-          'Bug',
-          'Urgent',
-          'Enhancement',
-          'WontFix',
-          'NiceToHave',
-          'Orders',
-          'Boxes'
-        ]
-      },
-      'Note': {
-        type: 'textarea',
-        size: 'two-thirds',
-        datatype: 'string',
-        required: true
-      },
-      'Completed': {
-        type: 'checkbox',
-        datatype: 'string',
-        size: 'third'
-      },
-      'Created': {
-        datatype: 'string',
-        type: 'hidden'
-      }
-    };
+    // form fields - required - see import
 
     // datalists - optional for 'select' input elements
     // required - initialize form data
@@ -93,10 +43,12 @@ function *UpsertTodoModal(props) {
             id={formId}
           />
           <Button
+            type="primary"
             onclick={ doSave }>
             Save
           </Button>
           <Button
+            type="secondary"
             onclick={ closeModal }>
             Cancel
           </Button>

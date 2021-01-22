@@ -28,6 +28,7 @@ function FormModalWrapper(Component, options) {
     let success = false;
     let saving = false;
     let fetchError = null;
+    let formError = null;
 
     const closeModal = () => {
       visible = false;
@@ -129,9 +130,7 @@ function FormModalWrapper(Component, options) {
       return data;
     };
 
-    // these next two methods could be moved to FormModalWrapper
-    // but for the fact of access to 'getData'
-    // listen for affirmation of form validates
+    // custom event called by form if passes validation
     this.addEventListener(`${id}.valid`, ev => {
       console.log('Got return event after validation', ev.detail.valid); // should be true
       if (ev.detail.valid === true) {
@@ -145,6 +144,7 @@ function FormModalWrapper(Component, options) {
       const form = document.getElementById(id);
       // fire event listener for Form element - which fires the above
       try {
+        // custom event - tell form to run validation
         form.dispatchEvent(
           new CustomEvent(`${id}.validate`, {
             bubbles: true
@@ -152,6 +152,8 @@ function FormModalWrapper(Component, options) {
         );
       } catch(err) {
         console.log(err);
+        formError = err;
+        this.refresh();
       }
     };
 

@@ -20,10 +20,11 @@ routes.post('/remove-order', queries.removeOrder);
 routes.get('/order-fields', queries.getOrderFields);
 routes.post('/delete-orders', queries.deleteOrders);
 routes.post('/import-orders', queries.importOrders);
-routes.get('/picking-list/:timestamp', queries.downloadPickingList);
+routes.get('/picking-list-download/:timestamp', queries.downloadPickingList);
 routes.get('/orders-download/:timestamp', queries.downloadOrders);
 
 routes.get('/packing-list/:timestamp', queries.getPackingList);
+routes.get('/packing-list-download/:timestamp', queries.downloadPackingList);
 
 routes.get('/current-todos', queries.getCurrentTodos);
 routes.post('/add-todo', queries.addTodo);
@@ -32,6 +33,7 @@ routes.post('/remove-todo', queries.removeTodo);
 
 //routes.get('/boxes', queries.getBoxes);
 routes.get('/current-boxes', queries.getCurrentBoxes);
+routes.get('/current-box-titles/:timestamp', queries.getCurrentBoxTitles);
 routes.get('/current-box-dates', queries.getCurrentBoxDates);
 
 routes.get('/sync-boxes', syncBoxes);

@@ -39,7 +39,7 @@ function *OrdersRemoveModal({ delivered, index }) {
           loading = false;
           this.refresh();
         } else {
-          fetchSources = JSON.parse(json);
+          fetchSources = json;
           selected = fetchSources.map(s => s.toLowerCase().replace(/ /g, '-'));
           loading = false;
           this.refresh();
@@ -144,13 +144,8 @@ function *OrdersRemoveModal({ delivered, index }) {
             </p>
             <p class="lh-copy near-black tl">
               It would not be advised to delete any orders matching 'Shopify'
-              as they are automatically inserted when created on the store.
-              Later we wil have some sort of 'sync from store' functionlity.
-              See <a href="todo" class="link dim">todos</a>.
-            </p>
-            <p class="lh-copy near-black tl bb b--gray pb2">
-              As yet there is no option to remove individual orders prior to export.
-              See <a href="todo" class="link dim">todos</a>.
+              as they are automatically inserted when created on the store and
+              will be removed when fulfilled.
             </p>
             { loading && <BarLoader /> }
             { fetchSources.length > 0 && (
@@ -188,12 +183,14 @@ function *OrdersRemoveModal({ delivered, index }) {
                 ) : (
                   <Fragment>
                     <Button
+                      type="primary"
                       onclick={ doDelete }
                       style={ selected.length === 0 ? 'opacity: 0.3' : '' }
                       disabled={ selected.length === 0 }>
                       Remove Orders
                     </Button>
                     <Button
+                      type="secondary"
                       onclick={ closeModal }>
                       Cancel
                     </Button>

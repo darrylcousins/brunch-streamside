@@ -123,6 +123,14 @@ function *OrderModal({ row }) {
                 <span class="dn">Close add modal</span>
               </a>
               <OrderDetail order={ row } />
+              <div class="w-100 tr">
+                <Button
+                  type="secondary"
+                  title="Close window"
+                  onclick={ closeModal }>
+                  Close
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -204,67 +212,6 @@ const TableBody = ({orders}) => {
   )
 };
 
-const PickingTable = ({items}) => {
-  return (
-    <Fragment>
-      <h2 class="pt2 pt4-ns f5 f4-ns lh-title-ns fg-streamside-maroon">
-        Picking List{ Object.keys(items).length > 1 && <span>s</span> }
-      </h2>
-      <table cellspacing="0">
-        <tbody class="lh-copy pt3">
-          <tr>
-            { 
-              Object.keys(items).map((name, index) => (
-                <th class="normal f6 f5-ns bb b--black-20 tl pb1 pr3 bg-white fg-streamside-maroon">
-                  <div class="dib mr4-ns">
-                    <a
-                      class="no-underline dark-green dim"
-                      href={ `/api/picking-list/${ new Date(name).getTime() }` }
-                      title="Download as xlsx">
-                      <DownloadIcon />
-                      <span class="dn">Download</span>
-                    </a>
-                    <a
-                      class="no-underline dark-blue dim dn"
-                      href={ `/api/edit-picking-list/${ new Date(name).getTime() }` }
-                      title="Edit Picking List">
-                      <EditIcon />
-                      <span class="dn">Edit</span>
-                    </a>
-                  </div>
-                  { name }
-                </th>
-              ))
-            } 
-          </tr>
-          <tr>
-            { 
-              Object.keys(items).map((name, index) => (
-                <td class="pr3 bb b--black-20 v-top">
-                  <table>
-                    { 
-                      Object.keys(sortObjectByKeys(items[name])).map((key, index) => (
-                        <tr crank-key={index}>
-                          <td class="pr3">
-                            { key }
-                          </td>
-                          <td class="pr3">
-                            { items[name][key] }
-                          </td>
-                        </tr>
-                      ))
-                    }
-                  </table>
-                </td>
-              ))
-            }
-          </tr>
-        </tbody>
-      </table>
-    </Fragment>
-  )
-};
-
 function *HelpSection({ children}) {
   let visible = false;
 
@@ -317,7 +264,6 @@ module.exports = {
   HelpSection,
   Order,
   OrderDetail,
-  PickingTable,
   TableHeader,
   TableBody,
   sortObjectByKey,

@@ -17,7 +17,10 @@ function Field(props) {
   if (typeof id === 'undefined') {
     id = label.toLowerCase().replace(/ /g, '-');
   }
-  const value = data[id]; // can be expected as undefined
+  let value = data[id]; // can be expected as undefined
+  if (formElements.hasOwnProperty(id) && formElements[id].value !== 'undefined') {
+    value = formElements[id].value;
+  }
 
   let valid = true;
   if (formElements.hasOwnProperty(id)) {

@@ -22,8 +22,6 @@ function *FileField(props) {
     if (ev.target.tagName === 'INPUT' && ev.target.type === 'file') {
       selected = ev.target.files[0];
       error = false;
-
-
       /*
       if (!selected.name.endsWith('csv') && !selected.name.endsWith('xlsx')) {
         error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;

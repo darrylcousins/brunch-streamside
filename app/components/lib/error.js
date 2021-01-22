@@ -9,6 +9,12 @@ module.exports = ({ msg }) => {
         <p class="tc">{msg}</p>
       </div>
     );
+  } else if (typeof msg === 'object' || !msg.mmsg) {
+    return (
+      <div class="dark-red mv2 pt2 pl2 br3 ba b--dark-red bg-washed-red">
+        <p class="tc">{msg.toString()}</p>
+      </div>
+    );
   } else {
     return (
       <div class="dark-red mv2 pt2 pl2 br3 ba b--dark-red bg-washed-red">

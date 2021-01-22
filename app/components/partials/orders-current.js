@@ -8,7 +8,6 @@ import {
   HelpSection,
   Order,
   OrderDetail,
-  PickingTable,
   TableHeader,
   TableBody,
   sortObjectByKeys
@@ -29,7 +28,6 @@ function *CurrentOrders() {
   let fetchOrders = Object();
   let fetchError = null;
   let fetchHeaders = null;
-  let fetchPickingList = Object();
   let loading = true;
 
   Fetch(`/api/current-orders`)
@@ -41,10 +39,10 @@ function *CurrentOrders() {
         loading = false;
         this.refresh();
       } else {
-        const { headers, orders, pickingList } = json;
+        const { headers, orders } = json;
         fetchHeaders = headers;
-        fetchOrders = sortObjectByKeys(orders);
-        fetchPickingList = pickingList;
+        //fetchOrders = sortObjectByKeys(orders);
+        fetchOrders = orders;
         loading = false;
         this.refresh();
       };
@@ -108,10 +106,10 @@ function *CurrentOrders() {
               <HelpSection>
                 <p class="lh-copy o-70">
                   &#x26AA; Click on the date header to display orders for that delivery date.<br />
-                  &#x26AA; The <code>excel</code> symbol is a link to download the individual
+                  &#x26AA; The <code>download</code> symbol is a link to download the individual
                   <code> xlsx</code> files for each delivery date.<br />
                   <span class="pl3">(Orders which haven't recorded a delivery date will also be included.)</span><br />
-                  &#x26AA; Packing lists for <strong>extra</strong> items are also available for download below.
+                  &#x26AA; Packing lists for are also available for download from the link in the header menu.
                 </p>
               </HelpSection>
             </div>
@@ -168,7 +166,6 @@ function *CurrentOrders() {
               </div>
             </div>
           )}
-          { Object.keys(fetchPickingList).length > 0 && <PickingTable items={fetchPickingList} /> }
         </div>
         { loading && <BarLoader /> }
       </div>

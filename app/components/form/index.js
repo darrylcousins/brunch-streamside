@@ -1,4 +1,3 @@
+import Form from "./form";
 
-import Form from './form';
-
-module.exports = Form;
+export default Form;

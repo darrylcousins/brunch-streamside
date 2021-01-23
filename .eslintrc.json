@@ -1,0 +1,45 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module",
+    "createDefaultProgram": true,
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": [
+    "react"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "airbnb",
+    "prettier"
+  ],
+  "rules": {
+    "no-console": 0,
+    "no-unused-vars": 1,
+    "no-dupe-class-members": 0,
+    "no-undef": 0,
+    "no-redeclare": 0,
+    "func-names": [1, "as-needed", { "generators": "never" }],
+    "linebreak-style": ["error", "unix"],
+    "react/jsx-uses-vars": 1,
+    "react/jsx-filename-extension": 0,
+    "react/no-unknown-property": [1, { "ignore": ["class", "for"] }],
+    "react/jsx-uses-react": 1,
+    "react/prop-types": 0,
+    "react/style-prop-object": 0,
+    "react/jsx-props-no-spreading": [1, { "html": "ignore", "exceptions": ["Component"] }]
+  },
+  "settings": {
+    "react": {
+      "version": "999.999.999"
+    }
+  }
+}

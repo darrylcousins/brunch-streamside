@@ -1,24 +1,28 @@
 /** @jsx createElement */
-import {createElement} from '@bikeshaving/crank/cjs';
+import { createElement } from "@bikeshaving/crank/cjs";
 
-module.exports = (props) => {
-  const { children, type } = props;
+export default (props) => {
+  const { children, type, title } = props;
   let classList;
-  if (type === 'secondary') {
-      classList = 'b--navy bg-near-white navy hover-bg-moon-gray';
+  let hint = "";
+  if (type === "secondary") {
+    classList = "b--navy bg-near-white navy hover-bg-moon-gray";
   } else {
-      classList = 'b--navy bg-dark-blue white hover-bg-navy';
+    classList = "b--navy bg-dark-blue white hover-bg-navy";
   }
-  if (!props.hasOwnProperty('title') && typeof children === 'string') {
-    props.title = children;
+  if (typeof title === "undefined" && typeof children === "string") {
+    hint = children.toString();
+  } else {
+    hint = title;
   }
   return (
     <button
-      { ...props }
+      {...props}
+      title={hint}
       type="button"
-      class={ `pointer br2 ba pa2 ml1 mv1 bg-animate border-box ${classList }` }>
-      { children }
+      class={`pointer br2 ba pa2 ml1 mv1 bg-animate border-box ${classList}`}
+    >
+      {children}
     </button>
   );
 };
-

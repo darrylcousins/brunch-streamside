@@ -1,28 +1,15 @@
 /** @jsx createElement */
-import {createElement, Fragment} from '@bikeshaving/crank/cjs';
+import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
-import BarLoader from '../lib/bar-loader';
-import Error from '../lib/error';
-import { PostFetch } from '../lib/fetch';
-import { CloseIcon } from '../lib/icon';
-import Button from '../lib/button';
+import BarLoader from "../lib/bar-loader";
+import Error from "../lib/error";
+import { PostFetch } from "../lib/fetch";
+import { CloseIcon } from "../lib/icon";
 
-function FormModalWrapper(Component, options) {
-
-  return function *(props) {
-
-    let {
-      id,
-      title,
-      src,
-      ShowLink,
-      color,
-      saveMsg,
-      successMsg,
-      index
-    } = options;
-    let name = title.toLowerCase().replace(/ /g, '-');
-
+export default function FormModalWrapper(Component, options) {
+  return function* (props) {
+    const { id, title, src, ShowLink, color, saveMsg, successMsg } = options;
+    const name = title.toLowerCase().replace(/ /g, "-");
     let visible = false;
     let loading = false;
     let success = false;
@@ -35,48 +22,54 @@ function FormModalWrapper(Component, options) {
       this.refresh();
     };
 
+    const keyUp = (ev) => {
+      console.log(`key=${ev.key},code=${ev.code}`);
+    };
+
     const showModal = () => {
       visible = !visible;
       this.refresh();
     };
 
-    const saveData = (json) => {
+    const saveData = (form) => {
       loading = true;
       saving = true;
       this.refresh();
 
       let hasFile = false;
       let data;
-      let headers = { 'Content-Type': 'application/json' };
+      let headers = { "Content-Type": "application/json" };
 
       // check to find if we have a file upload
-      for (const [key, value] of Object.entries(json)) {
-        if (typeof value.name === 'string') {
+      Object.values(form).some((value) => {
+        if (typeof value.name === "string") {
           hasFile = true;
-          break;
+          return true;
         }
-      }
+        return false;
+      });
+
       // we have a file so need to use FormData and not json encode data
       // see PostFetch
       if (hasFile) {
         data = new FormData();
-        for (const [key, value] of Object.entries(json)) {
+        Object.entries(form).forEach(([key, value]) => {
           data.set(key, value);
-        }
+        });
         headers = false;
       } else {
         // no file - use json encoding
-        data = json;
+        data = form;
       }
 
       console.log(headers, data);
 
       PostFetch({ src, data, headers })
-        .then(result => {
+        .then((result) => {
           const { error, json } = result;
           if (error !== null) {
             fetchError = error;
-            console.log('Fetch:', fetchError);
+            console.log("Fetch:", fetchError);
             loading = false;
             saving = false;
             this.refresh();
@@ -86,11 +79,13 @@ function FormModalWrapper(Component, options) {
             saving = false;
             success = true;
             this.refresh();
-            setTimeout(function(){ window.location.reload(); }, 2000);
-          };
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          }
         })
-        .catch(err => {
-          console.log('ERROR:', err);
+        .catch((err) => {
+          console.log("ERROR:", err);
           fetchError = err;
           loading = false;
           this.refresh();
@@ -98,31 +93,30 @@ function FormModalWrapper(Component, options) {
     };
 
     this.addEventListener("click", async (ev) => {
-      const name = ev.target.tagName.toUpperCase();
-      if (name === "SVG" || name === 'PATH') {
+      if ( ["SVG", "PATH"].includes(ev.target.tagName.toUpperCase()) ) {
         showModal();
-      };
+      }
     });
 
     const getData = () => {
       const form = document.getElementById(id);
       // get them all and use data-type to sort for type
-      let data = {};
-      Array.from(form.elements).forEach(el => {
-        if (el.tagName !== 'FIELDSET') {
+      const data = {};
+      Array.from(form.elements).forEach((el) => {
+        if (el.tagName !== "FIELDSET") {
           let value;
-          if (el.type === 'checkbox') {
+          if (el.type === "checkbox") {
             value = el.checked;
-          } else if (el.type === 'file') {
-            value = el.files[0];
+          } else if (el.type === "file") {
+            [value, ] = el.files;
           } else {
             value = el.value;
           }
-          if (el.getAttribute('datatype') === 'integer') {
-            value = parseInt(value);
+          if (el.getAttribute("datatype") === "integer") {
+            value = parseInt(value, 10);
           }
-          if (el.getAttribute('datatype') === 'array') {
-            value = value.split(',').filter(el => el !== '');
+          if (el.getAttribute("datatype") === "array") {
+            value = value.split(",").filter((item) => item !== "");
           }
           data[el.id] = value;
         }
@@ -131,8 +125,8 @@ function FormModalWrapper(Component, options) {
     };
 
     // custom event called by form if passes validation
-    this.addEventListener(`${id}.valid`, ev => {
-      console.log('Got return event after validation', ev.detail.valid); // should be true
+    this.addEventListener(`${id}.valid`, (ev) => {
+      console.log("Got return event after validation", ev.detail.valid); // should be true
       if (ev.detail.valid === true) {
         // valid is true
         // call ModalWrapper method 'saveData'
@@ -147,66 +141,76 @@ function FormModalWrapper(Component, options) {
         // custom event - tell form to run validation
         form.dispatchEvent(
           new CustomEvent(`${id}.validate`, {
-            bubbles: true
+            bubbles: true,
           })
         );
-      } catch(err) {
+      } catch (err) {
         console.log(err);
         formError = err;
         this.refresh();
       }
     };
 
-    while (true) (
-      yield ( 
+    while (true)
+      yield (
         <Fragment>
-          <ShowLink name={name} color={color} title={title} showModal={showModal} />
-          { visible && (
-            <div class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4"
-                 style={ `top: ${ Math.round(window.scrollY).toString() }px;` }>
+          <ShowLink
+            name={name}
+            color={color}
+            title={title}
+            showModal={showModal}
+          />
+          {visible && (
+            <div
+              class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4"
+              style={`top: ${Math.round(window.scrollY).toString()}px;`}
+            >
               <div class="bg-white pa4 br3">
-                <a
-                  class="no-underline mid-gray dim o-70 absolute top-1 right-1"
+                <span
+                  class="bn bg-transparent pa0 no-underline mid-gray dim o-70 absolute top-1 right-1"
                   name="close"
-                  onclick={ closeModal }
-                  href="#"
+                  onClick={closeModal}
+                  onKeyUp={keyUp}
+                  role="button"
                   style="margin-right: 30px; margin-top: 30px;"
-                  title="Close modal">
+                  title="Close modal"
+                  tabIndex={0}
+                >
                   <CloseIcon />
                   <span class="dn">Close modal</span>
-                </a>
+                </span>
                 <div class="tc center">
-                  <h2 class="fw4 fg-streamside-maroon">{ title }.</h2>
+                  <h2 class="fw4 fg-streamside-maroon">
+                    {title}
+                    .
+                  </h2>
                 </div>
-                { fetchError && <Error msg={ fetchError } /> }
-                { saving && (
+                {fetchError && <Error msg={fetchError} />}
+                {formError && <Error msg={formError} />}
+                {saving && (
                   <div class="mv2 pt2 pl2 navy br3 ba b--navy bg-washed-blue">
-                    <p class="tc">{ saveMsg }</p>
+                    <p class="tc">{saveMsg}</p>
                   </div>
                 )}
-                { success && (
+                {success && (
                   <div class="mv2 pt2 pl2 br3 dark-green ba b--dark-green bg-washed-green">
-                    <p class="tc">{ successMsg }</p>
+                    <p class="tc">{successMsg}</p>
                   </div>
                 )}
-                { loading && <BarLoader /> }
-                { !loading && !success && !fetchError && (
+                {loading && <BarLoader />}
+                {!loading && !success && !fetchError && (
                   <Component
                     {...props}
-                    title={ title }
-                    formId={ id }
-                    doSave={ doSave }
-                    closeModal={ closeModal }
+                    title={title}
+                    formId={id}
+                    doSave={doSave}
+                    closeModal={closeModal}
                   />
                 )}
               </div>
             </div>
-            )}
-          </Fragment>
-      )
-    )
-  }
-
-};
-
-module.exports = FormModalWrapper;
+          )}
+        </Fragment>
+      );
+  };
+}

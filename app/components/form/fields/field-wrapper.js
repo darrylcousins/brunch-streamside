@@ -1,18 +1,16 @@
 /** @jsx createElement */
-import {createElement} from '@bikeshaving/crank/cjs';
+import { createElement } from "@bikeshaving/crank/cjs";
 
-const FieldWrapper = (props) => {
+export default (props) => {
   const { children, label, size, id } = props;
   return (
-    <div class={ `fl w-100 w-${ size }-ns` }>
+    <div class={`fl w-100 w-${size}-ns`}>
       <div class="tl ph2 mt1 ml0">
-        <label class="fw6 lh-copy f6" for={ id }>
-          { label }
+        <label class="fw6 lh-copy f6" htmlFor={id} for={id}>
+          {label}
         </label>
-        { children }
+        {children}
       </div>
     </div>
-  )
-}
-
-module.exports = FieldWrapper;
+  );
+};

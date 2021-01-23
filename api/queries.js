@@ -257,6 +257,8 @@ exports.getCurrentOrders = async function (req, res, next) {
   const finalOrders = Object();
   const boxCounts = Object();
   const boxes = Object();  // later need to read directly from boxes
+  //res.status(400).json({ error: 'random message test' });
+  //return;
   try {
     collection.find().sort({delivered: -1}).toArray((err, result) => {
       if (err) throw err;

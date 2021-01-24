@@ -12,8 +12,9 @@ export default (props) => {
         }`}
         {...props}
       />
-      <span class={`small mt1 fg-streamside-orange ${valid && "hidden"}`}>
-        Field is required
+      <span class={`small mt1 fg-streamside-orange ${valid ? "hidden" : ""}`}>
+        { label }
+        is required
       </span>
       &nbsp;
     </FieldWrapper>

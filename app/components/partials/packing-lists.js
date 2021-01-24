@@ -1,11 +1,10 @@
 /** @jsx createElement */
-import {createElement, Fragment} from '@bikeshaving/crank/cjs';
+import { createElement, Fragment } from '@bikeshaving/crank/cjs';
 import BarLoader from '../lib/bar-loader';
 import Error from '../lib/error';
 import { Fetch } from '../lib/fetch';
-import { Boxes } from './boxes-lib';
 import { DownloadIcon } from '../lib/icon';
-import { sortObjectByKey, sortObjectByKeys } from './order-lib';
+import { sortObjectByKey, sortObjectByKeys } from './lib';
 
 function *PackingLists() {
   let fetchJson = null;

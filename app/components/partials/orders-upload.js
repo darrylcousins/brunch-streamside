@@ -4,18 +4,16 @@ import {renderer} from '@bikeshaving/crank/cjs/dom';
 
 import { RemoveIcon } from '../lib/icon';
 import Button from '../lib/button';
+import TextButton from '../lib/text-button';
 import FormModalWrapper from '../wrappers/form-modal';
 import Form from '../form';
 
+// class="link dim mid-gray dib mr3 ba b--mid-gray br1 pa2"
 const ShowLink = (opts) => {
   const { name, title, color, showModal } = opts;
   return (
-    <nav class="f6 fw6 ttu tracked ph3 pv2 pv3-ns tr">
-      <a
-        class="link dim mid-gray dib mr3 ba b--mid-gray br1 pa2"
-        onclick={ showModal }
-        href="#"
-        title={ title }>{ title }</a>
+    <nav class="ph3 pv2 pv3-ns tr">
+      <TextButton color={color} title={title} action={showModal} name={name} />
     </nav>
   );
 };
@@ -23,7 +21,7 @@ const ShowLink = (opts) => {
 const options = {
   id: 'import-orders', // form id
   title: 'Import Orders',
-  color: 'dark-gray',
+  color: 'gray',
   src: '/api/import-orders',
   ShowLink: ShowLink,
   saveMsg: 'Upload orders ...',
@@ -42,6 +40,7 @@ function *UploadOrdersModal(props) {
     return now;
   };
 
+  // get these from current boxes??
   const getUpcoming = () => {
     const dates = [4,6].map(el => findNextWeekday(el).toDateString());
     console.log(dates);
@@ -51,7 +50,9 @@ function *UploadOrdersModal(props) {
   for (const _  of this) {
 
     const fields = {
-      'orders': {
+      'Orders': {
+        id: 'orders',
+        size: 'third',
         type: 'file',
         datatype: 'file',
         required: true
@@ -99,4 +100,4 @@ function *UploadOrdersModal(props) {
 
 };
 
-module.exports = FormModalWrapper(UploadOrdersModal, options);
+export default FormModalWrapper(UploadOrdersModal, options);

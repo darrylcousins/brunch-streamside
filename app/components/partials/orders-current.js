@@ -4,14 +4,13 @@ import {renderer} from '@bikeshaving/crank/cjs/dom';
 
 import AddOrderModal from './order-add';
 import RemoveOrdersModal from './orders-remove';
+import HelpSection from './order-help';
 import {
-  HelpSection,
   Order,
-  OrderDetail,
   TableHeader,
   TableBody,
   sortObjectByKeys
-} from './order-lib';
+} from './order-table';
 import BarLoader from '../lib/bar-loader';
 import Error from '../lib/error';
 import { Fetch } from '../lib/fetch';

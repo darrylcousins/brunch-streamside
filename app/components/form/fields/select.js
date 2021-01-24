@@ -4,6 +4,7 @@ import FieldWrapper from "./field-wrapper";
 
 export default (props) => {
   const { label, id, size, valid, datalist } = props;
+  console.log('select', valid);
 
   return (
     <FieldWrapper label={label} size={size} id={id}>
@@ -14,8 +15,9 @@ export default (props) => {
         {...props}
         list={`${id}s`}
       />
-      <span class={`small mt1 fg-streamside-orange ${valid && "hidden"}`}>
-        Field is required
+      <span class={`small mt1 fg-streamside-orange ${valid ? "hidden" : ""}`}>
+        { label }
+        is required
       </span>
       &nbsp;
       <datalist id={`${id}s`}>

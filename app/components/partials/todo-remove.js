@@ -1,54 +1,52 @@
 /** @jsx createElement */
-import {createElement, Fragment} from '@bikeshaving/crank/cjs';
-import {renderer} from '@bikeshaving/crank/cjs/dom';
+import { createElement, Fragment } from "@bikeshaving/crank/cjs";
+import { renderer } from "@bikeshaving/crank/cjs/dom";
 
-import { RemoveIcon } from '../lib/icon';
-import Button from '../lib/button';
-import FormModalWrapper from '../wrappers/form-modal';
-import Form from '../form';
+import { RemoveIcon } from "../lib/icon";
+import Button from "../lib/button";
+import IconButton from "../lib/icon-button";
+import FormModalWrapper from "../wrappers/form-modal";
+import Form from "../form";
 
 const ShowLink = (opts) => {
   const { name, title, color } = opts;
   return (
-    <a
-      class={ `pointer no-underline ${color} dib dim` }
-      name={ name }
-      title={ title }>
+    <IconButton color={color} title={title} name={name}>
       <RemoveIcon />
-      <span class="dn">{ title }</span>
-    </a>
+    </IconButton>
   );
 };
 
 const options = {
-  id: 'remove-todo', // form id
-  title: 'Remove Todo',
-  color: 'dark-red',
-  src: '/api/remove-todo',
-  ShowLink: ShowLink,
-  saveMsg: 'Removing todo ...',
-  successMsg: 'Successfully removed todo, reloading page.'
+  id: "remove-todo", // form id
+  title: "Remove Todo",
+  color: "dark-red",
+  src: "/api/remove-todo",
+  ShowLink,
+  saveMsg: "Removing todo ...",
+  successMsg: "Successfully removed todo, reloading page.",
 };
 
-function *RemoveTodoModal(props) {
+function* RemoveTodoModal(props) {
+  const { doSave, closeModal, title, todo, formId } = props;
 
-  let { doSave, closeModal, title, todo, formId } = props;
-
-  for (const _  of this) {
-
+  for (const _ of this) {
     const fields = {
-      '_id': {
-        type: 'hidden',
-        datatype: 'integer'
+      _id: {
+        type: "hidden",
+        datatype: "integer",
       },
-    }
+    };
 
     const getInitialData = () => ({ _id: todo._id });
 
     yield (
       <Fragment>
         <p class="lh-copy tl">
-          Are you sure you want to remove <b>{ todo.title }</b>?
+          Are you sure you want to remove 
+          {' '}
+          <b>{todo.title}</b>
+          ?
         </p>
         <Form
           data={getInitialData()}
@@ -57,21 +55,16 @@ function *RemoveTodoModal(props) {
           id={formId}
         />
         <div class="w-90 center ph1">
-          <Button
-            type="primary"
-            onclick={ doSave }>
+          <Button type="primary" onclick={doSave}>
             Remove
           </Button>
-          <Button
-            type="secondary"
-            onclick={ closeModal }>
+          <Button type="secondary" onclick={closeModal}>
             Cancel
           </Button>
         </div>
       </Fragment>
     );
   }
-
-};
+}
 
 module.exports = FormModalWrapper(RemoveTodoModal, options);

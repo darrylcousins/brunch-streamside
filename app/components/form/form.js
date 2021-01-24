@@ -1,10 +1,10 @@
 /** @jsx createElement */
-import { createElement } from "@bikeshaving/crank/cjs";
+import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
 import Error from "../lib/error";
-import Field from "./fields/index";
+import Field from "./fields";
 
-function* Form(props) {
+export default function* Form(props) {
   const { id, data, fields, title } = props;
 
   const formElements = {};
@@ -13,19 +13,26 @@ function* Form(props) {
   this.addEventListener(`${id}.validate`, () => {
     const { elements } = document.getElementById(id);
     let error = false;
-    elements.forEach((element) => {
+    Array.from(elements).forEach((element) => {
       const el = element; // avoiding no-param-reassign eslint
       if (el.tagName !== "FIELDSET" && el.type !== "hidden") {
         if (!el.checkValidity()) {
-          // el.dispatchEvent(new Event('onblur')); // NOT WORKING BUT WAS?
           el.classList.add("invalid");
           if (el.nextSibling) {
             el.nextSibling.innerHTML = el.validationMessage;
             el.nextSibling.classList.remove("hidden");
           }
+          if (el.type === "file") {
+            // file is the only generator field that needs this
+            el.dispatchEvent(
+              new CustomEvent("invalid", {
+                bubbles: true,
+                detail: { valid: false },
+              })
+            );
+          }
           error = true;
         } else if (el.checkValidity()) {
-          // el.dispatchEvent(new Event('onfocus')); // NOT WORKING BUT WAS?
           el.classList.remove("invalid");
           if (el.nextSibling) {
             el.nextSibling.innerHTML = "";
@@ -54,16 +61,16 @@ function* Form(props) {
         <fieldset class="w-100 center dark-gray tl ba b--transparent ph0 mh0">
           <legend class="f4 fw6 ph0 mh0 dn">{title}</legend>
           {Object.keys(fields).map((key) => (
-            <Field
-              label={key}
-              options={fields[key]}
-              data={data}
-              formElements={formElements}
-            />
+            <Fragment>
+              <Field
+                label={key}
+                options={fields[key]}
+                data={data}
+                formElements={formElements}
+              />
+            </Fragment>
           ))}
         </fieldset>
       </form>
     );
 }
-
-module.exports = Form;

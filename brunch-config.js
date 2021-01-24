@@ -23,16 +23,21 @@ exports.npm = {
 exports.plugins = {
   babel: {
     presets: [
-      ['env', {
+      ['latest', {
         'targets': {
           'browsers': ['last 2 versions', 'safari >= 7']
         },
         //'debug': true,
         'useBuiltIns': 'usage',
-        //'modules': false
+        //'modules': true
+        'include': [
+          'plugin-transform-spread'
+        ],
       }], 
-      'react'
-    ]
+      'react',
+      'stage-3'
+    ],
+    plugins: []
   },
   sass: {
     options: {

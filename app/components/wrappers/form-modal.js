@@ -8,7 +8,15 @@ import { CloseIcon } from "../lib/icon";
 
 export default function FormModalWrapper(Component, options) {
   return function* (props) {
-    const { id, title, src, ShowLink, color, saveMsg, successMsg } = options;
+    const {
+      id,
+      title,
+      src,
+      ShowLink,
+      color,
+      saveMsg,
+      successMsg
+    } = options;
     const name = title.toLowerCase().replace(/ /g, "-");
     let visible = false;
     let loading = false;
@@ -18,6 +26,7 @@ export default function FormModalWrapper(Component, options) {
     let formError = null;
 
     const closeModal = () => {
+      console.log('here in close');
       visible = false;
       this.refresh();
     };
@@ -27,7 +36,7 @@ export default function FormModalWrapper(Component, options) {
     };
 
     const showModal = () => {
-      visible = !visible;
+      visible = true;
       this.refresh();
     };
 
@@ -93,7 +102,8 @@ export default function FormModalWrapper(Component, options) {
     };
 
     this.addEventListener("click", async (ev) => {
-      if ( ["SVG", "PATH"].includes(ev.target.tagName.toUpperCase()) ) {
+      // are we on the right target??
+      if (ev.target.closest(`button[name='${id}']`)) {
         showModal();
       }
     });
@@ -108,7 +118,7 @@ export default function FormModalWrapper(Component, options) {
           if (el.type === "checkbox") {
             value = el.checked;
           } else if (el.type === "file") {
-            [value, ] = el.files;
+            [value] = el.files;
           } else {
             value = el.value;
           }
@@ -128,8 +138,6 @@ export default function FormModalWrapper(Component, options) {
     this.addEventListener(`${id}.valid`, (ev) => {
       console.log("Got return event after validation", ev.detail.valid); // should be true
       if (ev.detail.valid === true) {
-        // valid is true
-        // call ModalWrapper method 'saveData'
         saveData(getData());
       }
     });
@@ -166,19 +174,17 @@ export default function FormModalWrapper(Component, options) {
               style={`top: ${Math.round(window.scrollY).toString()}px;`}
             >
               <div class="bg-white pa4 br3">
-                <span
-                  class="bn bg-transparent pa0 no-underline mid-gray dim o-70 absolute top-1 right-1"
+                <button
+                  class="bn outline-0 bg-transparent pa0 no-underline mid-gray dim o-70 absolute top-1 right-1"
                   name="close"
-                  onClick={closeModal}
-                  onKeyUp={keyUp}
-                  role="button"
+                  onclick={closeModal}
+                  type="button"
                   style="margin-right: 30px; margin-top: 30px;"
                   title="Close modal"
-                  tabIndex={0}
                 >
                   <CloseIcon />
                   <span class="dn">Close modal</span>
-                </span>
+                </button>
                 <div class="tc center">
                   <h2 class="fw4 fg-streamside-maroon">
                     {title}

@@ -18,17 +18,14 @@ export default (props) => {
     id = label.toLowerCase().replace(/ /g, "-");
   }
   let value = data[id]; // can be expected as undefined
+  let valid = true;
 
   // see https://github.com/eslint/eslint/blob/master/docs/rules/no-prototype-builtins.md
   if (Object.prototype.hasOwnProperty.call(formElements, id)) {
+    valid = formElements[id].checkValidity();
     if (formElements[id].value !== "undefined") {
       value = formElements[id].value;
     }
-  }
-
-  let valid = true;
-  if (Object.prototype.hasOwnProperty.call(formElements, id)) {
-    valid = formElements[id].checkValidity();
   }
 
   // sould then be event listeners??
@@ -55,7 +52,8 @@ export default (props) => {
   }
 
   if (type === "file") {
-    return <File name={id} type={type} id={id} datatype={datatype} />;
+    console.log('file field', valid);
+    return <File name={id} type={type} id={id} datatype={datatype} required={required} valid={valid} />;
   }
 
   if (type === "textarea") {
@@ -109,6 +107,7 @@ export default (props) => {
   }
 
   if (type === "select") {
+    console.log('select field', valid);
     return (
       <Select
         value={value}

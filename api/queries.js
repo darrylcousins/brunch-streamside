@@ -1,6 +1,4 @@
 'use strict';
-
-require('isomorphic-fetch');
 const MongoClient = require('mongodb').MongoClient;
 const uri = 'mongodb://localhost';
 const mongoClient = new MongoClient(uri, { useUnifiedTopology: true });
@@ -175,35 +173,6 @@ exports.removeTodo = async function (req, res, next) {
   };
 };
 
-exports.getCurrentBoxes = async function (req, res, next) {
-  const collection = req.app.locals.boxCollection;
-  const response = Object();
-  const now = new Date();
-
-  // consider defining fields to avoid the inner product documents
-  //https://docs.mongodb.com/drivers/node/fundamentals/crud/read-operations/project
-  //
-  // filter by dates later than now
-  try {
-    collection.find().toArray((err, result) => {
-      if (err) throw err;
-      result.forEach(el => {
-        const d = new Date(Date.parse(el.delivered));
-        if (d >= now) {
-          const delivery = el.delivered;
-          if (!response.hasOwnProperty(delivery)) {
-            response[delivery] = Array();
-          };
-          response[delivery].push(el);
-        };
-      });
-      res.status(200).json(response);
-    });
-  } catch(e) {
-    res.status(400).json({ error: e.toString() });
-  };
-};
-
 exports.getCurrentBoxTitles = async function (req, res, next) {
   // get current box titles by selected date
   const collection = req.app.locals.boxCollection;
@@ -247,7 +216,7 @@ exports.getCurrentBoxDates = async function (req, res, next) {
 
 const conformSKU = (str) => {
   // mixed up titles with Big Veg on Shopify and Big Vege elsewhere
-  if (str.startsWith('Big')) return 'Big Vege';
+  if (str && str.startsWith('Big')) return 'Big Vege';
   return str;
 };
 

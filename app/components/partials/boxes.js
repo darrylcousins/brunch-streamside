@@ -1,9 +1,23 @@
 /** @jsx createElement */
+/**
+  * Creates element to render array of boxes
+  * @module app/boxes
+  * @requires {@link module:app/box}
+  * @exports Boxes
+  */
 import { createElement } from "@bikeshaving/crank/cjs";
 import { sortObjectByKey } from "./lib";
 import Box from "./box";
 
-export default function* Boxes({ boxes }) {
+/**
+ * Create tabbed page of boxes by date and sets up tables for box details
+ *
+ * @generator
+ * @yields {Element} - a html table display of the boxes
+ * @param {object} props
+ * @param {array} props.boxes - The array of boxes to by displayed
+ */
+function* Boxes({ boxes }) {
 
   this.addEventListener("click", async (ev) => {
     const name = ev.target.tagName;
@@ -99,3 +113,5 @@ export default function* Boxes({ boxes }) {
       </div>
     );
 }
+
+export default Boxes;

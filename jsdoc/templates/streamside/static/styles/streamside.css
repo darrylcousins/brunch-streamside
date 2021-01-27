@@ -1,0 +1,26 @@
+.api {
+  color: #2980B9;
+}
+.app {
+  color: #E74C3C;
+}
+.component {
+  color: #2980B9;
+}
+.route {
+  color: #229954;
+}
+.webhook {
+  color: #A93226;
+}
+.lib {
+  color: #D68910;
+}
+nav>ul>li.active a {
+    color: #8E44AD;
+    margin-bottom: 0;
+}
+nav ul a:hover, nav ul a:active {
+    color: #8E44AD;
+    margin-bottom: 0;
+}

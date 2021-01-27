@@ -5,6 +5,7 @@ const routes = require('express').Router();
 const syncOrders = require('./sync-orders');
 const syncBoxes = require('./sync-boxes');
 const tagOrders = require('./tag-orders');
+const getCurrentBoxes = require('./current-boxes');
 
 routes.get('/', function (req, res) {
   res.status(404).send('No index for the api');
@@ -32,7 +33,7 @@ routes.post('/edit-todo', queries.editTodo);
 routes.post('/remove-todo', queries.removeTodo);
 
 //routes.get('/boxes', queries.getBoxes);
-routes.get('/current-boxes', queries.getCurrentBoxes);
+routes.get('/current-boxes', getCurrentBoxes);
 routes.get('/current-box-titles/:timestamp', queries.getCurrentBoxTitles);
 routes.get('/current-box-dates', queries.getCurrentBoxDates);
 

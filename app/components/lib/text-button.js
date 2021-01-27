@@ -1,7 +1,11 @@
 /** @jsx createElement */
+/**
+* @module app/lib/text-button
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 
-export default (props) => {
+const TextButton = (props) => {
   const { color, name, title, action } = props;
   return (
     <button
@@ -16,3 +20,4 @@ export default (props) => {
   );
 };
 
+export default TextButton;

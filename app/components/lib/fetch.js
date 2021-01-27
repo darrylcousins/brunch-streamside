@@ -1,6 +1,8 @@
-"use-strict";
-
 export const Fetch = async (src) =>
+/**
+* @module app/lib/fetch
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
   fetch(src)
     .then(async (response) => {
       if (response.status !== 200) {

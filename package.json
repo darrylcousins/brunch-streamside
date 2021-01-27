@@ -7,14 +7,17 @@
   "repository": "git@github.com:darrylcousins/brunch-streamside.git",
   "scripts": {
     "start": "brunch watch --server --port 3334",
-    "build": "brunch build --production"
+    "build": "brunch build --production",
+    "docs": "node_modules/.bin/jsdoc --configure ./jsdoc/jsdoc.json --verbose"
   },
   "browserslist": [
     "last 2 versions"
   ],
   "dependencies": {
     "@bikeshaving/crank": "^0.3.6",
+    "crossroads": "^0.12.2",
     "memorystore": "^1.6.4",
+    "regenerator-runtime": "^0.13.7",
     "tachyons": "^4.12.0"
   },
   "devDependencies": {
@@ -34,13 +37,13 @@
     "clean-css-brunch": "^2",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.5",
-    "crossroads": "^0.12.2",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "eslint": "^7.18.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsdoc": "^31.3.3",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
@@ -51,6 +54,7 @@
     "fast-csv": "^4.3.6",
     "hasher": "^1.2.0",
     "isomorphic-fetch": "^3.0.0",
+    "jsdoc": "^3.6.6",
     "json-as-xlsx": "^1.1.8",
     "mongodb": "^3.6.3",
     "morgan": "^1.10.0",

@@ -1,7 +1,33 @@
 /** @jsx createElement */
+/**
+  * Display a table row of box details
+  * @module app/box
+  * @exports Box
+  */
 import { createElement } from "@bikeshaving/crank/cjs";
 
-export default function Box({ box, index }) {
+/**
+ * Constructs and returns a table row for the box
+ * @function
+ * @yields {Element} - a html table row of the box
+ * @param {object} props
+ * @param {object} props.box The box to by displayed
+ * @param {object} props.index The index of boxes array
+ * @returns {Element}
+ * @example
+ * const box = {
+ *    shopify_sku: 'Big Vege',
+ *    delivered: 'Thu Jan 28 2021',
+ *    includedProducts: []
+ *    ...
+ *    }
+ *  <Box box={box} />
+ */
+function Box({ box, index }) {
+  /**
+   * Box delivery date as a Date object
+   * @const deliveryDate
+  */
   const deliveryDate = new Date(box.delivered);
   return (
     <tr key={index}>
@@ -27,3 +53,5 @@ export default function Box({ box, index }) {
     </tr>
   );
 }
+
+export default Box;

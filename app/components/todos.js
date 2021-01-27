@@ -1,9 +1,27 @@
 /** @jsx createElement */
+/**
+ * Starting point of url route /todos
+ *
+ * @module app/route/todo
+ * @exports Todos
+ * @requires module:app/todos
+ * @requires module:app/todos-add
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import CurrentTodos from "./partials/todos";
 import AddTodoModal from "./partials/todo-add";
 
-export default function Todos() {
+/**
+ * Route for todos, linked from navigation
+ *
+ * @function
+ * @returns {Element} DOM component
+ * @example
+ * import {renderer} from '@bikeshaving/crank/cjs/dom';
+ * renderer.render(<Todos />, document.querySelector('#app'))
+ */
+function Todos() {
   return (
     <Fragment>
       <AddTodoModal />
@@ -11,3 +29,5 @@ export default function Todos() {
     </Fragment>
   );
 }
+
+export default Todos;

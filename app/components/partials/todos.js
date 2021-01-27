@@ -1,4 +1,11 @@
 /** @jsx createElement */
+/**
+  * Starting point of url route /todos
+  * @module app/component/todos
+  * @exports TodosRoute
+  * @requires {@link module:app/todos}
+  * @requires {@link module:app/todos-add}
+  */
 import { createElement } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";

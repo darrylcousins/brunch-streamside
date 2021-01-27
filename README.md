@@ -1,39 +1,31 @@
-# brunch-streamside
-For streamside
+# Streamside
 
-## Step One
-
-Authentication with passport.
-
-## Step Two
-
-Postgres integration and models.
+Browser app to manage vege boxes and orders for [Streamside Organics](https://streamsideorganics.co.nz).
 
 ## Getting started
 
-* Install (if you don't have them):
-    * [Node.js](http://nodejs.org): `brew install node` on OS X
-    * [Brunch](http://brunch.io): `npm install -g brunch`
-    * Brunch plugins and app dependencies: `npm install`
+* Install:
+    * [Node.js](http://nodejs.org)
+    * `npm install`
 * Run:
-    * `npm start` — watches the project with continuous rebuild. This will also launch HTTP server with [pushState](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
-    * `npm run build` — builds minified project for production
-* Learn:
-    * `public/` dir is fully auto-generated and served by HTTP server.  Write your code in `app/` dir.
-    * Place static files you want to be copied from `app/assets/` to `public/`.
-    * [Brunch site](http://brunch.io), [Getting started guide](https://github.com/brunch/brunch-guide#readme)
+    * `npm run start` — watches the project with continuous rebuild. This will also launch HTTP server on port 3334
+    * `npm run docs` — build documentation
+    * `npm run build` — builds minified project for production (currently only running in developement mode)
 
-## Express
+## Current environment
 
-```
-npm install --save-dev express morgan body-parser
-```
+Using [Nginx](http://nginx.com) for http authentication and coarse routing to the app, webhooks, and code documentation.
 
-And configure with `brunch-server.js`.
+## Dependencies
 
-## ES-next
+The core important dependencies installed are:
 
-To use proposed JS features not included into ES6, do this:
-
-* `npm install --save-dev babel-preset-stage-0`
-* in `brunch-config.js`, add the preset: `presets: ['latest', 'stage-0']`
+* [Brunch](http://brunch.io): Build management
+* [Express](https://expressjs.com/): Server
+* [MongoDB](https://www.mongodb.com/): NoSQL document database
+* [@bikeshaving/crank](https://crank.js.org/): JSX-driven DOM components with functions, promises and generators
+* [Crossroads](http://millermedeiros.github.com/crossroads.js/): URL routing
+* [Prettier](https://prettier.io/): Opinionated code formatter
+* [Eslint](https://eslint.org/): Code analysis linter
+* [JsDocs](https://jsdoc.app/index.html): Code documentation
+* [Tachyons](https://tachyons.io/): CSS framework

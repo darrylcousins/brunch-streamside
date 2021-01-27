@@ -1,15 +1,51 @@
 /** @jsx createElement */
+/**
+  * Top of hierarchy of elements to render boxes
+  * @module app/boxes-current
+  * @exports CurrentBoxes
+  * @requires {@link module:app/boxes}
+  */
 import { createElement } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
 import { Fetch } from "../lib/fetch";
 import Boxes from "./boxes";
 
-export default function* CurrentBoxes() {
+/**
+ * Uses fetch to collect current boxes from api and then passes data to
+ * {@link module:app/boxes} to display as a table.
+ *
+ * @generator
+ * @yields {Element}
+ */
+function* CurrentBoxes() {
+  /**
+   * Contains box data as collected from [api/current-boxes]{@link
+   * module:api/current-boxes}. The data uses delivery date as keys to unsorted
+   * array of box data.
+   * @var fetchJson
+   * @type {Object<string:array>}
+  */
   let fetchJson = {};
+  /**
+   * If fetching data was unsuccessful.
+   * @var fetchError
+   * @type {Object|string|null}
+  */
   let fetchError = null;
+  /**
+   * Display loading indicator while fetching data
+   * @var loading
+   * @type {Boolean}
+  */
   let loading = true;
 
+  /**
+   * Uses fetch to collect current boxes from api and then refreshs this {Element}
+   * (Called as soon as the element is mounted.)
+   *
+   * @function fetchData
+   */
   const fetchData = () => {
     Fetch(`/api/current-boxes`)
       .then((result) => {
@@ -21,7 +57,6 @@ export default function* CurrentBoxes() {
         } else {
           fetchJson = json;
           loading = false;
-          console.log(JSON.stringify(fetchJson, null, 2));
           this.refresh();
         }
       })
@@ -50,3 +85,5 @@ export default function* CurrentBoxes() {
     );
   }
 }
+
+export default CurrentBoxes;

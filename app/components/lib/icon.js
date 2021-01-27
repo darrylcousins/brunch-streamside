@@ -1,4 +1,8 @@
 /** @jsx createElement */
+/**
+* @module app/lib/icon
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 
 const Icon = ({ children }) => {

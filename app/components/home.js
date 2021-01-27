@@ -1,10 +1,26 @@
 /** @jsx createElement */
-import { createElement, Fragment } from "@bikeshaving/crank/cjs";
+/**
+ * Starting point of url route /
+ *
+ * @module app/route/home
+ * @exports Home
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
+import { createElement } from "@bikeshaving/crank/cjs";
 
-export default function Home() {
+/**
+ *  Route to home page, linked from navigation
+ *
+ * @function
+ * @returns {Element} DOM component
+ * @example
+ * import {renderer} from '@bikeshaving/crank/cjs/dom';
+ * renderer.render(<Home />, document.querySelector('#app'))
+ */
+function Home() {
   return (
-    <Fragment>
-      <h2 class="lh-title">Box Management</h2>
-    </Fragment>
+    <h2 class="lh-title">Box Management</h2>
   );
 }
+
+export default Home;

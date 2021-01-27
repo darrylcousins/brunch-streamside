@@ -1,18 +1,26 @@
 /** @jsx createElement */
-import { createElement, Fragment } from "@bikeshaving/crank/cjs";
+/**
+ * Starting point of url route /boxes
+ *
+ * @module app/route/boxes
+ * @exports Boxes
+ * @requires module:app/boxes-current
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
+import { createElement } from "@bikeshaving/crank/cjs";
 import CurrentBoxes from "./partials/boxes-current";
 
-/*
-      <nav class="f6 fw6 ttu tracked ph3 pv2 pv3-ns tr">
-        <a class="link dim mid-gray dib mr3 ba b--mid-gray br1 pa2" href="#" title="Add box">Add box</a>
-        <a class="link dim mid-gray dib mr3 ba b--mid-gray br1 pa2" href="#" title="Duplicate box">Duplicate box</a>
-      </nav>
-      */
-
-export default function Boxes() {
-  return (
-    <Fragment>
-      <CurrentBoxes />
-    </Fragment>
-  );
+/**
+ * Route to boxes, linked from navigation
+ *
+ * @function
+ * @returns {Element} Renders <CurrentBoxes />
+ * @example
+ * import {renderer} from '@bikeshaving/crank/cjs/dom';
+ * renderer.render(<Box />, document.querySelector('#app'))
+ */
+function Boxes() {
+  return <CurrentBoxes />;
 }
+
+export default Boxes;

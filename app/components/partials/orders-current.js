@@ -43,6 +43,7 @@ function *CurrentOrders() {
         //fetchOrders = sortObjectByKeys(orders);
         fetchOrders = orders;
         loading = false;
+        console.log('Orders loaded');
         this.refresh();
       };
     })
@@ -86,6 +87,17 @@ function *CurrentOrders() {
       };
     };
   });
+
+  const DoOrders = ({key}) => {
+    console.log(JSON.stringify(fetchOrders[key], null, 2));
+    console.log(key);
+    // { fetchOrders[key].length > 0 && <TableBody crank-key={ `${ key }-tb` } orders={fetchOrders[key]} /> }
+    return "";
+    if (key !== "Sat Jan 23 2021") {
+      return <TableBody crank-key={ `${ key }-tb` } orders={fetchOrders[key]} />;
+    }
+    return "";
+  };
 
   while (true) {
     yield (
@@ -172,4 +184,5 @@ function *CurrentOrders() {
   };
 };
 
-module.exports = CurrentOrders;
+//{ fetchOrders[key].length > 0 && <TableBody crank-key={ `${ key }-tb` } orders={fetchOrders[key]} /> }
+export default CurrentOrders;

@@ -13,11 +13,13 @@
     }
   },
   "plugins": [
-    "react"
+    "react",
+    "jsdoc"
   ],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
+    "plugin:jsdoc/recommended",
     "airbnb",
     "prettier"
   ],
@@ -30,6 +32,8 @@
     "no-redeclare": 0,
     "func-names": [1, "as-needed", { "generators": "never" }],
     "linebreak-style": ["error", "unix"],
+    "jsdoc/check-tag-names": [1, { "definedTags": ["jsx"] }],
+    "jsdoc/require-returns": 0,
     "react/jsx-uses-vars": 1,
     "react/jsx-filename-extension": 0,
     "react/no-unknown-property": [1, { "ignore": ["class", "for", "onclick"] }],

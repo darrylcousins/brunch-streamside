@@ -1,7 +1,22 @@
 /** @jsx createElement */
+/**
+ * Button module
+ *
+ * @module app/lib/button
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 
-export default (props) => {
+/**
+ * Button component
+ *
+ * @return {Element} DOM component
+ * @param {Object} props  Component properties
+ * @param {Object} props.children Nested child components
+ * @param {String} props.type Button style `primary|secondary`
+ * @param {String} props.title Button title - hover hint
+ */
+const Button = (props) => {
   const { children, type, title } = props;
   let classList;
   let hint = "";
@@ -26,3 +41,5 @@ export default (props) => {
     </button>
   );
 };
+
+export default Button;

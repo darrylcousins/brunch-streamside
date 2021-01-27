@@ -1,7 +1,20 @@
 /** @jsx createElement */
+/**
+ * Error display component module
+ *
+* @module app/lib/error
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement, isElement } from "@bikeshaving/crank/cjs";
 
-export default ({ msg }) => {
+/**
+ * Error component
+ *
+ * @return {Element} DOM component
+ * @param {object} props  Component properties
+ * @param {Element|String|Object} props.msg Error to be displayed
+ */
+const ErrorMsg = ({ msg }) => {
   console.log(msg, typeof msg, isElement(msg));
   if (typeof msg === "string" || isElement(msg)) {
     return (
@@ -29,3 +42,5 @@ export default ({ msg }) => {
     </div>
   );
 };
+
+export default ErrorMsg;

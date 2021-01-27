@@ -1,6 +1,6 @@
 /** @jsx createElement */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
-import { RemoveIcon } from "../lib/icon";
+import { DeleteIcon } from "../lib/icon";
 import Button from "../lib/button";
 import IconButton from "../lib/icon-button";
 import FormModalWrapper from "../wrappers/form-modal";
@@ -10,7 +10,7 @@ const ShowLink = (opts) => {
   const { name, title, color } = opts;
   return (
     <IconButton color={color} title={title} name={name}>
-      <RemoveIcon />
+      <DeleteIcon />
     </IconButton>
   );
 };

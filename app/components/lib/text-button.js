@@ -1,10 +1,20 @@
 /** @jsx createElement */
 /**
-* @module app/lib/text-button
-* @author Darryl Cousins <darryljcousins@gmail.com>
-*/
+ * @module app/lib/text-button
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 
+/**
+ * TextButton component using a html `button` tag.
+ *
+ * @returns {Element} DOM component as `svg` wrapper
+ * @param {object} props  Component properties
+ * @param {string} props.color Text colour (background transparent)
+ * @param {string} props.title Button title (hover hint)
+ * @param {string} props.name Button name attribute
+ * @param {string} props.action Button `onclick` attribute
+ */
 const TextButton = (props) => {
   const { color, name, title, action } = props;
   return (
@@ -15,7 +25,7 @@ const TextButton = (props) => {
       name={name}
       type="button"
     >
-      { title }
+      {title}
     </button>
   );
 };

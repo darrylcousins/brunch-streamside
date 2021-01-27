@@ -6,7 +6,6 @@ import AddOrderModal from './order-add';
 import RemoveOrdersModal from './orders-remove';
 import HelpSection from './order-help';
 import {
-  Order,
   TableHeader,
   TableBody,
   sortObjectByKeys
@@ -15,13 +14,9 @@ import BarLoader from '../lib/bar-loader';
 import Error from '../lib/error';
 import { Fetch } from '../lib/fetch';
 import {
-  DownloadIcon,
-  HelpIcon,
-  CloseIcon,
-  EditIcon
+  DownloadIcon
 } from '../lib/icon';
 import Button from '../lib/button';
-
 
 function *CurrentOrders() {
   let fetchOrders = Object();

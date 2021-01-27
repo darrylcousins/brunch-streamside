@@ -1,20 +1,22 @@
 /** @jsx createElement */
 /**
-* @module app/lib/icon-button
-* @author Darryl Cousins <darryljcousins@gmail.com>
-*/
+ * Icon button module
+ *
+ * @module app/lib/icon-button
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 
 /**
  * IconButton component, will normally have an eventListener attached to parent
  * component as in example below.
  *
- * @return {Element} DOM component
- * @param {Object} props  Component properties
+ * @returns {Element} DOM component
+ * @param {object} props  Component properties
  * @param {Element} props.children Nested child icon for display
- * @param {String} props.color Icon colour
- * @param {String} props.title Button title - hover hint and hidden span
- * @param {String} props.name Button name attribute
+ * @param {string} props.color Icon colour
+ * @param {string} props.title Button title - hover hint and hidden span
+ * @param {string} props.name Button name attribute
  * @example
  * const name = "download";
  * const title = "Download";

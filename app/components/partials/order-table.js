@@ -6,7 +6,6 @@ import OrderDetail from "./order-detail";
 import OrderModal from "./order-modal";
 import EditOrderModal from "./order-edit";
 import RemoveOrderModal from "./order-remove";
-import { DownloadIcon, HelpIcon, CloseIcon, EditIcon } from "../lib/icon";
 import Button from "../lib/button";
 
 export const sortObjectByKeys = (o) =>

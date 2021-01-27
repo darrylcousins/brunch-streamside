@@ -8,6 +8,8 @@
 import { createElement } from "@bikeshaving/crank/cjs";
 import { sortObjectByKey } from "./lib";
 import Box from "./box";
+import {CloseIcon, DeleteIcon, DownloadIcon, EditIcon, AddIcon, ExcelIcon, HelpIcon} from "../lib/icon";
+import IconButton from "../lib/icon-button";
 
 /**
  * Create tabbed page of boxes by date and sets up tables for box details

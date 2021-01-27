@@ -5,6 +5,7 @@ import Error from '../lib/error';
 import { Fetch } from '../lib/fetch';
 import { DownloadIcon } from '../lib/icon';
 import { sortObjectByKey, sortObjectByKeys } from './lib';
+import IconButton from '../lib/icon-button';
 
 function *PackingLists() {
   let fetchJson = null;

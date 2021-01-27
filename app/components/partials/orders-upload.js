@@ -2,7 +2,6 @@
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import {renderer} from '@bikeshaving/crank/cjs/dom';
 
-import { RemoveIcon } from '../lib/icon';
 import Button from '../lib/button';
 import TextButton from '../lib/text-button';
 import FormModalWrapper from '../wrappers/form-modal';

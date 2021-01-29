@@ -1,5 +1,7 @@
 /** @jsx createElement */
 /**
+ * TextButton module
+ *
  * @module app/lib/text-button
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */

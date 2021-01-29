@@ -10,11 +10,11 @@ import { createElement } from "@bikeshaving/crank/cjs";
 /**
  * Button component
  *
- * @return {Element} DOM component
- * @param {Object} props  Component properties
- * @param {Object} props.children Nested child components
- * @param {String} props.type Button style `primary|secondary`
- * @param {String} props.title Button title - hover hint
+ * @returns {Element} DOM component
+ * @param {object} props  Component properties
+ * @param {object} props.children Nested child components
+ * @param {string} props.type Button style `primary|secondary`
+ * @param {string} props.title Button title - hover hint
  */
 const Button = (props) => {
   const { children, type, title } = props;

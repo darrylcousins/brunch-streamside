@@ -25,6 +25,9 @@ export const sortObjectByKey = (o, key) => {
 };
 
 export const Order = ({ order, index }) => {
+  if (order.name === '') {
+    order.name = `${order.first_name} ${order.last_name}`;
+  }
   return (
     <tr crank-key={order._id} class="striped--near-white">
       <td class="pv1 ph1 bb b--black-20 v-top">{order.sku}</td>
@@ -64,8 +67,13 @@ export const TableHeader = ({ headers, index }) => {
   );
 };
 
+export const TableBodyDoh  = ({ orders }) => {
+  console.log(orders);
+  orders.map(el => console.log(el));
+  return <Order order={orders[0]} index={1} />
+};
+
 export const TableBody = ({ orders }) => {
-  // order by box title
   orders.sort((a, b) => {
     var nameA = a["sku"].toUpperCase(); // ignore upper and lowercase
     var nameB = b["sku"].toUpperCase(); // ignore upper and lowercase

@@ -11,7 +11,9 @@ import { createElement } from "@bikeshaving/crank/cjs";
 /**
  * Loader component
  *
- * @return {Element} DOM component
+ * @returns {Element} DOM component
+ * @example
+ * { loading && <BarLoader /> }
  */
 const BarLoader = () => (
   <div class="progress-bar mt2">

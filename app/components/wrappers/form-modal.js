@@ -52,6 +52,7 @@ export default function FormModalWrapper(Component, options) {
       // check to find if we have a file upload
       Object.values(form).some((value) => {
         if (typeof value.name === "string") {
+          console.log('GOT FILE', value);
           hasFile = true;
           return true;
         }
@@ -65,7 +66,7 @@ export default function FormModalWrapper(Component, options) {
         Object.entries(form).forEach(([key, value]) => {
           data.set(key, value);
         });
-        headers = false;
+        headers = {};
       } else {
         // no file - use json encoding
         data = form;
@@ -136,7 +137,7 @@ export default function FormModalWrapper(Component, options) {
 
     // custom event called by form if passes validation
     this.addEventListener(`${id}.valid`, (ev) => {
-      console.log("Got return event after validation", ev.detail.valid); // should be true
+      //console.log("Got return event after validation", ev.detail.valid); // should be true
       if (ev.detail.valid === true) {
         saveData(getData());
       }

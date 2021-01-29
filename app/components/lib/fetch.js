@@ -1,8 +1,24 @@
-export const Fetch = async (src) =>
 /**
-* @module app/lib/fetch
-* @author Darryl Cousins <darryljcousins@gmail.com>
-*/
+ * Fetch components
+ *
+ * @module app/lib/fetch
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
+
+/**
+ * Fetch component that attempts to deal reasonably if the fetch fails. Always
+ * uses a `GET` request` and expects a `json` response.
+ *
+ * @returns {Promise} A promise resolving to { error, json }
+ * @param {string} src Url to send request
+ * @example
+ * const src
+ * Fetch(src)
+ *   .then((result) => {
+ *     const { error, json } = result;
+ *   })
+ */
+const Fetch = async (src) =>
   fetch(src)
     .then(async (response) => {
       if (response.status !== 200) {
@@ -22,7 +38,25 @@ export const Fetch = async (src) =>
       return { error, json: null };
     });
 
-export const PostFetch = async ({ src, data, headers }) => {
+/**
+ * PostFetch component that attempts to deal reasonably if the fetch fails. Always
+ * uses a `POST` request` and expects a `json` response.
+ *
+ * @returns {Promise} A promise resolving to { error, json }
+ * @param {object} opts Dicitonary of options
+ * @param {string} opts.src Url to send request to
+ * @param {string} opts.data Data to be sent with request
+ * @param {string} opts.headers Headers to send data with, usually `{"Content-Type": "application/json"}` but not when uploading files.
+ * @example
+ * const src = "api/create-todo";
+ * const data = {title: "Fix me"};
+ * const headers = { "Content-Type": "application/json" };
+ * PostFetch({src, data, headers})
+ *   .then((result) => {
+ *     const { error, json } = result;
+ *   })
+ */
+const PostFetch = async ({ src, data, headers }) => {
   // use json if according to content-type
   const formdata =
     headers["Content-Type"] === "application/json"
@@ -57,3 +91,5 @@ export const PostFetch = async ({ src, data, headers }) => {
       return { error, json: null };
     });
 };
+
+export { Fetch, PostFetch };

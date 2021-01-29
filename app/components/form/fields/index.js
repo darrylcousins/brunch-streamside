@@ -52,7 +52,6 @@ export default (props) => {
   }
 
   if (type === "file") {
-    console.log('file field', valid);
     return <File name={id} type={type} id={id} datatype={datatype} required={required} valid={valid} />;
   }
 
@@ -107,7 +106,6 @@ export default (props) => {
   }
 
   if (type === "select") {
-    console.log('select field', valid);
     return (
       <Select
         value={value}

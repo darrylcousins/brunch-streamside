@@ -2,17 +2,19 @@
 /**
  * Error display component module
  *
-* @module app/lib/error
-* @author Darryl Cousins <darryljcousins@gmail.com>
-*/
+ * @module app/lib/error
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement, isElement } from "@bikeshaving/crank/cjs";
 
 /**
  * Error component
  *
- * @return {Element} DOM component
+ * @returns {Element} DOM component
  * @param {object} props  Component properties
- * @param {Element|String|Object} props.msg Error to be displayed
+ * @param {Element|string|object} props.msg Error to be displayed
+ * @example
+ * { error && <ErrorMsg msg="Some error message" /> }
  */
 const ErrorMsg = ({ msg }) => {
   console.log(msg, typeof msg, isElement(msg));
@@ -35,9 +37,7 @@ const ErrorMsg = ({ msg }) => {
   return (
     <div class="dark-red mv2 pt2 pl2 br3 ba b--dark-red bg-washed-red">
       <p class="tc">
-        {msg.msg}
-        :
-        {msg.err}
+        {msg.msg}:{msg.err}
       </p>
     </div>
   );

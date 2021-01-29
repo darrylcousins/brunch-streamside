@@ -84,7 +84,7 @@ exports.editOrder = async function (req, res, next) {
 };
 
 exports.removeOrder = async function (req, res, next) {
-  _logger.info(JSON.stringify(req.body, null, 2));
+  _logger.info(`Removing order: ${JSON.stringify(req.body, null, 2)}`);
   try {
     const result = await mongoRemove(req.app.locals.orderCollection, req.body);
     res.status(200).json(result);
@@ -105,7 +105,7 @@ exports.deleteOrders = async function (req, res, next) {
   try {
     collection.deleteMany(query, (err, result) => {
       if (err) throw err;
-      _logger.info(result.result.n, 'objects deleted');
+      _logger.info(`Removing orders: ${result.result.n} objects deleted`);
       res.status(200).json({ count: result.result.n });
     });
   } catch(e) {
@@ -229,7 +229,7 @@ exports.getCurrentOrders = async function (req, res, next) {
   //res.status(400).json({ error: 'random message test' });
   //return;
   try {
-    collection.find().sort({delivered: -1}).toArray((err, result) => {
+    collection.find({sku: {$ne: null}}).sort({delivered: -1}).toArray((err, result) => {
       if (err) throw err;
       result.forEach(el => {
         const delivery = el.delivered;
@@ -283,14 +283,14 @@ exports.importOrders = async function (req, res, next) {
     const orders = req.files.orders;
     const delivered = req.body.delivered; // uploading to this date only
     const collection = req.app.locals.orderCollection;
-    if (orders.mimetype !== 'text/csv' && orders.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-      return res.status(400).json({ error: 'Could not parse data. Uploaded file is of wrong mimetype.' });
+    if (orders.mimetype !== 'text/csv' && orders.mimetype !== 'application/vnd.ms-excel' && orders.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      return res.status(400).json({ error: 'Could not parse data. Uploaded file should be a csv or xlxs file.' });
     };
     let result = true;
     _logger.info(`Uploading order for ${delivered} using ${orders.mimetype}`);
-    if (orders.mimetype === 'text/csv') {
+    if (orders.mimetype === 'text/csv' || orders.mimetype === 'application/vnd.ms-excel') {
       result = orderImportCSV(orders.data, delivered, collection);
-    } else {
+    } else if (orders.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
       result = orderImportXLSX(orders.data, delivered, collection);
     };
     if (result) {
@@ -300,7 +300,7 @@ exports.importOrders = async function (req, res, next) {
         delivered,
         success: 'Got file' }));
     } else {
-      return res.status(400).json({ error: 'Import failed.' });
+      return res.status(400).json({ error: 'Import failed. Unable to determine file type.' });
     }
   };
 };
@@ -357,7 +357,7 @@ exports.downloadOrders = async function (req, res, next) {
         var buffer = xlsx(columns, content, settings, false)
         res.writeHead(200, {
           'Content-Type': 'application/octet-stream',
-          'Content-disposition': `attachment; filename=packing-list-${deliveryDay.replace(/ /g, '-')}.xlsx`
+          'Content-disposition': `attachment; filename=box-orders-${deliveryDay.replace(/ /g, '-').toLowerCase()}.xlsx`
         })
         res.end(buffer)
       } catch(e) {
@@ -568,7 +568,7 @@ exports.downloadPackingList= async function (req, res, next) {
 
     res.writeHead(200, {
       'Content-Type': 'application/octet-stream',
-      'Content-disposition': `attachment; filename=packing-list-${deliveryDay.replace(/ /g, '-')}.xlsx`
+      'Content-disposition': `attachment; filename=packing-sheet-${deliveryDay.replace(/ /g, '-').toLowerCase()}.xlsx`
     })
     workbook.xlsx.write(res).then(function(){
       res.end();
@@ -660,7 +660,7 @@ exports.downloadPickingList = async function (req, res, next) {
 
     res.writeHead(200, {
           'Content-Type': 'application/octet-stream',
-          'Content-disposition': `attachment; filename=picking-list-${deliveryDay.replace(/ /g, '-')}.xlsx`
+          'Content-disposition': `attachment; filename=picking-list-${deliveryDay.replace(/ /g, '-').toLowerCase()}.xlsx`
         })
     workbook.xlsx.write(res).then(function(){
       res.end();

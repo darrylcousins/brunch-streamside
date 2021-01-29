@@ -11,8 +11,6 @@
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import CurrentOrders from "./partials/orders-current";
 import UploadOrders from "./partials/orders-upload";
-import {CloseIcon, DeleteIcon, DownloadIcon, EditIcon, AddIcon, ExcelIcon, HelpIcon} from "./lib/icon";
-import IconButton from "./lib/icon-button";
 
 /**
  * Route to orders, linked from navigation
@@ -29,9 +27,6 @@ function Orders() {
       <div class="tr db">
         <UploadOrders />
       </div>
-        <IconButton color="gray" title="Fuck" name="fuck">
-          <DownloadIcon />
-        </IconButton>
       <CurrentOrders />
     </Fragment>
   );

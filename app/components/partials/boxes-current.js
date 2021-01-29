@@ -1,10 +1,11 @@
 /** @jsx createElement */
 /**
-  * Top of hierarchy of elements to render boxes
-  * @module app/boxes-current
-  * @exports CurrentBoxes
-  * @requires {@link module:app/boxes}
-  */
+ * Top of hierarchy of elements to render boxes
+ *
+ * @module app/boxes-current
+ * @exports CurrentBoxes
+ * @requires module:app/boxes~Boxes
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
@@ -19,29 +20,36 @@ import Boxes from "./boxes";
  * @yields {Element}
  */
 function* CurrentBoxes() {
+
   /**
    * Contains box data as collected from [api/current-boxes]{@link
    * module:api/current-boxes}. The data uses delivery date as keys to unsorted
    * array of box data.
-   * @var fetchJson
-   * @type {Object<string:array>}
-  */
+   *
+   * @returns {Element} Dom component
+   * @member fetchJson
+   * @type {object.<string, Array>}
+   */
   let fetchJson = {};
+
   /**
    * If fetching data was unsuccessful.
-   * @var fetchError
-   * @type {Object|string|null}
-  */
+   *
+   * @member fetchError
+   * @type {object|string|null}
+   */
   let fetchError = null;
+
   /**
    * Display loading indicator while fetching data
-   * @var loading
-   * @type {Boolean}
-  */
+   *
+   * @member loading
+   * @type {boolean}
+   */
   let loading = true;
 
   /**
-   * Uses fetch to collect current boxes from api and then refreshs this {Element}
+   * Uses fetch to collect current boxes from api and then refreshs `this`
    * (Called as soon as the element is mounted.)
    *
    * @function fetchData

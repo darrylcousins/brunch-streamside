@@ -38,7 +38,6 @@ function *CurrentOrders() {
         //fetchOrders = sortObjectByKeys(orders);
         fetchOrders = orders;
         loading = false;
-        console.log('Orders loaded');
         this.refresh();
       };
     })

@@ -1,5 +1,7 @@
 /** @jsx createElement */
 /**
+ * Icon module exporting a number of svg icons
+ *
  * @module app/lib/icon
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
@@ -14,7 +16,6 @@ import { createElement } from "@bikeshaving/crank/cjs";
  */
 const Icon = ({ children }) => {
   const size = 20;
-  console.log(children);
   return (
     <svg
       width={`${size}px`}
@@ -32,7 +33,7 @@ const Icon = ({ children }) => {
       {children}
     </svg>
   );
-}
+};
 
 /**
  * ExcelIcon component, excel symbol, path borrowed from

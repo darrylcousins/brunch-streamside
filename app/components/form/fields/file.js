@@ -14,20 +14,24 @@ export default function* FileField(props) {
     if (ev.target.tagName === "INPUT" && ev.target.type === "file") {
       [selected] = ev.target.files;
       error = false;
+      console.log(selected);
       /*
       if (!selected.name.endsWith('csv') && !selected.name.endsWith('xlsx')) {
         error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
         selected = null;
       }
-      if (selected.type !== 'text/csv' && selected.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+      */
+      if (selected.type !== 'text/csv' && selected.type !== 'application/vnd.ms-excel' && selected.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
         selected = null;
       }
-      */
-      // error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
-      console.log('got selected', selected, error);
+      console.log('Selected file:', selected, error);
+      this.refresh();
+      if (!error) {
+        const showFile = document.getElementById(`selected-${id}`);
+        showFile.classList.remove('dn');
+      }
     }
-    this.refresh();
   });
 
   this.addEventListener("invalid", async (ev) => {
@@ -52,7 +56,7 @@ export default function* FileField(props) {
             Please select a file
           </span>
           {selected && (
-            <div class="dark-gray mv2 pa3 br3 ba b--dark-gray bg-washed-blue dn">
+            <div class="dark-gray mv2 pa3 br3 ba b--dark-gray bg-washed-blue dn" id={`selected-${id}`}>
               Selected file for import:
               <span class="code">{selected.name}</span>
               .

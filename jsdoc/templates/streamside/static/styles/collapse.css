@@ -17,11 +17,11 @@
   }
 
   nav > ul > li.active a {
-    margin-bottom: 5px;
+    margin-bottom: 0px;
   }
 
   nav > ul > li:hover > a,
   nav > ul > li.active > a {
-    margin-bottom: 5px;
+    margin-bottom: 0px;
   }
 }

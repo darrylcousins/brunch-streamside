@@ -1,7 +1,7 @@
 /** @jsx createElement */
 /**
   * Starting point of url route /todos
-  * @module app/component/todos
+  * @module app/components/todos
   * @exports TodosRoute
   * @requires {@link module:app/todos}
   * @requires {@link module:app/todos-add}

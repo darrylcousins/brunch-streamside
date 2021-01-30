@@ -1,27 +1,33 @@
 /** @jsx createElement */
 /**
-  * Creates element to render array of boxes
-  * @module app/boxes
-  * @requires {@link module:app/box}
-  * @exports Boxes
-  */
+ * Creates element to render array of boxes
+ *
+ * @module app/components/boxes
+ * @requires module:app/components/box~Box
+ * @exports Boxes
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 import { sortObjectByKey } from "./lib";
 import Box from "./box";
-import {CloseIcon, DeleteIcon, DownloadIcon, EditIcon, AddIcon, ExcelIcon, HelpIcon} from "../lib/icon";
-import IconButton from "../lib/icon-button";
 
 /**
  * Create tabbed page of boxes by date and sets up tables for box details
  *
  * @generator
  * @yields {Element} - a html table display of the boxes
- * @param {object} props
- * @param {array} props.boxes - The array of boxes to by displayed
+ * @param {object} props Property object
+ * @param {Array} props.boxes - The array of boxes to by displayed
  */
 function* Boxes({ boxes }) {
 
-  this.addEventListener("click", async (ev) => {
+  /**
+   * Switch box tabs
+   *
+   * @function boxTab
+   * @param {event} ev A click event on this element
+   * @listens this.click
+   */
+  const boxTab = async (ev) => {
     const name = ev.target.tagName;
     if (name === "LABEL" || name === "H2") {
       const { id } = ev.target;
@@ -41,7 +47,9 @@ function* Boxes({ boxes }) {
         });
       }
     }
-  });
+  };
+
+  this.addEventListener("click", boxTab);
 
   while (true)
     yield (

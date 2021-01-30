@@ -2,9 +2,9 @@
 /**
  * Top of hierarchy of elements to render boxes
  *
- * @module app/boxes-current
+ * @module app/components/boxes-current
  * @exports CurrentBoxes
- * @requires module:app/boxes~Boxes
+ * @requires module:app/components/boxes~Boxes
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";

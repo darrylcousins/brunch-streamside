@@ -2,7 +2,7 @@
 /**
  * Display a table row of box details
  *
- * @module app/box
+ * @module app/components/box
  * @exports Box
  */
 import { createElement } from "@bikeshaving/crank/cjs";
@@ -12,7 +12,7 @@ import { createElement } from "@bikeshaving/crank/cjs";
  *
  * @function
  * @returns {Element} - a html table row of the box
- * @param {object} props Dicitonary of attributes
+ * @param {object} props Property object
  * @param {object} props.box The box to by displayed
  * @param {object} props.index The index of boxes array
  * @example

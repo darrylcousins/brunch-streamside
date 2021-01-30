@@ -26,6 +26,9 @@ export default function OrderDetail({ order }) {
             <span class="gray db pv1">{order.contact_email}</span>
           </div>
           <h3 class="f6 gray fw2 ttu tracked">{order.source}</h3>
+          <div class="ph3">
+            { order.note }
+          </div>
         </article>
       </div>
       <div class="dtc-ns pv4">

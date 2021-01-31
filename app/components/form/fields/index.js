@@ -8,6 +8,7 @@ import Hidden from "./hidden";
 import Select from "./select";
 import Multiple from "./multiple";
 import File from "./file";
+import Error from "../../lib/error";
 
 export default (props) => {
   const { label, options, data, formElements } = props;
@@ -143,5 +144,5 @@ export default (props) => {
     );
   }
 
-  return <div class="b">Failed to find input element to render</div>;
+  return <Error msg="Failed to find input element to render" />;
 };

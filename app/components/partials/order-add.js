@@ -1,12 +1,14 @@
 /** @jsx createElement */
 /**
- * Creates element to render modal form to add an order. This is a stun
+ * Creates element to render modal form to add an order. This is a stub
  * component with all the work done by {@link
- * module:app/components/order-upsert~UpsertOrderModal|UpsertOrderModal} and is identical to {@link
- * module:app/components/order-edit~EditOrderModal|EditOrderModal} with the exception of not having an order passed to be edited.
+ * module:app/components/order-upsert~UpsertOrderModal|UpsertOrderModal} and is
+ * identical to {@link
+ * module:app/components/order-edit~EditOrderModal|EditOrderModal} with the
+ * exception of not having an order passed to be edited.
  *
  * @module app/components/order-add
- * @requires module:app/components/form-modal~FormModalWrapper
+ * @requires module:app/form/form-modal-wrapper~FormModalWrapper
  * @requires module:app/lib/icon-button~IconButton
  * @requires module:app/components/order-upsert~UpsertOrderModal
  * @exports AddOrderModal
@@ -56,4 +58,10 @@ const options = {
   successMsg: "Successfully saved order, reloading page.",
 };
 
-export default FormModalWrapper(UpsertOrderModal, options);
+/**
+ * Wrapped component
+ *
+ * @member {object} AddOrderModal
+ */
+const AddOrderModal = FormModalWrapper(UpsertOrderModal, options);
+export default AddOrderModal;

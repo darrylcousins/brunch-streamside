@@ -1,34 +1,65 @@
 /** @jsx createElement */
+/**
+ * Creates element to render a modal display in {@link
+ * module:app/components/order-detail~OrderDetail|OrderDetail}
+ *
+ * @module app/components/order-modal
+ * @exports OrderModal
+ */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import { CloseIcon } from "../lib/icon";
 import OrderDetail from "./order-detail";
 import Button from "../lib/button";
 
-export default function* OrderModal({ row }) {
+/**
+ * Display a modal containing {@link
+ * module:app/components/order-detail~OrderDetail|OrderDetail}
+ *
+ * @generator
+ * @yields {Element} DOM element displaying modal
+ * @param {object} props Property object
+ * @param {object} props.order The order to be displayed
+ */
+function* OrderModal({ order }) {
+  /**
+   * Hold visibility state.
+   *
+   * @member {boolean} visible
+   */
   let visible = false;
 
-  const remove = () => {
-    visible = false;
-    this.refresh();
-  };
-
+  /**
+   * Close the modal
+   *
+   * @function closeModal
+   */
   const closeModal = () => {
     visible = false;
     this.refresh();
   };
 
-  this.addEventListener("click", async (ev) => {
-    if (ev.target.tagName === "BUTTON") {
+  /**
+   * Hide the modal
+   *
+   * @function hideModal
+   * @param {object} ev Event emitted
+   * @listens window.click
+   * @listens window.keyup
+   */
+  const hideModal = async (ev) => {
+    if (ev.target && ev.target.tagName === "BUTTON") {
       visible = !visible;
       this.refresh();
     }
-  });
-
-  this.addEventListener("keyup", async (ev) => {
-    if (ev.key === "Escape") {
-      remove();
+    if (ev.key && ev.key === "Escape") {
+      closeModal();
+      this.refresh();
     }
-  });
+  };
+
+  this.addEventListener("click", hideModal);
+
+  this.addEventListener("keyup", hideModal);
 
   while (true)
     yield (
@@ -51,7 +82,7 @@ export default function* OrderModal({ row }) {
                 <CloseIcon />
                 <span class="dn">Close add modal</span>
               </button>
-              <OrderDetail order={row} />
+              <OrderDetail order={order} />
               <div class="w-100 tr">
                 <Button
                   type="secondary"
@@ -67,3 +98,5 @@ export default function* OrderModal({ row }) {
       </Fragment>
     );
 }
+
+export default OrderModal;

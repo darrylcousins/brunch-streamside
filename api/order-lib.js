@@ -91,7 +91,7 @@ const mongoUpdate = async (collection, data) => {
   return await collection.updateOne(
     { _id },
     { $set: { ...parts } },
-    { upsert: true }
+    { upsert: false }
   );
 };
 

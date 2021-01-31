@@ -1,4 +1,19 @@
 /** @jsx createElement */
+/**
+ * FormModalWrapper pull in common functionality shared between action that call up a modal and display a form. It used by
+ * * {@link module:app/components/order-add|AddOrderModal}
+ * * {@link module:app/components/order-edit|EditOrderModal}
+ * * {@link module:app/components/order-remove|RemoveOrderModal}
+ * * {@link module:app/components/box-add|AddBoxModal}
+ * * {@link module:app/components/box-edit|EditBoxModal}
+ * * {@link module:app/components/box-remove|RemoveBoxModal}
+ * * {@link module:app/components/todo-add|AddTodoModal}
+ * * {@link module:app/components/todo-edit|EditTodoModal}
+ * * {@link module:app/components/todo-remove|RemoveTodoModal}
+ *
+ * @module app/form/form-modal-wrapper
+ * @requires module:app/lib/fetch~PostFetch
+ */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
 import BarLoader from "../lib/bar-loader";
@@ -6,17 +21,24 @@ import Error from "../lib/error";
 import { PostFetch } from "../lib/fetch";
 import { CloseIcon } from "../lib/icon";
 
-export default function FormModalWrapper(Component, options) {
+/**
+ * Wrap a crank Component and provide modal and form functionality
+ *
+ * @function FormModalWrapper
+ * @returns {Function} Return the wrapped component
+ * @param {object} Component The component to be wrapped
+ * @param {object} options Options for form and modal
+ */
+function FormModalWrapper(Component, options) {
+  /**
+   * Wrap a crank Component and provide modal and form functionality
+   *
+   * @function Wrapper
+   * @yields {Element} Return the wrapped component
+   * @param {object} props Property object
+   */
   return function* (props) {
-    const {
-      id,
-      title,
-      src,
-      ShowLink,
-      color,
-      saveMsg,
-      successMsg
-    } = options;
+    const { id, title, src, ShowLink, color, saveMsg, successMsg } = options;
     const name = title.toLowerCase().replace(/ /g, "-");
     let visible = false;
     let loading = false;
@@ -25,21 +47,50 @@ export default function FormModalWrapper(Component, options) {
     let fetchError = null;
     let formError = null;
 
+    /**
+     * Action which closes the modal and refreshes component. Normally attached
+     * to the modal `close` button and the `cancel` button.
+     *
+     * @function closeModal
+     */
     const closeModal = () => {
-      console.log('here in close');
       visible = false;
       this.refresh();
     };
 
-    const keyUp = (ev) => {
-      console.log(`key=${ev.key},code=${ev.code}`);
-    };
-
+    /**
+     * Action which opens the modal and refreshes component
+     *
+     * @function showModal
+     */
     const showModal = () => {
       visible = true;
       this.refresh();
     };
 
+    /**
+     * Action which opens the modal and refreshes component, checks target for
+     * closest button to ensure that event is this.event. Fired on `this.click`.
+     *
+     * @function showModalAction
+     * @param {event} ev A click event on this element
+     * @listens window.click
+     */
+    const showModalAction = async (ev) => {
+      // are we on the right target??
+      if (ev.target.closest(`button[name='${id}']`)) {
+        showModal();
+      }
+    };
+
+    this.addEventListener("click", showModalAction);
+
+    /**
+     * Read data from the form and send to the api for saving
+     *
+     * @function saveData
+     * @param {object} form The form data.
+     */
     const saveData = (form) => {
       loading = true;
       saving = true;
@@ -52,7 +103,7 @@ export default function FormModalWrapper(Component, options) {
       // check to find if we have a file upload
       Object.values(form).some((value) => {
         if (typeof value.name === "string") {
-          console.log('GOT FILE', value);
+          console.log("GOT FILE", value);
           hasFile = true;
           return true;
         }
@@ -73,6 +124,7 @@ export default function FormModalWrapper(Component, options) {
       }
 
       console.log(headers, data);
+      return;
 
       PostFetch({ src, data, headers })
         .then((result) => {
@@ -102,13 +154,12 @@ export default function FormModalWrapper(Component, options) {
         });
     };
 
-    this.addEventListener("click", async (ev) => {
-      // are we on the right target??
-      if (ev.target.closest(`button[name='${id}']`)) {
-        showModal();
-      }
-    });
-
+    /**
+     * Read data from the form and send to the api for saving
+     *
+     * @function getData
+     * @returns {object} The form data collected
+     */
     const getData = () => {
       const form = document.getElementById(id);
       // get them all and use data-type to sort for type
@@ -135,24 +186,48 @@ export default function FormModalWrapper(Component, options) {
       return data;
     };
 
-    // custom event called by form if passes validation
-    this.addEventListener(`${id}.valid`, (ev) => {
-      //console.log("Got return event after validation", ev.detail.valid); // should be true
+    /**
+     * Called on custom event by the form if it passes validation. Calls
+     * saveData with getData().
+     *
+     * @function formValid
+     * @param {event} ev Custom event
+     * @listens module:app/form/form#validationEvent
+     */
+    const formValid = async (ev) => {
+      // console.log("Got return event after validation", ev.detail.valid); // should be true
       if (ev.detail.valid === true) {
         saveData(getData());
       }
+    };
+
+    // custom event called by form if passes validation
+    this.addEventListener(`${id}.valid`, formValid);
+
+    /**
+     * Dynamic custom event to emit when requesting form object to validate
+     *
+     * @event module:app/form/form-modal-wrapper#validateEvent
+     * @param {string} formId The form id
+     */
+    const validateEvent = (formId) => new CustomEvent(`${formId}.validate`, {
+      bubbles: true,
     });
 
+    /**
+     * The action attached to the `save` button. Locates the form in the DOM
+     * and sends it a custom event to validate. If the form validates it in
+     * turns fires the ${id}.valid event to which `formValid` is listening for.
+     *
+     * @function doSave
+     * @fires module:app/form/form-modal-wrapper#validateEvent
+     */
     const doSave = () => {
       const form = document.getElementById(id);
       // fire event listener for Form element - which fires the above
       try {
         // custom event - tell form to run validation
-        form.dispatchEvent(
-          new CustomEvent(`${id}.validate`, {
-            bubbles: true,
-          })
-        );
+        form.dispatchEvent(validateEvent(id));
       } catch (err) {
         console.log(err);
         formError = err;
@@ -160,11 +235,22 @@ export default function FormModalWrapper(Component, options) {
       }
     };
 
+    /**
+     * Bit of a hack to give a button a particular name to use as identifier,
+     * e.g. using props.delivered
+     *
+     * @function getName
+     * @returns {string} An identifying name for the button
+     */
+    const getName = () => {
+      return name;
+    };
+
     while (true)
       yield (
         <Fragment>
           <ShowLink
-            name={name}
+            name={getName()}
             color={color}
             title={title}
             showModal={showModal}
@@ -187,10 +273,7 @@ export default function FormModalWrapper(Component, options) {
                   <span class="dn">Close modal</span>
                 </button>
                 <div class="tc center">
-                  <h2 class="fw4 fg-streamside-maroon">
-                    {title}
-                    .
-                  </h2>
+                  <h2 class="fw4 fg-streamside-maroon">{title}.</h2>
                 </div>
                 {fetchError && <Error msg={fetchError} />}
                 {formError && <Error msg={formError} />}
@@ -221,3 +304,5 @@ export default function FormModalWrapper(Component, options) {
       );
   };
 }
+
+export default FormModalWrapper;

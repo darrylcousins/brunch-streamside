@@ -28,7 +28,7 @@ exports.orderUpdated = async function (req, res, next) {
   // primary pupose to update delivery date if tag has been changed
 
   // send receipt notification to avoid timeouts and errors
-  res.status(200).json({ success: 'order create webhook received' });
+  res.status(200).json({ success: 'order update webhook received' });
 
   const collection = req.app.locals.orderCollection;
 

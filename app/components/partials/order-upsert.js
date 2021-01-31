@@ -11,7 +11,10 @@
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
 import Button from "../lib/button";
+import Error from "../lib/error";
+import BarLoader from "../lib/bar-loader";
 import Form from "../form";
+import getOrderFields from "./order-fields";
 
 /**
  * Create a modal to add or edit an order..
@@ -26,180 +29,36 @@ import Form from "../form";
  * @param {string} props.delivered - The delivery date as a string
  * @param {string} props.formId - The unique form indentifier
  */
-function* UpsertOrderModal(props) {
+async function* UpsertOrderModal(props) {
   const { doSave, closeModal, title, order, delivered, formId } = props;
 
-  /**
-   * Get the next upcoming date for a particular weekday
-   *
-   * @function findNextWeekday
-   * @param {number} day Integer day of week, Monday -> 0
-   * @returns {object} Date object
-   */
-  const findNextWeekday = (day) => {
-    // return the date of next Thursday as 14/01/2021 for example
-    // Thursday day is 4, Saturday is 6
-    const now = new Date();
-    now.setDate(now.getDate() + ((day + (7 - now.getDay())) % 7));
-    return now;
-  };
-
-  /**
-   * Get list of possible delivery days for delivery select list on form
-   *
-   * @function getUpcoming
-   * @returns {Array} List of dates as strings including current delivery date
-   * and next Thursday and Saturday
-   * @todo Should get these dates from upcoming Boxes
-   */
-  const getUpcoming = () => {
-    // TODO change this to collect from upcoming boxes - /api/current-box-dates
-    const dates = [4, 6].map((el) => findNextWeekday(el).toDateString());
-    dates.unshift(delivered);
-    console.log(dates);
-    return dates;
-  };
-
-  for (const _ of this) { // eslint-disable-line no-unused-vars
+  for await (const _ of this) { // eslint-disable-line no-unused-vars
+    yield <BarLoader />;
 
     /**
-     * The form fields - required by {@link module:app/form/form~Form|Form}.
+     * The order form fields keyed by field title string - required by {@link
+     * module:app/form/form~Form|Form}. The `delivered` field depends on list
+     * of upcoming box dates fetched from api and therefore is asynchronous and
+     * handles error. See {@link
+     * module:app/components/order-fields~getOrderFields|getOrderFields} for
+     * clarification.
      *
-     * @member {object} fields The form fields keyed by field title string
+     * @member {object} fields
      */
-    const fields = {
-      _id: {
-        id: "_id",
-        type: "hidden",
-        datatype: "integer",
-      },
-      Name: {
-        id: "name", // compiled from first and last
-        type: "hidden",
-        datatype: "string",
-      },
-      "Order Number": {
-        id: "order_number",
-        type: "hidden",
-        datatype: "string",
-      },
-      Price: {
-        id: "subtotal_price",
-        type: "hidden",
-        datatype: "string",
-      },
-      Including: {
-        id: "including",
-        type: "hidden",
-        datatype: "array",
-      },
-      "First Name": {
-        id: "first_name",
-        type: "text",
-        size: "25",
-        datatype: "string",
-        required: true,
-      },
-      "Last Name": {
-        id: "last_name",
-        type: "text",
-        size: "25",
-        datatype: "string",
-        required: true,
-      },
-      Telephone: {
-        id: "phone",
-        type: "text",
-        size: "25",
-        datatype: "string",
-        required: true,
-      },
-      "Street Address": {
-        id: "address1",
-        type: "text",
-        size: "25",
-        datatype: "string",
-        required: true,
-      },
-      Suburb: {
-        id: "address2",
-        type: "text",
-        size: "25",
-        datatype: "string",
-        required: false,
-      },
-      City: {
-        id: "city",
-        type: "text",
-        size: "25",
-        datatype: "string",
-        required: true,
-      },
-      Postcode: {
-        id: "zip",
-        type: "text",
-        size: "25",
-        datatype: "string",
-        required: true,
-      },
-      Email: {
-        id: "contact_email",
-        type: "text",
-        size: "25",
-        datatype: "string",
-        required: true,
-      },
-      Box: {
-        id: "sku",
-        type: "text",
-        size: "third",
-        datatype: "string",
-        required: true,
-      },
-      Source: {
-        id: "source",
-        type: "text",
-        size: "third",
-        datatype: "string",
-        required: true,
-      },
-      Delivered: {
-        id: "delivered",
-        type: "select",
-        size: "third",
-        datatype: "string",
-        required: true,
-        datalist: getUpcoming(), // find upcoming days?
-      },
-      Extras: {
-        id: "addons",
-        type: "text",
-        size: "100",
-        datatype: "array",
-        required: false,
-      },
-      Excluding: {
-        id: "removed",
-        type: "text",
-        size: "100",
-        datatype: "array",
-        required: false,
-      },
-      "Delivery Note": {
-        id: "note",
-        type: "textarea",
-        size: "100",
-        datatype: "string",
-        required: false,
-      },
-    };
+    /**
+     * Error if fetching box delivery dates fails
+     *
+     * @member {object|string} error
+     */
+    const { error, fields } = await getOrderFields(delivered);
 
     /**
-     * The form fields - required by {@link module:app/form/form~Form|Form}.
+     * The initial form data - required by {@link
+     * module:app/form/form~Form|Form}.  If an order supplied returns the order
+     * else compiles reasonable defaults.
      *
      * @function getInitialData
-     * @returns {object} The initial data for the form, if an order supplied
-     * returns the order else compiles reasonable defaults.
+     * @returns {object} The initial form data
      */
     const getInitialData = () => {
       if (typeof order !== "undefined") {
@@ -216,20 +75,24 @@ function* UpsertOrderModal(props) {
 
     yield (
       <Fragment>
-        <div class="w-90 center ph1">
-          <Form
-            data={getInitialData()}
-            fields={fields}
-            title={title}
-            id={formId}
-          />
-          <Button type="primary" onclick={doSave}>
-            Save
-          </Button>
-          <Button type="secondary" onclick={closeModal}>
-            Cancel
-          </Button>
-        </div>
+        {error ? (
+          <Error msg={error} />
+        ) : (
+          <div class="w-90 center ph1">
+            <Form
+              data={getInitialData()}
+              fields={fields}
+              title={title}
+              id={formId}
+            />
+            <Button type="primary" onclick={doSave}>
+              Save
+            </Button>
+            <Button type="secondary" onclick={closeModal}>
+              Cancel
+            </Button>
+          </div>
+        )}
       </Fragment>
     );
   }

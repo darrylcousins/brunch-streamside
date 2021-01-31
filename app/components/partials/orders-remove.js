@@ -1,4 +1,10 @@
 /** @jsx createElement */
+/**
+ * Creates element to render a form modal to remove mulitple orders
+ *
+ * @module app/components/orders-remove
+ * @exports OrdersRemove
+ */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
 import BarLoader from "../lib/bar-loader";
@@ -7,7 +13,14 @@ import { PostFetch } from "../lib/fetch";
 import { DeleteIcon, CloseIcon } from "../lib/icon";
 import Button from "../lib/button";
 
-function* OrdersRemoveModal({ delivered }) {
+/**
+ * Create a modal to remove orders selected by source of order
+ *
+ * @generator
+ * @param {string} delivered Delivery date as string
+ * @yields {Element} DOM element modal with form to remove orders
+ */
+function* RemoveOrders({ delivered }) {
   let visible = false;
   let loading = true;
   let fetchError = null;
@@ -63,7 +76,9 @@ function* OrdersRemoveModal({ delivered }) {
     );
     const data = { sources, delivered };
     const headers = { "Content-Type": "application/json" };
-    PostFetch({ src: `/api/delete-orders`, data, headers })
+    console.log(headers, data);
+    return;
+    PostFetch({ src: `/api/remove-orders`, data, headers })
       .then((result) => {
         const { error, json } = result;
         if (error !== null) {
@@ -238,4 +253,4 @@ function* OrdersRemoveModal({ delivered }) {
   }
 }
 
-module.exports = OrdersRemoveModal;
+export default RemoveOrders;

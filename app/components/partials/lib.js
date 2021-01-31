@@ -48,3 +48,18 @@ export const sortObjectByKey = (o, key) => {
   });
   return o;
 };
+
+/**
+ * Get the next upcoming date for a particular weekday
+ *
+ * @function findNextWeekday
+ * @param {number} day Integer day of week, Monday -> 0
+ * @returns {object} Date object
+ */
+const findNextWeekday = (day) => {
+  // return the date of next Thursday as 14/01/2021 for example
+  // Thursday day is 4, Saturday is 6
+  const now = new Date();
+  now.setDate(now.getDate() + ((day + (7 - now.getDay())) % 7));
+  return now;
+};

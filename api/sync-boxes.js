@@ -121,7 +121,11 @@ module.exports = async function (req, res, next) {
       { $setOnInsert: { ...parts } },
       { upsert: true }
     );
-    _logger.info(`Inserted box with id: ${res.upsertedId._id}`);
+    if (res.upsertId) {
+      _logger.info(`Inserted box with id: ${res.upsertedId._id}`);
+    } else {
+      _logger.info(`No box to insert, existing box with _id: ${_id}`);
+    }
   });
 
   res.status(200).json({ success: true });

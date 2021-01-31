@@ -19,7 +19,7 @@ routes.post('/edit-order', queries.editOrder);
 routes.post('/remove-order', queries.removeOrder);
 
 routes.get('/order-fields', queries.getOrderFields);
-routes.post('/delete-orders', queries.deleteOrders);
+routes.post('/remove-orders', queries.deleteOrders);
 routes.post('/import-orders', queries.importOrders);
 routes.get('/picking-list-download/:timestamp', queries.downloadPickingList);
 routes.get('/orders-download/:timestamp', queries.downloadOrders);

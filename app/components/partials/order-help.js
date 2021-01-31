@@ -1,16 +1,47 @@
 /** @jsx createElement */
+/**
+ * Creates element to render a help section on order listing
+ *
+ * @module app/components/order-help
+ * @exports HelpSection
+ */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import { HelpIcon, CloseIcon } from "../lib/icon";
 
-export default function* HelpSection({ children }) {
+/**
+ * Display a help section
+ *
+ * @generator
+ * @yields {Element} DOM element displaying help section
+ * @param {object} props Property object
+ * @param {object} props.children Nested elements
+ */
+function* HelpSection({ children }) {
+  /**
+   * Hold visibility state.
+   *
+   * @member {boolean} visible
+   */
   let visible = false;
 
+  /**
+   * Hide help section
+   *
+   * @function remove
+   */
   const remove = () => {
     visible = false;
     this.refresh();
   };
 
-  this.addEventListener("click", async (ev) => {
+  /**
+   * Toggle visibility
+   *
+   * @function toggleVisibility
+   * @param {object} ev The event emitted on click
+   * @listens window.click
+   */
+  const toggleVisibility = async (ev) => {
     const name = ev.target.tagName.toUpperCase();
     if (name === "SVG" || name === "PATH") {
       visible = !visible;
@@ -18,7 +49,9 @@ export default function* HelpSection({ children }) {
     } else {
       remove();
     }
-  });
+  };
+
+  this.addEventListener("click", toggleVisibility);
 
   while (true)
     yield (
@@ -50,3 +83,5 @@ export default function* HelpSection({ children }) {
       </Fragment>
     );
 }
+
+export default HelpSection;

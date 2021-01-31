@@ -1,7 +1,21 @@
 /** @jsx createElement */
+/**
+ * Creates element to render html display of order details
+ *
+ * @module app/components/order-detail
+ * @exports OrderDetail
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 
-export default function OrderDetail({ order }) {
+/**
+ * Create a DOM representation of order properties.
+ *
+ * @function
+ * @returns {Element} DOM element displaying order detail
+ * @param {object} props Property object
+ * @param {object} props.order The order to be displayed
+ */
+function OrderDetail({ order }) {
   return (
     <div class="dt-ns dt--fixed-ns">
       <div class="dtc-ns pv4">
@@ -26,9 +40,7 @@ export default function OrderDetail({ order }) {
             <span class="gray db pv1">{order.contact_email}</span>
           </div>
           <h3 class="f6 gray fw2 ttu tracked">{order.source}</h3>
-          <div class="ph3">
-            { order.note }
-          </div>
+          <div class="ph3">{order.note}</div>
         </article>
       </div>
       <div class="dtc-ns pv4">
@@ -64,3 +76,5 @@ export default function OrderDetail({ order }) {
     </div>
   );
 }
+
+export default OrderDetail;

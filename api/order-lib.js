@@ -302,7 +302,7 @@ const orderImportXLSX = (data, delivered, collection) => {
   //return false;
   let count = 0;
   let targetDate = new Date(Date.parse(delivered));
-  let targetString = targetDate.toLocaleDateString().replace(/-/g, '/');
+  let targetString = targetDate.toLocaleDateString().replace(/-/g, '/').replace(/^0/,'');
   _logger.info(targetString);
   try {
     const wb = xlsx.read(data);

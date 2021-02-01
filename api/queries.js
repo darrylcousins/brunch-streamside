@@ -439,7 +439,7 @@ exports.downloadPackingList= async function (req, res, next) {
     data.forEach(el => {
       if (!el.box.startsWith('Custom')) {
         const key = el.box.toLowerCase().replace(/ /g, '-');
-        products[key] = el.including.map(name => name.replace(/^- /, ''));
+        products[key] = el.including.map(name => name.replace(/^- ?/, ''));
         const emptykey = el.box.toLowerCase().replace(/ /g, '-') + '-empty';
         columns.push(
           { header: el.box, key: key, width: 40 }

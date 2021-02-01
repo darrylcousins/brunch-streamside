@@ -11,7 +11,7 @@ exports.getPickingList = (data) => {
   const picking = Object();
   data.forEach(box => {
     box.including.forEach(product => {
-      product = product.replace(/^- /, '');
+      product = product.replace(/^- ?/, '');
       if (!picking.hasOwnProperty(product)) {
         picking[product] = Object();
       }
@@ -25,7 +25,7 @@ exports.getPickingList = (data) => {
       picking[product].total += box.order_count;
     });
     Object.keys(box.extras).forEach(key => {
-      const product = key.replace(/^- /, '');
+      const product = key.replace(/^- ?/, '');
       if (!picking.hasOwnProperty(product)) {
         picking[product] = Object();
       }

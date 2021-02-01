@@ -99,6 +99,7 @@ module.exports = function startServer(PORT, PATH, callback) {
 
   const loadCrank = (req, res, next) => {
     //if (!req.user) return res.redirect('/login');
+    res.locals.header = (PORT === 3335) ? "Streamside Organics DEVELOPMENT SITE" : null;
     res.render('pages/index',
       (err, html) => {
         if (err) next(err);

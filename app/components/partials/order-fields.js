@@ -17,8 +17,8 @@ import { Fetch } from "../lib/fetch";
  */
 const getOrderFields = async (delivered) => {
   const { error, json } = await Fetch("api/current-box-dates")
-    .then((result) => result)
-    .catch((e) => ({
+    .then(result => result)
+    .catch(e => ({
       error: e, json: null
     }));
 

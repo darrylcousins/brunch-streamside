@@ -1,13 +1,34 @@
 /** @jsx createElement */
+/**
+ * Creates element to render a modal form for uploading orders from other sources. This
+ * component sets up the form fields and initial data to render a {@link
+ * module:app/form/form~Form|Form}. Essential options for the form are a
+ * dictionary of fields and initialData.
+ *
+ * @module app/components/order-upload
+ * @requires module:app/form/form~Form
+ * @exports UploadOrdersModal
+ */
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import {renderer} from '@bikeshaving/crank/cjs/dom';
 
 import Button from '../lib/button';
+import Fetch from '../lib/fetch';
+import BarLoader from '../lib/bar-loader';
 import TextButton from '../lib/text-button';
 import FormModalWrapper from '../wrappers/form-modal';
 import Form from '../form';
 
-// class="link dim mid-gray dib mr3 ba b--mid-gray br1 pa2"
+/**
+ * Icon component for link to expand modal
+ *
+ * @function ShowLink
+ * @param {object} opts Options that are passed to {@link module:app/lib/icon-button~IconButton|IconButton}
+ * @param {string} opts.name Name as identifier for the action
+ * @param {string} opts.title Hover hint and hidden span
+ * @param {string} opts.color Icon colour
+ * @returns {Element} IconButton
+ */
 const ShowLink = (opts) => {
   const { name, title, color, showModal } = opts;
   return (
@@ -17,6 +38,11 @@ const ShowLink = (opts) => {
   );
 };
 
+/**
+ * Options object passed to module:app/components/form-modal~FormModalWrapper
+ *
+ * @member {object} options
+ */
 const options = {
   id: 'import-orders', // form id
   title: 'Import Orders',
@@ -27,26 +53,47 @@ const options = {
   successMsg: 'Successfully uploaded orders, reloading page.'
 };
 
+const getUpcomingDates = async () => {
+  return await Fetch("api/current-box-dates")
+    .then((result) => result)
+    .catch((e) => ({
+      error: e, json: null
+    }));
+};
+
+/**
+ * Create a modal to import a file, uploading orders from other sources.
+ *
+ * @generator
+ * @yields {Element} A {@link module:app/form/form~Form|Form} and save/cancel buttons.
+ * @param {object} props Property object
+ * @param {Function} props.doSave - The save action
+ * @param {Function} props.closeModal - The cancel and close modal action
+ * @param {string} props.title - Form title
+ * @param {string} props.formId - The unique form indentifier
+ */
 function *UploadOrdersModal(props) {
 
   let { doSave, closeModal, title, formId } = props;
 
-  const findNextWeekday = (day) => {
-    // return the date of next Thursday as 14/01/2021 for example
-    // Thursday day is 4, Saturday is 6
-    let now = new Date();
-    now.setDate(now.getDate() + (day + (7-now.getDay())) % 7);
-    return now;
-  };
+  for (const _ of this) { // eslint-disable-line no-unused-vars
 
-  // get these from current boxes??
-  const getUpcoming = () => {
-    const dates = [4,6].map(el => findNextWeekday(el).toDateString());
-    console.log(dates);
-    return dates;
-  };
+    const findNextWeekday = (day) => {
+      // return the date of next Thursday as 14/01/2021 for example
+      // Thursday day is 4, Saturday is 6
+      let now = new Date();
+      now.setDate(now.getDate() + (day + (7-now.getDay())) % 7);
+      return now;
+    };
 
-  for (const _  of this) {
+    // get these from current boxes??
+    const getUpcoming = () => {
+      const dates = [4,6].map(el => findNextWeekday(el).toDateString());
+      console.log(dates);
+      return dates;
+    };
+
+    //const upcoming = await getUpcomingDates();
 
     const fields = {
       'Orders': {
@@ -56,9 +103,9 @@ function *UploadOrdersModal(props) {
         datatype: 'file',
         required: true
       },
-      'Delivered': {
+      'Delivery Date': {
         id: 'delivered',
-        type: 'select',
+        type: 'input-select',
         size: 'third',
         datatype: 'string',
         required: true,
@@ -96,7 +143,6 @@ function *UploadOrdersModal(props) {
       </Fragment>
     );
   }
-
 };
 
 export default FormModalWrapper(UploadOrdersModal, options);

@@ -2,15 +2,16 @@
 import { createElement } from "@bikeshaving/crank/cjs";
 
 import Checkbox from "./checkbox";
+import CheckboxMultiple from "./checkbox-multiple";
 import TextField from "./text";
 import TextArea from "./textarea";
 import Hidden from "./hidden";
-import Select from "./select";
-import Multiple from "./multiple";
+import InputSelect from "./input-select";
+import InputMultipleSelect from "./input-multiple";
 import File from "./file";
 import Error from "../../lib/error";
 
-export default (props) => {
+const Field = (props) => {
   const { label, options, data, formElements } = props;
   const { type, size, required, datalist, datatype } = options;
   let { id } = options;
@@ -53,7 +54,16 @@ export default (props) => {
   }
 
   if (type === "file") {
-    return <File name={id} type={type} id={id} datatype={datatype} required={required} valid={valid} />;
+    return (
+      <File
+        name={id}
+        type={type}
+        id={id}
+        datatype={datatype}
+        required={required}
+        valid={valid}
+      />
+    );
   }
 
   if (type === "textarea") {
@@ -106,9 +116,9 @@ export default (props) => {
     );
   }
 
-  if (type === "select") {
+  if (type === "input-select") {
     return (
-      <Select
+      <InputSelect
         value={value}
         name={id}
         label={label}
@@ -125,9 +135,28 @@ export default (props) => {
     );
   }
 
-  if (type === "multiple") {
+  if (type === "input-multiple") {
     return (
-      <Multiple
+      <InputMultipleSelect
+        value={value}
+        name={id}
+        label={label}
+        id={id}
+        type={type}
+        size={size}
+        required={required}
+        valid={valid}
+        onfocus={onFocus} // addEventListener???
+        onblur={onBlur}
+        datalist={datalist}
+        datatype={datatype}
+      />
+    );
+  }
+
+  if (type === "checkbox-multiple") {
+    return (
+      <CheckboxMultiple
         value={value}
         name={id}
         label={label}
@@ -146,3 +175,5 @@ export default (props) => {
 
   return <Error msg="Failed to find input element to render" />;
 };
+
+export default Field;

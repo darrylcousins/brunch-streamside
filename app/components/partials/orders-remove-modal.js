@@ -70,19 +70,19 @@ const getRemoveFields = async (delivered) => {
     }));
   let fields = {};
   if (!error) {
-    json.forEach(el => {
-      fields[el] = {
-        type: "checkbox",
-        datatype: "string",
-        size: "100",
-      };
-    });
+    fields["Delivered"] = {
+      id: "delivered",
+      type: "hidden",
+      datatype: "string",
+    };
+    fields["Sources"] = {
+      id: "sources",
+      type: "checkbox-multiple",
+      size: "100",
+      datatype: "array",
+      datalist: json
+    };
   }
-  fields["Delivered"] = {
-    type: "hidden",
-    value: delivered,
-    datatype: "string",
-  };
   return { error, fields };
 };
 
@@ -133,9 +133,10 @@ async function* RemoveOrdersModal(props) {
      * @returns {object} The initial form data
      */
     const getInitialData = () => {
-      return {};
+      return {
+        delivered
+      };
     };
-    console.log(doSave);
 
     yield (
       <Fragment>

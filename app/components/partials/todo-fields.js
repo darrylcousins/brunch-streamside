@@ -10,14 +10,14 @@ module.exports = {
     required: true,
   },
   Author: {
-    type: "select",
+    type: "input-select",
     size: "third",
     required: true,
     datatype: "string",
     datalist: ["Lilly", "Dominique", "Darryl"],
   },
   Tags: {
-    type: "multiple",
+    type: "input-multiple",
     size: "third",
     required: true,
     datatype: "array",

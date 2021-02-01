@@ -126,7 +126,7 @@ const getOrderFields = async (delivered) => {
       },
       Delivered: {
         id: "delivered",
-        type: "select",
+        type: "input-select",
         size: "third",
         datatype: "string",
         required: true,

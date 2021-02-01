@@ -45,10 +45,11 @@ function* Form(props) {
    * @param {string} formId The form id
    * @param {boolean} valid The form validation state
    */
-  const validationEvent = (formId, valid) => new CustomEvent(`${formId}.valid`, {
-    bubbles: true,
-    detail: { valid },
-  });
+  const validationEvent = (formId, valid) =>
+    new CustomEvent(`${formId}.valid`, {
+      bubbles: true,
+      detail: { valid },
+    });
 
   /**
    * Listens for  ${id}.validate which is a custom event fired by {@link

@@ -23,7 +23,7 @@ export default function* CurrentTodos() {
   let filters = {
     author: [],
     tags: [],
-    completed: [0, 1],
+    completed: [0],
   };
 
   const mapCompletedFilters = (arr) => {

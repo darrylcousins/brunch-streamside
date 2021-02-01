@@ -77,7 +77,7 @@ function* RemoveOrders({ delivered }) {
     const data = { sources, delivered };
     const headers = { "Content-Type": "application/json" };
     console.log(headers, data);
-    return;
+    //return;
     PostFetch({ src: `/api/remove-orders`, data, headers })
       .then((result) => {
         const { error, json } = result;

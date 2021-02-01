@@ -1,5 +1,4 @@
 /** @jsx createElement */
-require('isomorphic-fetch');
 import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import BarLoader from '../lib/bar-loader';
 import Error from '../lib/error';

@@ -2,7 +2,7 @@
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
-export default function* Multiple(props) {
+function* InputMultipleSelect(props) {
   const { label, id, size, valid, datalist, value } = props;
 
   const separator = ",";
@@ -69,7 +69,7 @@ export default function* Multiple(props) {
           {...props}
         />
         <span class={`small mt1 fg-streamside-orange ${valid && "hidden"}`}>
-          Field is required
+          {label} is required
         </span>
         &nbsp;
         <datalist id={`${id}s`}>
@@ -80,3 +80,5 @@ export default function* Multiple(props) {
       </FieldWrapper>
     );
 }
+
+export default InputMultipleSelect;

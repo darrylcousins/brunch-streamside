@@ -15,7 +15,7 @@ export default (props) => {
         {value || ""}
       </textarea>
       <span class={`small mt1 fg-streamside-orange ${valid && "hidden"}`}>
-        Field is required
+        {label} is required
       </span>
       &nbsp;
     </FieldWrapper>

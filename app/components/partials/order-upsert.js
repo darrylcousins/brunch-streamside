@@ -1,8 +1,9 @@
 /** @jsx createElement */
 /**
- * Creates element to render modal form adding or editing an order.  component
- * with all the work done by {@link module:app/form/form~Form|Form}. Essential
- * options for the form are a dictionary of fields and initialData.
+ * Creates element to render a modal form for adding or editing an order. This
+ * component sets up the form fields and initial data to render a {@link
+ * module:app/form/form~Form|Form}. Essential options for the form are a
+ * dictionary of fields and initialData.
  *
  * @module app/components/order-upsert
  * @requires module:app/form/form~Form
@@ -20,7 +21,7 @@ import getOrderFields from "./order-fields";
  * Create a modal to add or edit an order..
  *
  * @generator
- * @yields {Element} A form and save/cancel buttons.
+ * @yields {Element} A {@link module:app/form/form~Form|Form} and save/cancel buttons.
  * @param {object} props Property object
  * @param {Function} props.doSave - The save action
  * @param {Function} props.closeModal - The cancel and close modal action

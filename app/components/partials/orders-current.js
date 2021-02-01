@@ -244,7 +244,6 @@ function* CurrentOrders() {
                     >
                       <AddOrderModal delivered={key} />
                       <RemoveOrders delivered={key} />
-                      <RemoveOrdersModal delivered={key} />
                       {new Date(key).toString() !== "Invalid Date" && (
                         <a
                           name={`${key.replace(/ /g, "-")}-key`}

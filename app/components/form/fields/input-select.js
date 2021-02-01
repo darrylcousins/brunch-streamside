@@ -16,6 +16,7 @@ export default (props) => {
       />
       <span class={`small mt1 fg-streamside-orange ${valid ? "hidden" : ""}`}>
         { label }
+        &nbsp;
         is required
       </span>
       &nbsp;

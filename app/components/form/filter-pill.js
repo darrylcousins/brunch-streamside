@@ -2,6 +2,7 @@
 import { createElement } from "@bikeshaving/crank/cjs";
 
 function* FilterPill({ name, type, callback }) {
+
   this.addEventListener("click", () => {
     callback(name, type);
   });

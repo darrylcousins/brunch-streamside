@@ -124,7 +124,6 @@ function FormModalWrapper(Component, options) {
       }
 
       console.log(headers, data);
-      return;
 
       PostFetch({ src, data, headers })
         .then((result) => {
@@ -165,8 +164,14 @@ function FormModalWrapper(Component, options) {
       // get them all and use data-type to sort for type
       const data = {};
       Array.from(form.elements).forEach((el) => {
-        if (el.tagName !== "FIELDSET") {
+        if (el.tagName !== "FIELDSET" && el.tagName !== "BUTTON") {
           let value;
+          //console.log(el);
+          el.dispatchEvent(
+            new CustomEvent("getdata", {
+              bubbles: true
+            })
+          );
           if (el.type === "checkbox") {
             value = el.checked;
           } else if (el.type === "file") {

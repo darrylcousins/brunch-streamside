@@ -2,8 +2,13 @@
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
-export default (props) => {
+function TextField(props) {
   const { label, id, size, valid } = props;
+
+  this.addEventListener("getdata", (ev) => {
+    console.log('Got event data', ev.target.value);
+  });
+
   return (
     <FieldWrapper label={label} size={size} id={id}>
       <input
@@ -13,10 +18,12 @@ export default (props) => {
         {...props}
       />
       <span class={`small mt1 fg-streamside-orange ${valid ? "hidden" : ""}`}>
-        { label }
+        { label }&nbsp;
         is required
       </span>
       &nbsp;
     </FieldWrapper>
   );
 };
+
+export default TextField;

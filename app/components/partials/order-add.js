@@ -19,11 +19,6 @@ import FormModalWrapper from "../wrappers/form-modal";
 import UpsertOrderModal from "./order-upsert";
 import IconButton from "../lib/icon-button";
 
-/* TODO
- * check date list in order-upsert to collect from upcoming boxes - /api/current-box-dates
- * make box a list to collect from available boxes for selected date - /api/current-boxes
- */
-
 /**
  * Icon component for link to expand modal
  *
@@ -59,7 +54,7 @@ const options = {
 };
 
 /**
- * Wrapped component
+ * Wrapped component {@link module:app/form/form-modal-wrapper~FormModalWrapper|FormModalWrapper}
  *
  * @member {object} AddOrderModal
  */

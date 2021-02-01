@@ -18,8 +18,9 @@
  *     const { error, json } = result;
  *   })
  */
-const Fetch = async (src) =>
-  fetch(src)
+const Fetch = async (src) => {
+  console.log('fetching', src);
+  return fetch(src)
     .then(async (response) => {
       if (response.status !== 200) {
         throw new Error(JSON.stringify(await response.json()));
@@ -37,6 +38,7 @@ const Fetch = async (src) =>
       }
       return { error, json: null };
     });
+};
 
 /**
  * PostFetch component that attempts to deal reasonably if the fetch fails. Always

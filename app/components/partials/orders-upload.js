@@ -13,7 +13,7 @@ import {createElement, Fragment} from '@bikeshaving/crank/cjs';
 import {renderer} from '@bikeshaving/crank/cjs/dom';
 
 import Button from '../lib/button';
-import Fetch from '../lib/fetch';
+import { Fetch }  from '../lib/fetch';
 import BarLoader from '../lib/bar-loader';
 import Error from '../lib/error';
 import TextButton from '../lib/text-button';
@@ -60,6 +60,7 @@ const options = {
  * @returns {object}
  */
 const getUploadFields = async () => {
+  console.log('wtf2');
   const { error, json } = await Fetch("api/current-box-dates")
     .then(result => result)
     .catch(e => ({
@@ -105,6 +106,7 @@ async function *UploadOrdersModal(props) {
   for await (const _ of this) { // eslint-disable-line no-unused-vars
     yield <BarLoader />;
 
+    console.log('wtf');
     const { error, fields } = await getUploadFields();
 
     const getInitialData = () => (

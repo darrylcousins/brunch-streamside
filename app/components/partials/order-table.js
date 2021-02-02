@@ -13,7 +13,7 @@ import { createElement } from "@bikeshaving/crank/cjs";
 import OrderModal from "./order-modal";
 import EditOrderModal from "./order-edit";
 import RemoveOrderModal from "./order-remove";
-import { sortObjectByKey } from "./lib";
+import { sortObjectByKey } from "../../helpers";
 
 /**
  * Create a DOM representation of order as a table row

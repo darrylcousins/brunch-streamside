@@ -7,7 +7,7 @@
  * @exports Boxes
  */
 import { createElement } from "@bikeshaving/crank/cjs";
-import { sortObjectByKey } from "./lib";
+import { sortObjectByKey } from "../../helpers";
 import Box from "./box";
 
 /**

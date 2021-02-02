@@ -14,11 +14,11 @@ import "regenerator-runtime/runtime"; // regeneratorRuntime error
 import { createElement } from "@bikeshaving/crank/cjs";
 import { renderer } from "@bikeshaving/crank/cjs/dom";
 import crossroads from "crossroads";
-import Home from "./components/home";
-import Orders from "./components/orders";
-import Box from "./components/boxes";
-import Todos from "./components/todos";
-import PackingLists from "./components/packing-lists";
+import Home from "./route/home";
+import Orders from "./route/orders";
+import Box from "./route/boxes";
+import Todos from "./route/todos";
+import PackingLists from "./route/packing-lists";
 
 crossroads.addRoute("/", () =>
   renderer.render(<Home />, document.querySelector("#app"))

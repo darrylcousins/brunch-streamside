@@ -6,6 +6,7 @@
  * @requires module:app/form/form-modal-wrapper~FormModalWrapper
  * @requires module:app/lib/icon-button~IconButton
  * @exports RemoveOrderModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import { DeleteIcon } from "../lib/icon";

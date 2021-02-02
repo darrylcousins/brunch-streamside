@@ -4,6 +4,7 @@
  *
  * @module app/components/order-current
  * @exports CurrentOrders
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 

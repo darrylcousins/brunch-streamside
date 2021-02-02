@@ -4,6 +4,7 @@
  *
  * @module app/form/form
  * @requires module:app/form/field~Field
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 

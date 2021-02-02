@@ -1,7 +1,17 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/input-select
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
+/**
+*
+* @function InputSelectField
+* @param {object} props The property object
+*/
 function InputSelectField(props) {
   const { label, id, size, valid, datalist } = props;
 

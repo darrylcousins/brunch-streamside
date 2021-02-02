@@ -12,6 +12,7 @@
  * @requires module:app/lib/icon-button~IconButton
  * @requires module:app/components/order-upsert~UpsertOrderModal
  * @exports EditOrderModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 

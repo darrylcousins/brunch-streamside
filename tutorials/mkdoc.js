@@ -1,29 +1,40 @@
 const fs = require('fs');
 const path = require('path');
 
-const dir = "./app/components/lib";
-fs.readdir(dir, (err, files) => {
-  files.forEach(f => {
+//const comment =` * @author Darryl Cousins <darryljcousins@gmail.com>`
+const dir = "./app/form/fields";
+
+const doSo = (f) => {
     const fp = path.join(dir, f);
-    console.log(f);
-    const [name] = f.split('.');
+  //console.log(fp);
     let count = 0;
     const lines = []
     if (true) {
       fs.readFileSync(fp).toString().split('\n').forEach(function (line) { 
-        lines.push(line);
-        if (count === 0) {
+        if (line.match(/^function/) && count === 0) {
+          let name = line.split(' ')[1];
+          if (name.startsWith('*')) name = name.slice(1);
+          name = name.split('(')[0];
+          count = 1;
           const comment =`/**
-* @module app/lib/${name}
-* @author Darryl Cousins <darryljcousins@gmail.com>
+*
+* @function ${name}
+* @param {object} props The property object
 */`
           lines.push(comment);
         }
-        count += 1;
-        //fs.appendFileSync("./output.txt", line.toString() + "\n");
+        lines.push(line);
       });
-      console.log(lines.join('\n'));
+      //console.log(lines.join('\n'));
       fs.writeFileSync(fp, lines.join('\n'));
+    }
+};
+
+fs.readdir(dir, (err, files) => {
+  files.forEach(f => {
+    if (f.endsWith('.js')) {
+      //console.log(f);
+      doSo(f);
     }
   });
 });

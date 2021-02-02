@@ -1,4 +1,9 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/filter-select
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 
 function* FilterSelect({ name, fields, position, type, callback }) {

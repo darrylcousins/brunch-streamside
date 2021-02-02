@@ -4,6 +4,7 @@
  *
  * @module app/components/order-detail
  * @exports OrderDetail
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 

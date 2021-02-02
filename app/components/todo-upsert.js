@@ -8,6 +8,7 @@
  * @module app/components/todo-upsert
  * @requires module:app/form/form~Form
  * @exports UpsertTodoModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 

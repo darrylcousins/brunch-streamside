@@ -4,6 +4,7 @@
  *
  * @module app/components/packing-lists
  * @exports PackingLists
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";

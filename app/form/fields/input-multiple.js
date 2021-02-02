@@ -1,7 +1,17 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/input-multiple
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
+/**
+*
+* @function InputMultipleSelect
+* @param {object} props The property object
+*/
 function* InputMultipleSelect(props) {
   const { label, id, size, valid, datalist, value } = props;
 

@@ -4,6 +4,7 @@
  *
  * @module app/components/box
  * @exports Box
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 

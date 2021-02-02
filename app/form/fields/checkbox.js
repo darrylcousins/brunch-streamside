@@ -1,7 +1,17 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/checkbox
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
+/**
+*
+* @function CheckboxField
+* @param {object} props The property object
+*/
 function CheckboxField(props) {
   const { label, valid, size, id, value, datatype } = props;
 

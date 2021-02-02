@@ -8,6 +8,7 @@
  * @module app/components/order-upload
  * @requires module:app/form/form~Form
  * @exports UploadOrdersModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 

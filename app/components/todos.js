@@ -4,6 +4,7 @@
  *
  * @module app/components/todos
  * @exports CurrentTodos
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";

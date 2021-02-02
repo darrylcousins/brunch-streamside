@@ -7,6 +7,7 @@
  * @requires module:app/lib/icon-button~IconButton
  * @requires module:app/components/todo-upsert~UpsertTodoModal
  * @exports RemoveTodoModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 

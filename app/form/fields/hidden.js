@@ -1,6 +1,16 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/hidden
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 
+/**
+*
+* @function HiddenField
+* @param {object} props The property object
+*/
 function HiddenField(props) {
   const { id, datatype } = props;
 

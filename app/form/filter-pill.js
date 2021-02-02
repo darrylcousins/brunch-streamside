@@ -1,4 +1,9 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/filter-pill
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 
 function* FilterPill({ name, type, callback }) {

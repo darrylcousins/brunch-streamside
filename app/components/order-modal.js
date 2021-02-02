@@ -5,6 +5,7 @@
  *
  * @module app/components/order-modal
  * @exports OrderModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import { CloseIcon } from "../lib/icon";

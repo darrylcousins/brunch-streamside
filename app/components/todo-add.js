@@ -12,6 +12,7 @@
  * @requires module:app/lib/text-button~TextButton
  * @requires module:app/components/todo-upsert~UpsertTodoModal
  * @exports AddTodoModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 

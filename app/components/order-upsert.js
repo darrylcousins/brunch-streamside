@@ -8,6 +8,7 @@
  * @module app/components/order-upsert
  * @requires module:app/form/form~Form
  * @exports UpsertOrderModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 

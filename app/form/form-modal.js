@@ -11,8 +11,9 @@
  * * {@link module:app/components/todo-edit|EditTodoModal}
  * * {@link module:app/components/todo-remove|RemoveTodoModal}
  *
- * @module app/form/form-modal-wrapper
+ * @module app/form/form-modal
  * @requires module:app/lib/fetch~PostFetch
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 

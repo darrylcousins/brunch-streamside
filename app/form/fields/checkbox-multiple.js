@@ -1,7 +1,17 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/checkbox-multiple
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
+/**
+*
+* @function CheckboxMultiple
+* @param {object} props The property object
+*/
 function *CheckboxMultiple(props) {
   const { label, id, size, valid, datalist, datatype } = props;
   let value = false;

@@ -1,7 +1,17 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/textarea
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
+/**
+*
+* @function TextAreaField
+* @param {object} props The property object
+*/
 function TextAreaField(props) {
   const { label, id, value, valid, size } = props;
 

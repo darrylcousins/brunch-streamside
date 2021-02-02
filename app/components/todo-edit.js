@@ -12,6 +12,7 @@
  * @requires module:app/lib/icon-button~IconButton
  * @requires module:app/components/todo-upsert~UpsertTodoModal
  * @exports EditTodoModal
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 

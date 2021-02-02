@@ -5,6 +5,7 @@
  * @module app/components/boxes-current
  * @exports CurrentBoxes
  * @requires module:app/components/boxes~Boxes
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";

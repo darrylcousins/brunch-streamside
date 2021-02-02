@@ -4,6 +4,7 @@
  * * {@link module:app/components/order-edit|EditOrderModal}
  *
  * @module app/components/order-fields
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { Fetch } from "../lib/fetch";
 

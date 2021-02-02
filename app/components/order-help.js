@@ -4,6 +4,7 @@
  *
  * @module app/components/order-help
  * @exports HelpSection
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import { HelpIcon, CloseIcon } from "../lib/icon";

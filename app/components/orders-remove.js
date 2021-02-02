@@ -9,6 +9,7 @@
  * @requires module:app/form/form~Form
  * @requires module:app/form/form-modal-wrapper~FormModalWrapper
  * @exports RemoveOrders
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 

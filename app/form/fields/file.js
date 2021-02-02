@@ -1,9 +1,19 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/file
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 import Error from "../../lib/error";
 
 // TODO 1. add file types allowed, 2. add multiple
-export default function* FileField(props) {
+/**
+*
+* @function FileField
+* @param {object} props The property object
+*/
+function* FileField(props) {
   const { label, id, size, required } = props;
   let { valid } = props;
 
@@ -82,24 +92,5 @@ export default function* FileField(props) {
       </div>
     );
 }
-  /*
-      <FieldWrapper label={label} size={size} id={id}>
-        <label
-          htmlFor={id}
-          class="pointer link dim mid-gray f6 fw6 ttu tracked dib mr3 ba b--mid-gray br2 pa2"
-          title="Select file"
-        >
-          <input type="file" id={id} hidden required={required} />
-          <span class={`small mt1 fg-streamside-orange ${valid && "hidden"}`}>
-          Select file
-        </label>
-        {selected && (
-          <div class="dark-gray mv2 pa3 br3 ba b--dark-gray bg-washed-blue">
-            Selected file for import:
-            <span class="code">{selected.name}</span>
-            .
-          </div>
-        )}
-        {error && <Error msg={error} />}
-      </FieldWrapper>
-      */
+
+export default FileField;

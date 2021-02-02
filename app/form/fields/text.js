@@ -1,7 +1,17 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/text
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
+/**
+*
+* @function TextField
+* @param {object} props The property object
+*/
 function TextField(props) {
   const { label, id, size, valid, datatype } = props;
 

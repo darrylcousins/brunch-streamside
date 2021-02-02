@@ -5,6 +5,7 @@
  * @module app/components/boxes
  * @requires module:app/components/box~Box
  * @exports Boxes
+ * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 import { sortObjectByKey } from "../helpers";

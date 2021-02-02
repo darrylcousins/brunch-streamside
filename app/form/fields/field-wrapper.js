@@ -1,7 +1,17 @@
 /** @jsx createElement */
+/**
+*
+* @module app/form/field-wrapper
+* @author Darryl Cousins <darryljcousins@gmail.com>
+*/
 import { createElement } from "@bikeshaving/crank/cjs";
 
-export default (props) => {
+/**
+*
+* @function FieldWrapper
+* @param {object} props The property object
+*/
+function FieldWrapper(props) {
   const { children, label, size, id } = props;
   return (
     <div class={`fl w-100 w-${size}-ns`}>
@@ -14,3 +24,5 @@ export default (props) => {
     </div>
   );
 };
+
+export default FieldWrapper;

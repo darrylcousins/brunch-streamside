@@ -9,7 +9,6 @@ import { createElement } from "@bikeshaving/crank/cjs";
 
 import AddOrderModal from "./order-add";
 import RemoveOrders from "./orders-remove";
-import RemoveOrdersModal from "./orders-remove-modal"; // this is the new one under develpment!!
 import HelpSection from "./order-help";
 import { TableHeader, TableBody } from "./order-table";
 import BarLoader from "../lib/bar-loader";

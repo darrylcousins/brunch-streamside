@@ -2,8 +2,24 @@
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
-export default (props) => {
+function CheckboxField(props) {
   const { label, valid, size, id, value, datatype } = props;
+
+  this.addEventListener("form.data.collect", (ev) => {
+    const value = ev.target.checked;
+    if (ev.target.id === id) {
+      this.dispatchEvent(
+        new CustomEvent("form.data.feed", {
+          bubbles: true,
+          detail: {
+            id,
+            value
+          }
+        })
+      );
+    }
+  });
+
   return (
     <FieldWrapper label={label} size={size} id={id}>
       <input
@@ -19,3 +35,5 @@ export default (props) => {
     </FieldWrapper>
   );
 };
+
+export default CheckboxField;

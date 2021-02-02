@@ -39,6 +39,21 @@ export default function* FileField(props) {
     this.refresh();
   });
 
+  this.addEventListener("form.data.collect", (ev) => {
+    const [value] = ev.target.files;
+    if (ev.target.id === id) {
+      this.dispatchEvent(
+        new CustomEvent("form.data.feed", {
+          bubbles: true,
+          detail: {
+            id,
+            value
+          }
+        })
+      );
+    }
+  });
+
   while (true)
     yield (
       <div class={`fl w-100 w-${size}-ns`}>

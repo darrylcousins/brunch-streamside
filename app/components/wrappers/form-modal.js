@@ -21,6 +21,8 @@ import Error from "../lib/error";
 import { PostFetch } from "../lib/fetch";
 import { CloseIcon } from "../lib/icon";
 
+const hasOwnProp = Object.prototype.hasOwnProperty;
+
 /**
  * Wrap a crank Component and provide modal and form functionality
  *
@@ -86,6 +88,21 @@ function FormModalWrapper(Component, options) {
     this.addEventListener("click", showModalAction);
 
     /**
+     * Hide the modal on escape key
+     *
+     * @function hideModal
+     * @param {object} ev Event emitted
+     * @listens window.keyup
+     */
+    const hideModal = async (ev) => {
+      if (ev.key && ev.key === "Escape") {
+        closeModal();
+      }
+    };
+
+    this.addEventListener("keyup", hideModal);
+
+    /**
      * Read data from the form and send to the api for saving
      *
      * @function saveData
@@ -103,7 +120,6 @@ function FormModalWrapper(Component, options) {
       // check to find if we have a file upload
       Object.values(form).some((value) => {
         if (typeof value.name === "string") {
-          console.log("GOT FILE", value);
           hasFile = true;
           return true;
         }
@@ -123,7 +139,12 @@ function FormModalWrapper(Component, options) {
         data = form;
       }
 
-      console.log(headers, data);
+        /*
+      console.log(data);
+      console.warn('Posting save successfully but disabled for development');
+      closeModal();
+      return;
+      */
 
       PostFetch({ src, data, headers })
         .then((result) => {
@@ -146,49 +167,49 @@ function FormModalWrapper(Component, options) {
           }
         })
         .catch((err) => {
-          console.log("ERROR:", err);
+          console.err("ERROR:", err);
           fetchError = err;
           loading = false;
           this.refresh();
         });
     };
 
+    const fieldIds = [];
+    const fieldData = [];
+    let fieldLength
+
+    this.addEventListener("form.data.feed", (ev) => {
+      //console.log('Got data back from input', ev.detail);
+      if (!fieldIds.includes(ev.detail.id)) {
+        console.log(ev.detail.id, 'not stored in fieldIds??', fieldIds);
+      }
+      fieldData.push(ev.detail);
+      if (fieldData.length === fieldLength) {
+        const finalData = Object.fromEntries(fieldData.map(el => [el.id, el.value]));
+        saveData(finalData);
+      }
+    });
+
     /**
-     * Read data from the form and send to the api for saving
+     * Loop through form elements and request data
      *
      * @function getData
-     * @returns {object} The form data collected
      */
     const getData = () => {
       const form = document.getElementById(id);
-      // get them all and use data-type to sort for type
-      const data = {};
       Array.from(form.elements).forEach((el) => {
         if (el.tagName !== "FIELDSET" && el.tagName !== "BUTTON") {
-          let value;
-          //console.log(el);
-          el.dispatchEvent(
-            new CustomEvent("getdata", {
-              bubbles: true
-            })
-          );
-          if (el.type === "checkbox") {
-            value = el.checked;
-          } else if (el.type === "file") {
-            [value] = el.files;
-          } else {
-            value = el.value;
+          if (!fieldIds.includes(el.id)) {
+            fieldIds.push(el.id);
+            el.dispatchEvent(
+              new CustomEvent("form.data.collect", {
+                bubbles: true,
+                detail: {id: el.id}
+              })
+            );
           }
-          if (el.getAttribute("datatype") === "integer") {
-            value = parseInt(value, 10);
-          }
-          if (el.getAttribute("datatype") === "array") {
-            value = value.split(",").filter((item) => item !== "");
-          }
-          data[el.id] = value;
         }
       });
-      return data;
     };
 
     /**
@@ -202,7 +223,8 @@ function FormModalWrapper(Component, options) {
     const formValid = async (ev) => {
       // console.log("Got return event after validation", ev.detail.valid); // should be true
       if (ev.detail.valid === true) {
-        saveData(getData());
+        fieldLength = ev.detail.length;
+        getData();
       }
     };
 

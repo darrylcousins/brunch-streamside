@@ -3,10 +3,27 @@ import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
 function TextField(props) {
-  const { label, id, size, valid } = props;
+  const { label, id, size, valid, datatype } = props;
 
-  this.addEventListener("getdata", (ev) => {
-    console.log('Got event data', ev.target.value);
+  this.addEventListener("form.data.collect", (ev) => {
+    let value = ev.target.value;
+    if (datatype === "integer") {
+      value = parseInt(value, 10);
+    }
+    if (datatype === "array") {
+      value = value.split(",").filter((item) => item !== "");
+    }
+    if (ev.target.id === id) {
+      this.dispatchEvent(
+        new CustomEvent("form.data.feed", {
+          bubbles: true,
+          detail: {
+            id,
+            value
+          }
+        })
+      );
+    }
   });
 
   return (

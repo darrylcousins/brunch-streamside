@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   _id: {
     type: "hidden",
     datatype: "integer",

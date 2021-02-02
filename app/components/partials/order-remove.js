@@ -49,7 +49,7 @@ const options = {
 };
 
 /**
- * Create a modal to remove an order..
+ * Create a modal to remove an order.
  *
  * @generator
  * @yields {Element} A form and remove/cancel buttons.
@@ -76,7 +76,7 @@ function* RemoveOrder(props) {
   };
 
   /**
-   * The form fields - required by {@link module:app/form/form~Form|Form}.
+   * The initial data of the form
    *
    * @function getInitialData
    * @returns {object} The initial data for the form

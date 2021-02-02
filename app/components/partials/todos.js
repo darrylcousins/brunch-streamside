@@ -1,11 +1,10 @@
 /** @jsx createElement */
 /**
-  * Starting point of url route /todos
-  * @module app/components/todos
-  * @exports TodosRoute
-  * @requires {@link module:app/todos}
-  * @requires {@link module:app/todos-add}
-  */
+ * Provide display of todos
+ *
+ * @module app/components/todos
+ * @exports CurrentTodos
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
@@ -16,16 +15,48 @@ import EditTodoModal from "./todo-edit";
 import RemoveTodoModal from "./todo-remove";
 import fields from "./todo-fields";
 
-export default function* CurrentTodos() {
+/**
+ * Fetch todos from api and construct component
+ *
+ * @generator
+ * @yields {Element} DOM component of listing todos
+ */
+function* CurrentTodos() {
+  /**
+   * Json object containing todos returned from api
+   *
+   * @member {object} fetchJson
+   */
   let fetchJson = [];
+  /**
+   * If fetch returns an error
+   *
+   * @member {object|string} fetchError
+   */
   let fetchError = null;
+  /**
+   * True while loading data from api
+   *
+   * @member {boolean} loading
+   */
   let loading = true;
+  /**
+   * Object holding current filters
+   *
+   * @member {object} loading
+   */
   let filters = {
     author: [],
     tags: [],
     completed: [0],
   };
 
+  /**
+   * Method to handle special case of `completed` as a filter
+   *
+   * @function mapCompletedFilters
+   * @param {Array} arr The array of filters
+   */
   const mapCompletedFilters = (arr) => {
     if (arr.length > 1) return [];
     return arr
@@ -33,6 +64,13 @@ export default function* CurrentTodos() {
       .filter((el) => el !== "All");
   };
 
+  /**
+   * Method to construct query string to include current filters when fetching
+   * todos from api
+   *
+   * @function getQueryString
+   * @param {Array} parts The array of parts used to construct query string
+   */
   const getQueryString = (parts) => {
     let qs = "?";
     parts.completed.forEach((bool) => {
@@ -47,6 +85,12 @@ export default function* CurrentTodos() {
     return qs;
   };
 
+  /**
+   * Fetch data from api and set `fetchJson` and `fetchError` dependent on result
+   *
+   * @function fetchData
+   * @param {Array} parts The array of parts used to construct query string
+   */
   const fetchData = (parts) => {
     Fetch(`/api/current-todos${getQueryString(parts)}`)
       .then((result) => {
@@ -71,6 +115,13 @@ export default function* CurrentTodos() {
 
   fetchData(filters);
 
+  /**
+   * When filters are selected refetch the data from api
+   *
+   * @function addFilter
+   * @param {string} name The string to be included in filters
+   * @param {string} type The type of filter: completed, author etc
+   */
   const addFilter = (name, type) => {
     const { ...parts } = filters;
     if (["All", "Author", "Tags"].includes(name)) return;
@@ -86,6 +137,13 @@ export default function* CurrentTodos() {
     }
   };
 
+  /**
+   * When a filter is removed refetch the data from api
+   *
+   * @function removeFilter
+   * @param {string} name The string to be removed from filters
+   * @param {string} type The type of filter: completed, author etc
+   */
   const removeFilter = (name, type) => {
     const { ...parts } = filters;
     if (type === "completed") {
@@ -99,11 +157,23 @@ export default function* CurrentTodos() {
     }
   };
 
+  /**
+   * Get the array of authors for dropdown list
+   *
+   * @function getAuthorFields
+   * @returns {Array} Array of strings
+   */
   const getAuthorFields = () => [
     "Author",
     ...fields.Author.datalist.filter((el) => !filters.author.includes(el)),
   ];
 
+  /**
+   * Get the array of tags for dropdown list
+   *
+   * @function getTagFields
+   * @returns {Array} Array of strings
+   */
   const getTagFields = () => [
     "Tags",
     ...fields.Tags.datalist.filter((el) => !filters.tags.includes(el)),
@@ -200,11 +270,11 @@ export default function* CurrentTodos() {
                             {todo.tags.length === 0
                               ? ""
                               : todo.tags.map((el) => (
-                                  <span class="db">{el}</span>
-                                ))}
+                                <span class="db">{el}</span>
+                              ))}
                           </small>
                         </h2>
-                        <span class="dn">{ todo._id }</span>
+                        <span class="dn">{todo._id}</span>
                         <EditTodoModal todo={todo} />
                         <RemoveTodoModal todo={todo} />
                       </div>
@@ -221,3 +291,5 @@ export default function* CurrentTodos() {
       </div>
     );
 }
+
+export default CurrentTodos;

@@ -1,8 +1,12 @@
 # tmps
-mkdoc.js  # write doc header to file
-trial.mjs  # for trying things out
-tmp.js  # as for trial.js
-promises.js  # reminder on promises
+# write doc header to file
+mkdoc.js
+# for trying things out
+trial.mjs
+# as for trial.js
+tmp.js
+# reminder on promises
+promises.js
 
 # Logs
 logs

@@ -1,251 +1,172 @@
 /** @jsx createElement */
 /**
- * Creates element to render a form modal to remove mulitple orders
+ * Creates element to render modal form for deleting orders. This includes
+ * making a selection of order `sources` to remove, i.e. all `CSA` orders only
+ * leaving `Shopify` orders which are removed via webhook when they are marked
+ * as `fulfilled` in the Shopify admin.
  *
  * @module app/components/orders-remove
- * @exports OrdersRemove
+ * @requires module:app/form/form~Form
+ * @requires module:app/form/form-modal-wrapper~FormModalWrapper
+ * @exports RemoveOrders
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
-import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
-import { PostFetch } from "../lib/fetch";
-import { DeleteIcon, CloseIcon } from "../lib/icon";
+import BarLoader from "../lib/bar-loader";
 import Button from "../lib/button";
+import { DeleteIcon } from "../lib/icon";
+import { PostFetch } from "../lib/fetch";
+import IconButton from "../lib/icon-button";
+import FormModalWrapper from "../wrappers/form-modal";
+import Form from "../form";
 
 /**
- * Create a modal to remove orders selected by source of order
+ * Icon component for link to expand modal
+ *
+ * @function ShowLink
+ * @param {object} opts Options that are passed to {@link module:app/lib/icon-button~IconButton|IconButton}
+ * @param {string} opts.name Name as identifier for the action
+ * @param {string} opts.title Hover hint and hidden span
+ * @param {string} opts.color Icon colour
+ * @returns {Element} IconButton
+ */
+const ShowLink = (opts) => {
+  const { name, title, color } = opts;
+  return (
+    <IconButton color={color} title={title} name={name}>
+      <DeleteIcon />
+    </IconButton>
+  );
+};
+
+/**
+ * Options object passed to module:app/components/form-modal-wrapper~FormModalWrapper
+ *
+ * @member {object} options
+ */
+const options = {
+  id: "remove-orders", // form id
+  title: "Remove Orders",
+  color: "dark-red",
+  src: "/api/remove-orders",
+  ShowLink,
+  saveMsg: "Removing orders ...",
+  successMsg: "Successfully removed X orders, reloading page.",
+};
+
+/**
+ * Get the fields, this includes the sources. May also return error if fetch fails.
+ *
+ * @see {@link module:app/components/orders-remove~fields|fields}
+ * @param {string} delivered Delivery date as string
+ * @returns {object} Error (if any) and the fields
+ */
+const getRemoveFields = async (delivered) => {
+  const headers = { "Content-Type": "application/json" };
+  const { error, json } = await PostFetch({
+    src: `/api/order-sources`,
+    data: { delivered },
+    headers,
+  })
+    .then((result) => result)
+    .catch((e) => ({
+      error: e,
+      json: null,
+    }));
+  const fields = {};
+  if (!error) {
+    fields.Delivered = {
+      id: "delivered",
+      type: "hidden",
+      datatype: "string",
+    };
+    fields.Sources = {
+      id: "sources",
+      type: "checkbox-multiple",
+      size: "100",
+      datatype: "array",
+      datalist: json,
+    };
+  }
+  return { error, fields };
+};
+
+/**
+ * Create a modal to remove a set of orders
  *
  * @generator
- * @param {string} delivered Delivery date as string
- * @yields {Element} DOM element modal with form to remove orders
+ * @yields {Element} A form and save/cancel buttons.
+ * @param {object} props Property object
+ * @param {Function} props.doSave - The save action
+ * @param {Function} props.closeModal - The cancel and close modal action
+ * @param {string} props.title - Form title
+ * @param {object} props.order - The order (or null if adding) to be edited
+ * @param {string} props.delivered - The delivery date as a string
+ * @param {string} props.formId - The unique form indentifier
  */
-function* RemoveOrders({ delivered }) {
-  let visible = false;
-  let loading = true;
-  let fetchError = null;
-  let fetchSources = [];
-  let selected = [];
-  let success = 0;
-  let active = false; // try to keep button visible on refresh
-  const key = delivered.replace(/ /g, "-").toLowerCase();
+async function* RemoveOrders(props) {
+  const { doSave, closeModal, title, delivered, formId } = props;
 
-  const setActive = (value) => {
-    active = value;
-    return active;
-  };
+  for await (const _ of this) { // eslint-disable-line no-unused-vars
+    yield <BarLoader />;
 
-  const closeModal = () => {
-    visible = false;
-    active = true;
-    this.refresh();
-  };
+    /**
+     * Fields of the form
+     * * `delivered`: Delivery date of orders to be removed
+     * * `sources`: Source type to remove `Shopify|CSA|BuckyBox`
+     *
+     * @see {@link module:app/components/orders-remove~getRemoveFields|getRemoveFields}
+     * @member {object} fields
+     */
+    /**
+     * Error if fetching box delivery dates fails
+     *
+     * @member {object|string} error
+     */
+    const { error, fields } = await getRemoveFields(delivered);
 
-  const loadSources = () => {
-    setActive(true);
-    const headers = { "Content-Type": "application/json" };
-    PostFetch({ src: `/api/order-sources`, data: { delivered }, headers })
-      .then((result) => {
-        const { error, json } = result;
-        if (error !== null) {
-          fetchError = error;
-          console.log("fetch error:", fetchError);
-          loading = false;
-          this.refresh();
-        } else {
-          fetchSources = json;
-          selected = fetchSources.map((s) =>
-            s.toLowerCase().replace(/ /g, "-")
-          );
-          loading = false;
-          this.refresh();
-        }
-      })
-      .catch((err) => {
-        fetchError = err;
-        loading = false;
-        this.refresh();
-      });
-  };
+    /**
+     * The initial form data - required by {@link
+     * module:app/form/form~Form|Form}.  If an order supplied returns the order
+     * else compiles reasonable defaults.
+     *
+     * @function getInitialData
+     * @returns {object} The initial form data
+     */
+    const getInitialData = () => ({ delivered });
 
-  const doDelete = () => {
-    loading = true;
-    this.refresh();
-    const sources = fetchSources.filter((el) =>
-      selected.includes(el.toLowerCase().replace(/ /g, "-"))
-    );
-    const data = { sources, delivered };
-    const headers = { "Content-Type": "application/json" };
-    console.log(headers, data);
-    //return;
-    PostFetch({ src: `/api/remove-orders`, data, headers })
-      .then((result) => {
-        const { error, json } = result;
-        if (error !== null) {
-          fetchError = error;
-          console.log("fetch error:", fetchError);
-          loading = false;
-          this.refresh();
-        } else {
-          console.log(JSON.stringify(json, null, 2));
-          loading = false;
-          success = parseInt(json.count, 10);
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
-          this.refresh();
-        }
-      })
-      .catch((err) => {
-        fetchError = err;
-        loading = false;
-        this.refresh();
-      });
-  };
-
-  const updateSelected = (id, remove) => {
-    if (id === "") return;
-    const idx = selected.indexOf(id);
-    if (idx === -1 && !remove) {
-      selected.push(id);
-    } else if (idx > -1 && remove) {
-      selected.splice(idx, 1);
-    }
-  };
-
-  const isChecked = (source) =>
-    selected.includes(source.toLowerCase().replace(/ /g, "-"));
-
-  this.addEventListener("click", async (ev) => {
-    const name = ev.target.tagName.toUpperCase();
-    if (name === "SVG" || name === "PATH") {
-      visible = !visible;
-      this.refresh();
-      loadSources();
-    } else if (name === "LABEL" || name === "INPUT") {
-      if (ev.target.value && ev.target.value === "allsources") {
-        document.querySelectorAll("input[name='sources']").forEach((el) => {
-          updateSelected(el.id, !ev.target.checked);
-        });
-      } else if (ev.target.value) {
-        updateSelected(ev.target.id, !ev.target.checked);
-      }
-      this.refresh();
-    }
-  });
-
-  while (true) {
     yield (
       <Fragment>
-        <button
-          name={`${delivered.replace(/ /g, "-")}-key`}
-          class="pointer bn outline-0 bg-transparent dark-red dim dib"
-          title="Delete Orders"
-          type="button"
-        >
-          <DeleteIcon />
-        </button>
-        {visible && (
-          <div
-            class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4"
-            style={`top: ${Math.round(
-              window.scrollY
-            ).toString()}px; cursor: default`}
-          >
-            <div class="bg-white pa4 br3">
-              <button
-                class="bn outline-0 bg-transparent mid-gray dim o-70 absolute top-1 right-1"
-                name="close"
-                onClick={closeModal}
-                style="margin-right: 30px; margin-top: 30px;"
-                title="Close delete modal"
-                type="button"
-              >
-                <CloseIcon />
-                <span class="dn">Close delete modal</span>
-              </button>
-              {fetchError && <Error msg={fetchError} />}
-              <h2 class="fw4">
-                Removing orders from &apos;
-                {delivered}
-                &apos;.
-              </h2>
-              <p class="lh-copy near-black tl">
-                Use the checkboxes to filter orders by sources. Removing orders
-                here makes
-                <b class="ph1">no</b>
-                changes to the orders on Shopify nor to the
-                original imported files from BuckyBox or CSA.
-              </p>
-              <p class="lh-copy near-black tl">
-                It would not be advised to delete any orders matching
-                &apos;Shopify&apos; as they are automatically inserted when
-                created on the store and will be removed when fulfilled.
-              </p>
-              {loading && <BarLoader />}
-              {fetchSources.length > 0 && (
-                <Fragment>
-                  <div class="mt2">
-                    <div class="flex items-center mb2 dark-gray" id={key}>
-                      <input
-                        class="mr2 hidden"
-                        type="checkbox"
-                        id="allsources"
-                        value="allsources"
-                        checked={selected.length > 0}
-                      />
-                      <label
-                        htmlFor="allsources"
-                        for="allsources"
-                        class="lh-copy"
-                      >
-                        {selected.length === 0 ? "Select all" : "Deselect all"}
-                      </label>
-                    </div>
-                    {fetchSources.map((source) => (
-                      <div class="flex items-center mb1 dark-gray">
-                        <input
-                          class="mr2"
-                          type="checkbox"
-                          id={source.toLowerCase().replace(/ /g, "-")}
-                          value={source.toLowerCase().replace(/ /g, "-")}
-                          name="sources"
-                          checked={isChecked(source)}
-                        />
-                        <label
-                          for={source.toLowerCase().replace(/ /g, "-")}
-                          htmlFor={source.toLowerCase().replace(/ /g, "-")}
-                          class="lh-copy"
-                        >
-                          {source}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                  {success > 0 ? (
-                    <div class="lh-copy dark-gray pa3 br3 ba b--dark-gray bg-washed-green">
-                      Successfully deleted
-                      {success}
-                      orders, reloading page.
-                    </div>
-                  ) : (
-                    <Fragment>
-                      <Button
-                        type="primary"
-                        onclick={doDelete}
-                        style={selected.length === 0 ? "opacity: 0.3" : ""}
-                        disabled={selected.length === 0}
-                      >
-                        Remove Orders
-                      </Button>
-                      <Button type="secondary" onclick={closeModal}>
-                        Cancel
-                      </Button>
-                    </Fragment>
-                  )}
-                </Fragment>
-              )}
-            </div>
+        {error ? (
+          <Error msg={error} />
+        ) : (
+          <div class="w-90 center ph1">
+            <h3>{delivered}</h3>
+            <p class="lh-copy near-black tl">
+              Use the checkboxes to filter orders by sources. Removing orders
+              here makes
+              <b class="ph1">no</b>
+              changes to the orders on Shopify nor to the original imported
+              files from BuckyBox or CSA.
+            </p>
+            <p class="lh-copy near-black tl">
+              It would not be advised to delete any orders matching
+              &apos;Shopify&apos; as they are automatically inserted when
+              created on the store and will be removed when fulfilled.
+            </p>
+            <Form
+              data={getInitialData()}
+              fields={fields}
+              title={title}
+              id={formId}
+            />
+            <Button type="primary" onclick={doSave}>
+              Delete Orders
+            </Button>
+            <Button type="secondary" onclick={closeModal}>
+              Cancel
+            </Button>
           </div>
         )}
       </Fragment>
@@ -253,4 +174,4 @@ function* RemoveOrders({ delivered }) {
   }
 }
 
-export default RemoveOrders;
+export default FormModalWrapper(RemoveOrders, options);

@@ -65,7 +65,7 @@ async function* UpsertOrderModal(props) {
       if (typeof order !== "undefined") {
         return order;
       }
-      const result = Object();
+      const result = {};
       for (const value of Object.values(fields)) {
         result[value.id] = "";
       }

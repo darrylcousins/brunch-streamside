@@ -58,6 +58,21 @@ function* InputMultipleSelect(props) {
     }
   });
 
+  this.addEventListener("form.data.collect", (ev) => {
+    const value = ev.target.value.split(',');
+    if (ev.target.id === id) {
+      this.dispatchEvent(
+        new CustomEvent("form.data.feed", {
+          bubbles: true,
+          detail: {
+            id,
+            value
+          }
+        })
+      );
+    }
+  });
+
   while (true)
     yield (
       <FieldWrapper label={label} size={size} id={id}>

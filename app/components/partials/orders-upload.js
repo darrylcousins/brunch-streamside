@@ -9,16 +9,15 @@
  * @requires module:app/form/form~Form
  * @exports UploadOrdersModal
  */
-import {createElement, Fragment} from '@bikeshaving/crank/cjs';
-import {renderer} from '@bikeshaving/crank/cjs/dom';
+import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
-import Button from '../lib/button';
-import { Fetch }  from '../lib/fetch';
-import BarLoader from '../lib/bar-loader';
-import Error from '../lib/error';
-import TextButton from '../lib/text-button';
-import FormModalWrapper from '../wrappers/form-modal';
-import Form from '../form';
+import Button from "../lib/button";
+import { Fetch } from "../lib/fetch";
+import BarLoader from "../lib/bar-loader";
+import Error from "../lib/error";
+import TextButton from "../lib/text-button";
+import FormModalWrapper from "../wrappers/form-modal";
+import Form from "../form";
 
 /**
  * Icon component for link to expand modal
@@ -45,48 +44,48 @@ const ShowLink = (opts) => {
  * @member {object} options
  */
 const options = {
-  id: 'import-orders', // form id
-  title: 'Import Orders',
-  color: 'gray',
-  src: '/api/import-orders',
-  ShowLink: ShowLink,
-  saveMsg: 'Upload orders ...',
-  successMsg: 'Successfully uploaded orders, reloading page.'
+  id: "import-orders", // form id
+  title: "Import Orders",
+  color: "gray",
+  src: "/api/import-orders",
+  ShowLink,
+  saveMsg: "Upload orders ...",
+  successMsg: "Successfully uploaded orders, reloading page.",
 };
 
 /**
  * Get the fields, this includes aync fetching of box dates from api
  *
- * @returns {object}
+ * @see {@link module:app/components/orders-upload~fields|fields}
+ * @returns {object} Error (if any) and the fields
  */
 const getUploadFields = async () => {
-  console.log('wtf2');
   const { error, json } = await Fetch("api/current-box-dates")
-    .then(result => result)
-    .catch(e => ({
-      error: e, json: null
+    .then((result) => result)
+    .catch((e) => ({
+      error: e,
+      json: null,
     }));
-  let fields = {};
+  const fields = {};
   if (!error) {
-    fields["Orders"] = {
-      id: 'orders',
-      size: 'third',
-      type: 'file',
-      datatype: 'file',
-      required: true
+    fields.Orders = {
+      id: "orders",
+      size: "third",
+      type: "file",
+      datatype: "file",
+      required: true,
     };
     fields["Delivery Date"] = {
-      id: 'delivered',
-      type: 'input-select',
-      size: 'third',
-      datatype: 'string',
+      id: "delivered",
+      type: "input-select",
+      size: "third",
+      datatype: "string",
       required: true,
-      datalist: json
+      datalist: json,
     };
   }
   return { error, fields };
 };
-
 
 /**
  * Create a modal to import a file, uploading orders from other sources.
@@ -99,22 +98,37 @@ const getUploadFields = async () => {
  * @param {string} props.title - Form title
  * @param {string} props.formId - The unique form indentifier
  */
-async function *UploadOrdersModal(props) {
-
-  let { doSave, closeModal, title, formId } = props;
+async function* UploadOrdersModal(props) {
+  const { doSave, closeModal, title, formId } = props;
 
   for await (const _ of this) { // eslint-disable-line no-unused-vars
     yield <BarLoader />;
 
-    console.log('wtf');
+    /**
+     * Fields of the form
+     * * `delivered`: Delivery date to which orders are imported
+     * * `file`: Source file to import `CSA|BuckyBox`
+     *
+     * @see {@link module:app/components/orders-upload~getUploadFields|getUploadFields}
+     * @member {object} fields
+     */
+    /**
+     * Error if fetching box delivery dates fails
+     *
+     * @member {object|string} error
+     */
     const { error, fields } = await getUploadFields();
 
-    const getInitialData = () => (
-      {
-        file: null,
-        delivered: ''
-      }
-    );
+    /**
+     * Initialize form values
+     *
+     * @function getInitialData
+     * @returns {object} Initial data for the form
+     */
+    const getInitialData = () => ({
+      file: null,
+      delivered: "",
+    });
 
     yield (
       <Fragment>
@@ -129,14 +143,10 @@ async function *UploadOrdersModal(props) {
               id={formId}
             />
             <div class="w-90 center ph1">
-              <Button
-                type="primary"
-                onclick={ doSave }>
+              <Button type="primary" onclick={doSave}>
                 Upload
               </Button>
-              <Button
-                type="secondary"
-                onclick={ closeModal }>
+              <Button type="secondary" onclick={closeModal}>
                 Cancel
               </Button>
             </div>
@@ -145,6 +155,6 @@ async function *UploadOrdersModal(props) {
       </Fragment>
     );
   }
-};
+}
 
 export default FormModalWrapper(UploadOrdersModal, options);

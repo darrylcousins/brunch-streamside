@@ -2,8 +2,24 @@
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
-export default (props) => {
+function TextAreaField(props) {
   const { label, id, value, valid, size } = props;
+
+  this.addEventListener("form.data.collect", (ev) => {
+    const value = ev.target.value;
+    if (ev.target.id === id) {
+      this.dispatchEvent(
+        new CustomEvent("form.data.feed", {
+          bubbles: true,
+          detail: {
+            id,
+            value
+          }
+        })
+      );
+    }
+  });
+
   return (
     <FieldWrapper label={label} size={size} id={id}>
       <textarea
@@ -21,3 +37,5 @@ export default (props) => {
     </FieldWrapper>
   );
 };
+
+export default TextAreaField;

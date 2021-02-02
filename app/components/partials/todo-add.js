@@ -1,10 +1,35 @@
 /** @jsx createElement */
-import { createElement, Fragment } from "@bikeshaving/crank/cjs";
+/**
+ * Creates element to render modal form to add a todo. This is a stub
+ * component with all the work done by {@link
+ * module:app/components/todo-upsert~UpsertTodoModal|UpsertTodoModal} and is
+ * identical to {@link
+ * module:app/components/todo-edit~EditTodoModal|EditTodoModal} with the
+ * exception of not having an todo passed to be edited.
+ *
+ * @module app/components/todo-add
+ * @requires module:app/form/form-modal-wrapper~FormModalWrapper
+ * @requires module:app/lib/text-button~TextButton
+ * @requires module:app/components/todo-upsert~UpsertTodoModal
+ * @exports AddTodoModal
+ */
+import { createElement } from "@bikeshaving/crank/cjs";
 
 import FormModalWrapper from "../wrappers/form-modal";
 import UpsertTodoModal from "./todo-upsert";
 import TextButton from "../lib/text-button";
 
+/**
+ * Text button for link to expand modal
+ *
+ * @function ShowLink
+ * @param {object} opts Options that are passed to {@link module:app/lib/text-button~TextButton|TextButton}
+ * @param {string} opts.name Name as identifier for the action
+ * @param {string} opts.title Hover hint
+ * @param {string} opts.color Text colour
+ * @param {Function} opts.showModal Action to display modal
+ * @returns {Element} A button
+ */
 const ShowLink = (opts) => {
   const { name, title, color, showModal } = opts;
   return (
@@ -14,8 +39,11 @@ const ShowLink = (opts) => {
   );
 };
 
-// this is all that we need to make a form modal
-// edit src is 'api/update-todo
+/**
+ * Options object passed to module:app/components/form-modal~FormModalWrapper
+ *
+ * @member {object} options
+ */
 const options = {
   id: "add-todo", // form id
   title: "Add Todo", // titles

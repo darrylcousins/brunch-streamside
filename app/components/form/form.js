@@ -39,7 +39,16 @@ function* Form(props) {
   let formError = false;
 
   /**
-   * Dynamic custom event to emit after validating form
+   * Holds field length - used when collecting data
+   *
+   * @member {number} length
+   */
+  const length = Object.keys(fields).length;
+
+  /**
+   * Dynamic custom event to emit after validating form, the form wrapper
+   * listens for this, the field length is included so the wrapper/controller
+   * can keep count of data fields required
    *
    * @event module:app/form/form#validationEvent
    * @param {string} formId The form id
@@ -48,7 +57,7 @@ function* Form(props) {
   const validationEvent = (formId, valid) =>
     new CustomEvent(`${formId}.valid`, {
       bubbles: true,
-      detail: { valid },
+      detail: { valid, length },
     });
 
   /**

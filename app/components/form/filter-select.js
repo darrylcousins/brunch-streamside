@@ -14,7 +14,7 @@ function* FilterSelect({ name, fields, position, type, callback }) {
     [el.value] = fields;
   });
 
-  while (true)
+  while (true) {
     yield (
       <select
         class={`pa1 bg-transparent hover-bg-near-white dib ${borders} br2 b--mid-gray mid-gray`}
@@ -26,6 +26,7 @@ function* FilterSelect({ name, fields, position, type, callback }) {
         ))}
       </select>
     );
+  }
 }
 
 export default FilterSelect;

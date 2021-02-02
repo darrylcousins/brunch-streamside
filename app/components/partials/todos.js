@@ -179,7 +179,7 @@ function* CurrentTodos() {
     ...fields.Tags.datalist.filter((el) => !filters.tags.includes(el)),
   ];
 
-  while (true)
+  while (true) {
     yield (
       <div class="">
         <div class="mb3 pr4 tr w-100">
@@ -290,6 +290,7 @@ function* CurrentTodos() {
         )}
       </div>
     );
+  }
 }
 
 export default CurrentTodos;

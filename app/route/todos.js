@@ -9,8 +9,8 @@
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
-import CurrentTodos from "../components/partials/todos";
-import AddTodoModal from "../components/partials/todo-add";
+import CurrentTodos from "../components/todos";
+import AddTodoModal from "../components/todo-add";
 
 /**
  * Route for todos, linked from navigation

@@ -8,7 +8,7 @@
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
-import PackingLists from "../components/partials/packing-lists";
+import PackingLists from "../components/packing-lists";
 
 /**
  * Route for packing-lists, linked from navigation

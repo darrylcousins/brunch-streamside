@@ -9,8 +9,8 @@
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
-import CurrentOrders from "../components/partials/orders-current";
-import UploadOrders from "../components/partials/orders-upload";
+import CurrentOrders from "../components/orders-current";
+import UploadOrders from "../components/orders-upload";
 
 /**
  * Route to orders, linked from navigation

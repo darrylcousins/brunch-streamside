@@ -8,7 +8,7 @@
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
-import CurrentBoxes from "../components/partials/boxes-current";
+import CurrentBoxes from "../components/boxes-current";
 
 /**
  * Route to boxes, linked from navigation

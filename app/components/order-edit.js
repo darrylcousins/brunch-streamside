@@ -15,7 +15,7 @@
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 
-import FormModalWrapper from "../wrappers/form-modal";
+import FormModalWrapper from "../form/form-modal";
 import UpsertOrderModal from "./order-upsert";
 import { EditIcon } from "../lib/icon";
 import IconButton from "../lib/icon-button";

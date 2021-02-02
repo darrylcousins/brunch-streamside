@@ -16,7 +16,7 @@ import { Fetch } from "../lib/fetch";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
 import TextButton from "../lib/text-button";
-import FormModalWrapper from "../wrappers/form-modal";
+import FormModalWrapper from "../form/form-modal";
 import Form from "../form";
 
 /**

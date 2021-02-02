@@ -13,7 +13,7 @@ import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import { DeleteIcon } from "../lib/icon";
 import Button from "../lib/button";
 import IconButton from "../lib/icon-button";
-import FormModalWrapper from "../wrappers/form-modal";
+import FormModalWrapper from "../form/form-modal";
 import Form from "../form";
 
 /**

@@ -18,7 +18,7 @@ import Button from "../lib/button";
 import { DeleteIcon } from "../lib/icon";
 import { PostFetch } from "../lib/fetch";
 import IconButton from "../lib/icon-button";
-import FormModalWrapper from "../wrappers/form-modal";
+import FormModalWrapper from "../form/form-modal";
 import Form from "../form";
 
 /**

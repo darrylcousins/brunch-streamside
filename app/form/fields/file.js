@@ -30,11 +30,11 @@ function* FileField(props) {
         error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
         selected = null;
       }
-      */
       if (selected.type !== 'text/csv' && selected.type !== 'application/vnd.ms-excel' && selected.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         error = <div>Upload cancelled, expected the file to be a spreadsheet (<code>csv</code> or <code>xlsx</code>).</div>;
         selected = null;
       }
+      */
       console.log('Selected file:', selected, error);
       this.refresh();
       if (!error) {

@@ -121,6 +121,7 @@ function FormModalWrapper(Component, options) {
       // check to find if we have a file upload
       Object.values(form).some((value) => {
         if (typeof value.name === "string") {
+          console.log('FILE:', value)
           hasFile = true;
           return true;
         }
@@ -140,8 +141,8 @@ function FormModalWrapper(Component, options) {
         data = form;
       }
 
-        /*
       console.log(data);
+      /*
       console.warn('Posting save successfully but disabled for development');
       closeModal();
       return;

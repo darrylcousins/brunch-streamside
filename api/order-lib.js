@@ -143,8 +143,32 @@ const processOrderJson = (json) => {
     contact_email,
     shipping_address,
     note,
-    line_items
+    line_items,
+    customer
   } = json;
+  const cust_details = {};
+  // TODO destructuring within if else to const didn't work???
+  if (shipping_address) {
+    cust_details = shipping_address;
+    cust_details.name = shipping_address.name;
+    cust_details.first_name = shipping_address.first_name;
+    cust_details.last_name = shipping_address.last_name;
+    cust_details.address1 = shipping_address.address1;
+    cust_details.address2 = shipping_address.address2;
+    cust_details.city = shipping_address.city;
+    cust_details.zip = shipping_address.zip;
+    cust_details.phone = shipping_address.phone;
+  } else {
+    cust_details.first_name = customer.first_name;
+    cust_details.last_name = customer.last_name;
+    cust_details.name = customer.default_address.name;
+    cust_details.address1 = customer.default_address.address1;
+    cust_details.address2 = customer.default_address.address2;
+    cust_details.city = customer.default_address.city;
+    cust_details.zip = customer.default_address.zip;
+    cust_details.phone = customer.default_address.phone;
+  }
+  // TODO destructuring within if else to const didn't work???
   const {
     name,
     first_name,
@@ -154,7 +178,8 @@ const processOrderJson = (json) => {
     city,
     zip,
     phone
-  } = shipping_address;
+  } = cust_details;
+
   const sku = line_items[0].sku;
   const properties = line_items[0].properties;
 
@@ -176,7 +201,7 @@ const processOrderJson = (json) => {
   if (removedKey in attributes) removed = attributes[removedKey]
     .split(',').map(el => el.trim()).filter(el => el !== '');
 
-  return {
+  const result = {
     _id: id,
     order_number,
     sku,
@@ -197,6 +222,7 @@ const processOrderJson = (json) => {
     removed,
     source: 'Shopify'
   };
+  return result;
 };
 
 const parseNumberedString = (str) => {

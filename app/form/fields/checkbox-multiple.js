@@ -39,6 +39,8 @@ function* CheckboxMultiple(props) {
    * @member selected
    */
   const selected = datalist.map((value) => slugify(value));
+  const map = {};
+  datalist.forEach(el => map[slugify(el)] = el);
 
   /**
    * Helper method to determine if a value is checked/selected
@@ -110,7 +112,7 @@ function* CheckboxMultiple(props) {
           bubbles: true,
           detail: {
             id,
-            value: selected, // TODO datatype!
+            value: selected.map(el => map[el]), // TODO datatype!
           },
         })
       );

@@ -121,6 +121,7 @@ function FormModalWrapper(Component, options) {
       // check to find if we have a file upload
       Object.values(form).some((value) => {
         if (typeof value.name === "string") {
+          console.log('FILE:', value)
           hasFile = true;
           return true;
         }

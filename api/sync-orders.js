@@ -14,8 +14,11 @@ const fetchOrder = async (url) => {
   })
     .then(response => response.json())
     .then(data => data);
+  return data;
+  /*
   const { order } = data;
   return processOrderJson(order);
+  */
 };
 
 const getFetch = (query) => {
@@ -34,7 +37,8 @@ const getIds = () => {
     query {
       orders(first:100,
       ${ /* successful test comment */`` }
-      query: "fulfillment_status:unshipped AND financial_status:paid"
+      ${ /* query: "fulfillment_status:unshipped AND financial_status:paid" */`` }
+      query: "name:#2019 OR name:#2018"
       ) {
         edges {
           node {
@@ -65,23 +69,35 @@ module.exports = async function (req, res, next) {
         'contact_email',
         'shipping_address',
         'note',
-        'line_items'
+        'line_items',
+        'customer'
       ];
       const url = `https://${process.env.SHOP_NAME}.myshopify.com/admin/api/${process.env.API_VERSION}/${path}?fields=${fields.join(',')}`;
+      console.log(url);
 
       orders.push(await fetchOrder(url));
     };
     const collection = req.app.locals.orderCollection;
-    orders.forEach(order => {
-      insertOrder(collection, order);
-      _logger.info(JSON.stringify(order, null, 2));
-      //updateOrderTag(order._id.toString(), order.delivered);
-    });
+    Promise.all(orders).then(values => {
+      //console.log(values);
+      const result = [];
+      values.forEach(order => {
+        const res = processOrderJson(order.order);
+        insertOrder(collection, res);
+        result.push(res);
+        _logger.info(JSON.stringify(res, null, 2));
+        updateOrderTag(res._id.toString(), res.delivered);
+      });
 
-    res.set('Content-Type', 'application/json');
-    res.write(JSON.stringify(orders));
-    res.end();
+      res.set('Content-Type', 'application/json');
+      res.write(JSON.stringify(result));
+      res.end();
     
+    }).catch(err => {
+      _logger.info(err);
+      res.status(400).json({ error: err.toString() });
+      return;
+    });
   } catch(e) {
     res.status(400).json({ error: e.toString() });
     return;

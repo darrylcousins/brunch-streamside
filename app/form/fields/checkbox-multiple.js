@@ -1,74 +1,123 @@
 /** @jsx createElement */
 /**
-*
-* @module app/form/checkbox-multiple
-* @author Darryl Cousins <darryljcousins@gmail.com>
-*/
+ * Exports a multiple checkbox form field
+ *
+ * @module app/form/checkbox-multiple
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
 /**
-*
-* @function CheckboxMultiple
-* @param {object} props The property object
-*/
-function *CheckboxMultiple(props) {
-  const { label, id, size, valid, datalist, datatype } = props;
-  let value = false;
+ * Renders a multiple checkbox field. Includes a `select all`/`deselect all`
+ * button. The resulting data is returned as an array of values.
+ *
+ * @generator
+ * @param {object} props The property object
+ * @param {string} props.label The label text
+ * @param {string} props.id The form unique identifier for the field
+ * @param {string} props.size The width of the field as per tachyons width values
+ * @param {Array} props.datalist The selectable values
+ * @param {string} props.datatype The datatype of the returned values `string|integer|boolean`
+ * @yields {Element} List of checkboxes as DOM component
+ */
+function* CheckboxMultiple(props) {
+  const { label, id, size, datalist } = props;
 
+  /**
+   * Slugify a value - i.e. remove spaces and put to lower case
+   *
+   * @function slugify
+   * @param {string} str The input string
+   * @returns {string} The slugified string
+   */
   const slugify = (str) => str.toLowerCase().replace(/ /g, "-");
-  const name = slugify(label);
-  let selected = datalist.map(src => slugify(src));
 
-  const isChecked = (src) =>
-    selected.includes(slugify(src));
+  /**
+   * Store the array of selected values
+   *
+   * @member selected
+   */
+  const selected = datalist.map((value) => slugify(value));
 
-  const updateSelected = (id, remove) => {
-    console.log('Updating:', id, remove);
+  /**
+   * Helper method to determine if a value is checked/selected
+   *
+   * @function isChecked
+   * @param {string} value The value to check for in
+   * {@link module:app/form/checkbox-multiple~selected|selected}
+   */
+  const isChecked = (value) => selected.includes(slugify(value));
 
-    if (id === "") return;
-    const idx = selected.indexOf(id);
+  /**
+   * Helper method to update the selected array when an item is checked
+   *
+   * @function updateSelected
+   * @param {string} value The value to add or remove from
+   * {@link module:app/form/checkbox-multiple~selected|selected}
+   * @param {boolean} remove Removing or adding to
+   * {@link module:app/form/checkbox-multiple~selected|selected}?
+   */
+  const updateSelected = (value, remove) => {
+    if (value === "") return;
+    const idx = selected.indexOf(value);
     if (idx === -1 && !remove) {
-      selected.push(id);
+      selected.push(value);
     } else if (idx > -1 && remove) {
       selected.splice(idx, 1);
     }
-    console.log(selected);
   };
 
+  /**
+   * Event handler on user click to update selected array
+   *
+   * @function updateSelected
+   * @param {object} ev The event
+   * @listens click
+   */
   const handleClick = async (ev) => {
     const tagName = ev.target.tagName.toUpperCase();
-    console.log(tagName);
     if (tagName === "BUTTON") {
-      const selectAll = ev.target.name === "all" ? false : true;
+      const selectAll = ev.target.name !== "all";
       document.querySelectorAll(`input[name='${id}']`).forEach((el) => {
         updateSelected(el.id, selectAll);
       });
       this.refresh();
     }
     if (tagName === "LABEL" || tagName === "INPUT") {
-      const el = (tagName === "LABEL") ? ev.target.previousElementSibling : ev.target;
-      const checked = (tagName === "LABEL") ? !el.checked : el.checked;
-      updateSelected(el.id, !checked);
+      const el =
+        tagName === "LABEL" ? ev.target.previousElementSibling : ev.target;
+      updateSelected(el.id, !el.checked);
       this.refresh();
     }
   };
 
   this.addEventListener("click", handleClick);
 
-  this.addEventListener("form.data.collect", (ev) => {
-    if (ev.target.name === id) {  // note use of name here
+  /**
+   * Event handler when {@link
+   * module:form/form-modal~FormModalWrapper|FormModalWrapper} sends for data
+   *
+   * @function updateSelected
+   * @param {object} ev The event
+   * @listens form.data.feed
+   */
+  const collectAndSendData = (ev) => {
+    if (ev.target.name === id) {
+      // note use of name here
       this.dispatchEvent(
         new CustomEvent("form.data.feed", {
           bubbles: true,
           detail: {
             id,
-            value: selected
-          }
+            value: selected, // TODO datatype!
+          },
         })
       );
     }
-  });
+  };
+
+  this.addEventListener("form.data.collect", collectAndSendData);
 
   while (true) {
     yield (
@@ -94,6 +143,8 @@ function *CheckboxMultiple(props) {
                 checked={isChecked(source)}
               />
               <label
+                htmlFor={slugify(source)}
+                for={slugify(source)}
                 name={slugify(source)}
                 class="lh-copy pointer"
               >
@@ -105,6 +156,6 @@ function *CheckboxMultiple(props) {
       </FieldWrapper>
     );
   }
-};
+}
 
 export default CheckboxMultiple;

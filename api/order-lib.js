@@ -146,10 +146,9 @@ const processOrderJson = (json) => {
     line_items,
     customer
   } = json;
-  const cust_details = {};
+  let cust_details = {};
   // TODO destructuring within if else to const didn't work???
   if (shipping_address) {
-    cust_details = shipping_address;
     cust_details.name = shipping_address.name;
     cust_details.first_name = shipping_address.first_name;
     cust_details.last_name = shipping_address.last_name;
@@ -159,9 +158,9 @@ const processOrderJson = (json) => {
     cust_details.zip = shipping_address.zip;
     cust_details.phone = shipping_address.phone;
   } else {
+    cust_details.name = customer.default_address.name;
     cust_details.first_name = customer.first_name;
     cust_details.last_name = customer.last_name;
-    cust_details.name = customer.default_address.name;
     cust_details.address1 = customer.default_address.address1;
     cust_details.address2 = customer.default_address.address2;
     cust_details.city = customer.default_address.city;

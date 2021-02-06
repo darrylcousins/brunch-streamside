@@ -1,87 +1,134 @@
 /** @jsx createElement */
 /**
-*
-* @module app/form/input-multiple
-* @author Darryl Cousins <darryljcousins@gmail.com>
-*/
+ * Component to render a multiple input comma separated field with selectable
+ * values using html5 datalist attribute
+ *
+ * @module app/form/input-multiple
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 import FieldWrapper from "./field-wrapper";
 
 /**
-*
-* @function InputMultipleSelect
-* @param {object} props The property object
-*/
+ * Component to render a multiple input comma separated field with selectable
+ * values using html5 datalist attribute
+ *
+ * @generator
+ * @param {object} props The property object
+ * @param {string} props.label The label text
+ * @param {string} props.id The form unique identifier for the field
+ * @param {string} props.size The width of the field as per tachyons width values
+ * @param {Array} props.datalist The selectable values
+ * @param {string} props.datatype The datatype of the returned values `string|integer|boolean`
+ * @param {string} props.value The current selected values
+ * @param {string} props.valid Is the current selection valid
+ * @yields {Element} DOM component to render comma seperated input field
+ */
 function* InputMultipleSelect(props) {
   const { label, id, size, valid, datalist, value } = props;
 
-  const separator = ",";
-  let valueCount;
-  let optionsValues;
+  const separator = ","; // TODO move to props if necessary
 
+  /**
+   * @member {number} Hold a count of selected values
+   */
+  let selectedValueCount;
+
+  /**
+   * @member {Array} Hold the current selected values
+   */
+  let selectedValues;
+
+  // initialize the current values
   if (value && typeof value !== "undefined") {
-    optionsValues = datalist;
+    selectedValues = datalist;
     if (typeof value === "string") {
-      valueCount = value.split(separator).length;
+      selectedValueCount = value.split(separator).length;
     } else {
-      valueCount = value.length;
+      selectedValueCount = value.length;
     }
   } else {
     // initialize
-    valueCount = null;
-    optionsValues = null;
+    selectedValueCount = null;
+    selectedValues = null;
   }
 
-  const filldatalist = (input, optionValues, optionPrefix) => {
+  /**
+   * Populate the input element list of values
+   *
+   * @function fillDatalist
+   * @param {object} input The input DOM element
+   * @param {Array} optionValues The possible values
+   * @param {string} optionPrefix The current string in the input
+   */
+  const fillDatalist = (input, optionValues, optionPrefix) => {
     const { list } = input;
     if (list && optionValues.length > 0) {
       list.innerHTML = "";
       const usedOptions = optionPrefix.split(separator).map((el) => el.trim());
       // for (const optionsValue of optionValues) {
-      optionValues.forEach((optionsValue) => {
-        if (usedOptions.indexOf(optionsValue) < 0) {
+      optionValues.forEach((val) => {
+        if (usedOptions.indexOf(val) < 0) {
           // Skip used values
           const option = document.createElement("option");
-          option.value = optionPrefix + optionsValue;
+          option.value = optionPrefix + val;
           list.append(option);
         }
       });
     }
   };
 
-  this.addEventListener("input", (ev) => {
+  /**
+   * Event handler on input, calculate option values selectable and update
+   * datalist for the input
+   *
+   * @function handleInput
+   * @param {object} ev The event
+   * @listens input
+   */
+  const handleInput = async (ev) => {
     console.log("got event on input");
     if (ev.target.tagName === "INPUT") {
       const input = ev.target;
-      if (valueCount === null) {
-        optionsValues = Array.from(input.list.options).map((opt) => opt.value);
-        valueCount = input.value.split(separator).length;
+      if (selectedValueCount === null) {
+        selectedValues = Array.from(input.list.options).map((opt) => opt.value);
+        selectedValueCount = input.value.split(separator).length;
       }
       const currentValueCount = input.value.split(separator).length;
-      if (valueCount !== currentValueCount) {
+      if (selectedValueCount !== currentValueCount) {
         const lsIndex = input.value.lastIndexOf(separator);
         const str =
           lsIndex !== -1 ? input.value.substr(0, lsIndex) + separator : "";
-        filldatalist(input, optionsValues, str);
-        valueCount = currentValueCount;
+        fillDatalist(input, selectedValues, str);
+        selectedValueCount = currentValueCount;
       }
     }
-  });
+  };
 
-  this.addEventListener("form.data.collect", (ev) => {
-    const value = ev.target.value.split(',');
+  this.addEventListener("input", handleInput);
+
+  /**
+   * Event handler when {@link
+   * module:form/form-modal~FormModalWrapper|FormModalWrapper} sends for data
+   *
+   * @function collectAndSendData
+   * @param {object} ev The event
+   * @listens form.data.feed
+   */
+  const collectAndSendData = (ev) => {
     if (ev.target.id === id) {
       this.dispatchEvent(
         new CustomEvent("form.data.feed", {
           bubbles: true,
           detail: {
             id,
-            value
-          }
+            value: ev.target.value.split(","),
+          },
         })
       );
     }
-  });
+  };
+  this.addEventListener("form.data.collect", collectAndSendData);
 
   while (true)
     yield (

@@ -1,9 +1,10 @@
 /** @jsx createElement */
 /**
-*
-* @module app/form/index
-* @author Darryl Cousins <darryljcousins@gmail.com>
-*/
+ * A field component to render form elements
+ *
+ * @module app/form/index
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 
 import Checkbox from "./checkbox";
@@ -16,7 +17,24 @@ import InputMultipleSelect from "./input-multiple";
 import File from "./file";
 import Error from "../../lib/error";
 
-const Field = (props) => {
+/**
+ * A field component to render form elements
+ *
+ * @function Field
+ * @param {object} props The property object
+ * @param {object} props.data The form data containing current values
+ * @param {object} props.formElements The formElements representing the rendered DOM
+ * @param {string} props.label The label text
+ * @param {object} props.options The field options
+ * @param {string} props.options.id The form unique identifier for the field
+ * @param {string} props.options.type The type of input field to render (text, checkbox, hidden etc)
+ * @param {string} props.options.size The width of the field as per tachyons width values
+ * @param {boolean} props.options.required Is this a required field
+ * @param {Array} props.options.datalist The selectable values
+ * @param {string} props.options.datatype The datatype of the returned values `string|integer|boolean`
+ * @returns {Element} The field DOM component to be rendered
+ */
+function Field(props) {
   const { label, options, data, formElements } = props;
   const { type, size, required, datalist, datatype } = options;
   let { id } = options;
@@ -35,7 +53,13 @@ const Field = (props) => {
     }
   }
 
-  // sould then be event listeners??
+  /**
+   * Event handler on focus, remove invalid state of field
+   *
+   * @function onFocus
+   * @param {object} ev The event
+   * @listens focus
+   */
   const onFocus = (ev) => {
     const el = ev.target;
     el.classList.remove("invalid");
@@ -43,6 +67,14 @@ const Field = (props) => {
     el.nextSibling.classList.add("hidden");
   };
 
+  /**
+   * Event handler on blur, add invalid state to field after checking for
+   * validity using html5 validation
+   *
+   * @function onBlur
+   * @param {object} ev The event
+   * @listens blur
+   */
   const onBlur = (ev) => {
     const el = ev.target;
     if (!el.checkValidity()) {
@@ -179,6 +211,6 @@ const Field = (props) => {
   }
 
   return <Error msg="Failed to find input element to render" />;
-};
+}
 
 export default Field;

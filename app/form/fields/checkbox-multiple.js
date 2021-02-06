@@ -36,11 +36,19 @@ function* CheckboxMultiple(props) {
   /**
    * Store the array of selected values
    *
-   * @member selected
+   * @member {Array} selected
    */
   const selected = datalist.map((value) => slugify(value));
-  const map = {};
-  datalist.forEach(el => map[slugify(el)] = el);
+
+  /**
+   * Store a map of selected slugs to actual values
+   *
+   * @member selectedMap
+   */
+  const selectedMap = {};
+  datalist.forEach((el) => {
+    selectedMap[slugify(el)] = el;
+  });
 
   /**
    * Helper method to determine if a value is checked/selected
@@ -73,7 +81,7 @@ function* CheckboxMultiple(props) {
   /**
    * Event handler on user click to update selected array
    *
-   * @function updateSelected
+   * @function handleClick
    * @param {object} ev The event
    * @listens click
    */
@@ -100,7 +108,7 @@ function* CheckboxMultiple(props) {
    * Event handler when {@link
    * module:form/form-modal~FormModalWrapper|FormModalWrapper} sends for data
    *
-   * @function updateSelected
+   * @function collectAndSendData
    * @param {object} ev The event
    * @listens form.data.feed
    */
@@ -112,7 +120,7 @@ function* CheckboxMultiple(props) {
           bubbles: true,
           detail: {
             id,
-            value: selected.map(el => map[el]), // TODO datatype!
+            value: selected.map((el) => selectedMap[el]), // TODO datatype!
           },
         })
       );

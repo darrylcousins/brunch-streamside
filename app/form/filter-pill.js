@@ -1,16 +1,34 @@
 /** @jsx createElement */
 /**
-*
-* @module app/form/filter-pill
-* @author Darryl Cousins <darryljcousins@gmail.com>
-*/
+ * Renders a clickable label showing and deleting filter fields
+ *
+ * @module app/form/filter-pill
+ * @author Darryl Cousins <darryljcousins@gmail.com>
+ */
 import { createElement } from "@bikeshaving/crank/cjs";
 
+/**
+ * Renders a clickable label showing and deleting filter fields
+ *
+ * @generator
+ * @param {object} props The property object
+ * @param {string} props.name The input id and name
+ * @param {string} props.type The type, or more correctly the field that will be filtered
+ * @param {Function} props.callback The callback function to call with the selected value
+ * @yields {Element} A clickable label
+ */
 function* FilterPill({ name, type, callback }) {
-
-  this.addEventListener("click", () => {
+  /**
+   * Event handler on click
+   *
+   * @function handleClick
+   * @listens click
+   */
+  const handleClick = async () => {
     callback(name, type);
-  });
+  };
+
+  this.addEventListener("change", handleClick);
 
   while (true)
     yield (

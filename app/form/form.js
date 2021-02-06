@@ -44,7 +44,7 @@ function* Form(props) {
    *
    * @member {number} length
    */
-  const length = Object.keys(fields).length;
+  const { length } = Object.keys(fields);
 
   /**
    * Dynamic custom event to emit after validating form, the form wrapper
@@ -91,7 +91,7 @@ function* Form(props) {
           if (el.type === "file") {
             // file is the only generator field that needs this
             el.dispatchEvent(
-              new CustomEvent("invalid", {
+              new CustomEvent("data.form.invalid", {
                 bubbles: true,
                 detail: { valid: false },
               })

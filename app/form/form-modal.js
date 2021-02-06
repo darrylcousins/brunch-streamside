@@ -22,8 +22,6 @@ import Error from "../lib/error";
 import { PostFetch } from "../lib/fetch";
 import { CloseIcon } from "../lib/icon";
 
-const hasOwnProp = Object.prototype.hasOwnProperty;
-
 /**
  * Wrap a crank Component and provide modal and form functionality
  *
@@ -121,7 +119,7 @@ function FormModalWrapper(Component, options) {
       // check to find if we have a file upload
       Object.values(form).some((value) => {
         if (typeof value.name === "string") {
-          console.log('FILE:', value)
+          // console.log('FILE:', value)
           hasFile = true;
           return true;
         }
@@ -142,11 +140,9 @@ function FormModalWrapper(Component, options) {
       }
 
       console.log(data);
-      /*
       console.warn('Posting save successfully but disabled for development');
       closeModal();
       return;
-      */
 
       PostFetch({ src, data, headers })
         .then((result) => {
@@ -181,7 +177,7 @@ function FormModalWrapper(Component, options) {
     let fieldLength
 
     this.addEventListener("form.data.feed", (ev) => {
-      //console.log('Got data back from input', ev.detail);
+      // console.log('Got data back from input', ev.detail);
       if (!fieldIds.includes(ev.detail.id)) {
         console.log(ev.detail.id, 'not stored in fieldIds??', fieldIds);
       }
@@ -271,9 +267,7 @@ function FormModalWrapper(Component, options) {
      * @function getName
      * @returns {string} An identifying name for the button
      */
-    const getName = () => {
-      return name;
-    };
+    const getName = () => name;
 
     while (true)
       yield (

@@ -1,7 +1,6 @@
 'use strict';
 
 require('dotenv').config();
-const rawBody = require('raw-body');
 const crypto = require('crypto');
 
 module.exports = function (options) {
@@ -10,11 +9,10 @@ module.exports = function (options) {
 
     const secret = process.env.SHOPIFY_WEBHOOK_KEY;
     const hmac = req.get('X-Shopify-Hmac-SHA256');
-    const body = await rawBody(req);
 
     const hash = crypto
       .createHmac('sha256', secret)
-      .update(body, 'utf8', 'hex')
+      .update(req.body, 'utf8', 'hex')
       .digest('base64')
 
     if (hash === hmac) {

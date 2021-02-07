@@ -27,7 +27,8 @@ const orderCreated = async function (req, res) {
   // check for open and fulfillment and paid??
   // check if tag already stored
 
-  const order = processOrderJson(req.body);
+  // for webhooks the body is a raw string
+  const order = processOrderJson(JSON.parse(req.body.toString()));
   insertOrder(collection, order);
   updateOrderTag(order._id.toString(), order.delivered);
 

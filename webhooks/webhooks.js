@@ -14,7 +14,9 @@ exports.orderCreated = async function (req, res, next) {
   // check for open and fulfillment and paid??
   // check if tag already stored
 
-  const order = processOrderJson(req.body);
+  // for webhooks the body is a raw string
+  const order = processOrderJson(JSON.parse(req.body.toString()));
+
   insertOrder(collection, order);
   updateOrderTag(order._id.toString(), order.delivered);
 
@@ -34,9 +36,11 @@ exports.orderUpdated = async function (req, res, next) {
 
   _logger.info(`Webhook received updating delivered date from tag: \n${ req.body.id }\n${ req.body.tags }\n${ req.body.name }`);
 
+  const body = JSON.parse(req.body.toString());
+
   // Updating 
   try {
-    req.body.tags.split(',').forEach(tag => {
+    body.tags.split(',').forEach(tag => {
       const parsed = Date.parse(tag.trim());
       if (Boolean(parsed)) {
         const date = new Date(parsed);
@@ -64,14 +68,22 @@ exports.orderFulfilled = async function (req, res, next) {
   // send receipt notification to avoid timeouts and errors
   res.status(200).json({ success: 'order fulfillment webhook received' });
 
-  const { id, order_number } = req.body;
+  const body = JSON.parse(req.body.toString());
+  _logger.info(JSON.stringify(body, null, 2));
+
+  const { id, order_number } = body;
+  _logger.info(id, order_number);
 
   const collection = req.app.locals.orderCollection;
   collection.deleteOne({_id: parseInt(id), order_number: parseInt(order_number)}, (err, result) => {
     if (err) {
       _logger.error(`Webhook error orderFulfilled. ${ err }`);
     };
-    _logger.info(`Webhook received and order fulfilled and deleted: ${ id } ${ order_number }`);
+    if (result.result.n > 0) {
+      _logger.info(`Webhook received and order fulfilled and deleted: ${ id } ${ order_number }`);
+    } else {
+      _logger.info(`Webhook received and no orders deleted: ${ id } ${ order_number }`);
+    }
   });
 
 };

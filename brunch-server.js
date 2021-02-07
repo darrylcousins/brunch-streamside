@@ -81,6 +81,11 @@ module.exports = function startServer(PORT, PATH, callback) {
   //app.use(morgan('dev')); // simple
   app.use(session(sessionOpts));
   app.use(bodyParser.urlencoded({ extended: true }));
+
+  // need raw body for verification
+  app.use('/webhook', bodyParser.raw({ type: 'application/json' }))
+  app.use('/webhook', webhookMiddleware({}));
+
   app.use(bodyParser.json());
   app.use(fileUpload());
 
@@ -91,7 +96,6 @@ module.exports = function startServer(PORT, PATH, callback) {
   app.use('/api', api.routes);
 
   // shopify webhook routes - unprotected by Basic Auth, so middleware should check for shopify credentials
-  app.use('/webhook', webhookMiddleware({}));
   app.use('/webhook', webhooks.routes);
 
   // to do page from views

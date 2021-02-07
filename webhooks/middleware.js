@@ -3,6 +3,11 @@
 require('dotenv').config();
 const crypto = require('crypto');
 
+/**
+ * Verify that the request comes from shopify
+  *
+  * @param {object} options Currently an empty object in case we need options
+ */
 module.exports = function (options) {
   return async function (req, res, next) {
     // Implement the middleware function based on the options object

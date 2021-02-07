@@ -6,7 +6,7 @@
   "version": "0.0.1",
   "repository": "git@github.com:darrylcousins/brunch-streamside.git",
   "scripts": {
-    "start": "brunch watch --server --port 3334",
+    "start": "brunch watch --server --port $PORT",
     "build": "brunch build --production",
     "docs": "node_modules/.bin/jsdoc --configure ./jsdoc/jsdoc.json --verbose"
   },

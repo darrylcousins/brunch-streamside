@@ -8,7 +8,7 @@ Browser app to manage vege boxes and orders for [Streamside Organics](https://st
     * [Node.js](http://nodejs.org)
     * `npm install`
 * Run:
-    * `npm run start` — watches the project with continuous rebuild. This will also launch HTTP server on port 3334
+    * `PORT=3333 npm run start` — watches the project with continuous rebuild. This will also launch HTTP server on port 3334
     * `npm run docs` — build documentation
     * `npm run build` — builds minified project for production (currently only running in developement mode)
 

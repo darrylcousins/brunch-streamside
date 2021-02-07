@@ -14,7 +14,9 @@ const MemoryStore = require('memorystore')(session);
 const MongoClient = require('mongodb').MongoClient;
 
 const api = require('./api');
+const apiMiddleware = require('./api/middleware');
 const webhooks = require('./webhooks');
+const webhookMiddleware = require('./webhooks/middleware');
 
 // make logger available globally
 global._logger = winston;
@@ -82,10 +84,14 @@ module.exports = function startServer(PORT, PATH, callback) {
   app.use(bodyParser.json());
   app.use(fileUpload());
 
-  // db api routes
+  // db api routes - unprotected by Basic Auth but does have CORS Allow-Origin
+  // header to restrict access. The middleware further hardens access from curl
+  // etc
+  app.use('/api', apiMiddleware({}));
   app.use('/api', api.routes);
 
-  // shopify webhook routes
+  // shopify webhook routes - unprotected by Basic Auth, so middleware should check for shopify credentials
+  app.use('/webhook', webhookMiddleware({}));
   app.use('/webhook', webhooks.routes);
 
   // to do page from views

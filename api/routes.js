@@ -6,6 +6,7 @@ const syncOrders = require('./sync-orders');
 const syncBoxes = require('./sync-boxes');
 const tagOrders = require('./tag-orders');
 const getCurrentBoxes = require('./current-boxes');
+const getCurrentBoxesByProduct = require('./current-boxes-by-product');
 
 routes.get('/', function (req, res) {
   res.status(404).send('No index for the api');
@@ -34,6 +35,7 @@ routes.post('/remove-todo', queries.removeTodo);
 
 //routes.get('/boxes', queries.getBoxes);
 routes.get('/current-boxes', getCurrentBoxes);
+routes.get('/current-boxes-by-product/:product_id', getCurrentBoxesByProduct);
 routes.get('/current-box-titles/:timestamp', queries.getCurrentBoxTitles);
 routes.get('/current-box-dates', queries.getCurrentBoxDates);
 

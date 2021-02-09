@@ -78,11 +78,11 @@ const collectBoxes = async () => {
         pool
           .query(boxProducts, [boxId, 't'])
           .then(res => {
-            boxDoc.addOnProducts = res.rows.map(el => el.shopify_title);
+            boxDoc.addOnProducts = res.rows.map(el => ({...el}));
             pool
               .query(boxProducts, [boxId, 'f'])
               .then(res => {
-                boxDoc.includedProducts = res.rows.map(el => el.shopify_title);
+                boxDoc.includedProducts = res.rows.map(el => ({...el}));
               });
           });
         boxDocuments.push(boxDoc);

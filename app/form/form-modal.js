@@ -140,9 +140,11 @@ function FormModalWrapper(Component, options) {
       }
 
       console.log(data);
+      /*
       console.warn('Posting save successfully but disabled for development');
       closeModal();
       return;
+      */
 
       PostFetch({ src, data, headers })
         .then((result) => {

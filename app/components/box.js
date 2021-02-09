@@ -37,12 +37,12 @@ function Box({ box, index }) {
       </td>
       <td class="pv3 pr3 bb b--black-20 black-50 v-top">
         {box.includedProducts.map((el) => (
-          <span class="db">{el}</span>
+          <span class="db">{el.shopify_title}</span>
         ))}
       </td>
       <td class="pv3 pr3 bb b--black-20 black-50 v-top">
         {box.addOnProducts.map((el) => (
-          <span class="db">{el}</span>
+          <span class="db">{el.shopify_title}</span>
         ))}
       </td>
       <td class="pv3 pr3 bb b--black-20 rh-copy black-70 v-top">

@@ -8,10 +8,11 @@
   * @function getCurrentBoxes
   * @returns {object} Arrays of boxes grouped by delivery date
   */
-const getCurrentBoxes = async function (req, res, next) {
+const getCurrentBoxesByProduct = async function (req, res, next) {
   const collection = req.app.locals.boxCollection;
   const response = Object();
   const now = new Date();
+  const product_id = parseInt(req.params.product_id);
 
   /**
    * Get upcoming delivery dates to filter boxes by
@@ -42,21 +43,14 @@ const getCurrentBoxes = async function (req, res, next) {
     .catch(err => res.status(400).json({ error: e.toString() }));
 
   // consider defining fields to avoid the inner product documents
-  //https://docs.mongodb.com/drivers/node/fundamentals/crud/read-operations/project
-  //
+  // https://docs.mongodb.com/drivers/node/fundamentals/crud/read-operations/project
+  // TODO absolutely essential the data is unique by delivered and shopify_product_id
   // filter by dates later than now
   try {
-    collection.find({delivered: {$in: dates}}).toArray((err, result) => {
+    collection.find({delivered: {$in: dates}, shopify_product_id: product_id}).toArray((err, result) => {
       if (err) throw err;
       result.forEach(el => {
-        const d = new Date(Date.parse(el.delivered));
-        const delivery = el.delivered;
-        // collate into object with delivery date as key - can this be done in
-        // mongo api - not with aggregation as far as I can figure
-        if (!response.hasOwnProperty(delivery)) {
-          response[delivery] = Array();
-        };
-        response[delivery].push(el);
+        response[el.delivered] = el;
       });
       res.status(200).json(response);
     });
@@ -65,4 +59,5 @@ const getCurrentBoxes = async function (req, res, next) {
   };
 };
 
-module.exports = getCurrentBoxes;
+module.exports = getCurrentBoxesByProduct;
+

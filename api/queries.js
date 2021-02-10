@@ -439,9 +439,9 @@ exports.downloadPackingList= async function (req, res, next) {
     const rowkeys = Array();
     
     data.forEach(el => {
-      if (!el.box.startsWith('Custom')) {
+      if (!el.box.startsWith('Custom') && el.order_count) {
         const key = el.box.toLowerCase().replace(/ /g, '-');
-        products[key] = el.including.map(name => name.replace(/^- ?/, ''));
+        products[key] = el.including.map(name => name.shopify_title.replace(/^- ?/, ''));
         const emptykey = el.box.toLowerCase().replace(/ /g, '-') + '-empty';
         columns.push(
           { header: el.box, key: key, width: 40 }

@@ -197,7 +197,7 @@ function* PackingLists() {
     <Fragment>
       <h4>Included box products</h4>
       {including.map((product) => (
-        <span class="db">{product.replace(/^- ?/, "")}</span>
+        <span class="db">{product.shopify_title.replace(/^- ?/, "")}</span>
       ))}
     </Fragment>
   );

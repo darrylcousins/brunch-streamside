@@ -10,8 +10,8 @@ exports.isFruit = isFruit;
 exports.getPickingList = (data) => {
   const picking = Object();
   data.forEach(box => {
-    box.including.forEach(product => {
-      product = product.replace(/^- ?/, '');
+    box.including.forEach(el => {
+      const product = el.shopify_title.replace(/^- ?/, '');
       if (!picking.hasOwnProperty(product)) {
         picking[product] = Object();
       }

@@ -36,6 +36,7 @@ routes.post('/remove-todo', queries.removeTodo);
 //routes.get('/boxes', queries.getBoxes);
 routes.get('/current-boxes', getCurrentBoxes);
 routes.get('/current-boxes-by-product/:product_id', getCurrentBoxesByProduct);
+routes.get('/box-by-date-and-product/:product_id/:timestamp', queries.getBoxByDateAndProduct);
 routes.get('/current-box-titles/:timestamp', queries.getCurrentBoxTitles);
 routes.get('/current-box-dates', queries.getCurrentBoxDates);
 

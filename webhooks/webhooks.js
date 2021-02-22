@@ -34,9 +34,9 @@ exports.orderUpdated = async function (req, res, next) {
 
   const collection = req.app.locals.orderCollection;
 
-  _logger.info(`Webhook received updating delivered date from tag: \n${ req.body.id }\n${ req.body.tags }\n${ req.body.name }`);
-
   const body = JSON.parse(req.body.toString());
+
+  _logger.info(`Webhook received updating delivered date from tag: \n${ body.id }\n${ body.tags }\n${ body.name }`);
 
   // Updating 
   try {
@@ -45,7 +45,7 @@ exports.orderUpdated = async function (req, res, next) {
       if (Boolean(parsed)) {
         const date = new Date(parsed);
         const data = {
-          _id: req.body.id,
+          _id: body.id,
           delivered: date.toDateString()
         }
         mongoUpdate(collection, data);

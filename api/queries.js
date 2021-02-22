@@ -191,6 +191,20 @@ exports.getCurrentBoxTitles = async function (req, res, next) {
   };
 };
 
+exports.getBoxByDateAndProduct = async function (req, res, next) {
+  // get current box by selected date and shopify product id
+  const collection = req.app.locals.boxCollection;
+  const response = Array();
+  const deliveryDay = getNZDeliveryDay(req.params.timestamp);
+  const product_id = parseInt(req.params.product_id);
+  try {
+    const box = await collection.findOne({ delivered: deliveryDay, shopify_product_id: product_id });
+    res.status(200).json(box);
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
 exports.getCurrentBoxDates = async function (req, res, next) {
   const collection = req.app.locals.boxCollection;
   const response = Array();

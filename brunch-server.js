@@ -141,5 +141,8 @@ module.exports = function startServer(PORT, PATH, callback) {
     res.render('pages/error');
   });
 
-  server.listen(PORT, callback);
+  server.listen(PORT, () => {
+    _logger.info(`Server started on port ${server.address().port}`);
+    callback();
+  });
 };

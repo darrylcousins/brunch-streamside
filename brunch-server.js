@@ -98,12 +98,6 @@ module.exports = function startServer(PORT, PATH, callback) {
   // shopify webhook routes - unprotected by Basic Auth, so middleware should check for shopify credentials
   app.use('/webhook', webhooks.routes);
 
-  // to do page from views
-  app.get('/todo', (req, res, next) => {
-    //if (!req.user) return res.redirect('/login');
-    res.render('pages/todo');
-  });
-
   // brunch compiled static files
   app.use(express.static(path.join(__dirname, PATH)));
 

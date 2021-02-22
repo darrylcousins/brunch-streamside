@@ -34,7 +34,7 @@ exports.orderUpdated = async function (req, res, next) {
 
   const collection = req.app.locals.orderCollection;
 
-  const body = JSON.parse(req.body.toString());
+  const body = JSON.parse(req.body);
 
   _logger.info(`Webhook received updating delivered date from tag: \n${ body.id }\n${ body.tags }\n${ body.name }`);
 

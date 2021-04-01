@@ -3,7 +3,7 @@ const {
 } = require('./order-lib');
 
 const isBread = (str) => Boolean(str.match(/bread|bellbird|sourdough/gi));
-const isFruit = (str) => Boolean(str.match(/apple/gi));
+const isFruit = (str) => Boolean(str.match(/apple|pear/gi));
 exports.isBread = isBread;
 exports.isFruit = isFruit;
 

@@ -31,14 +31,21 @@ const sortObjectByKeys = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o
 
 const sortObjectByKey = (o, key) => {
   o.sort((a, b) => {
-    var nameA = a[key].toUpperCase(); // ignore upper and lowercase
-    var nameB = b[key].toUpperCase(); // ignore upper and lowercase
+    let nameA = a[key];
+    let nameB = b[key];
+    if (!Number.isInteger) {
+      nameA = a[key].toUpperCase(); // ignore upper and lowercase
+      nameB = b[key].toUpperCase(); // ignore upper and lowercase
+    }
     if (nameA < nameB) return -1;
     if (nameA > nameB) return 1;
     return 0;
   });
   return o;
 };
+
+exports.sortObjectByKeys = sortObjectByKeys;
+exports.sortObjectByKey = sortObjectByKey;
 
 exports.getOrderSources = async function (req, res, next) {
   const collection = req.app.locals.orderCollection;
@@ -349,6 +356,7 @@ exports.downloadOrders = async function (req, res, next) {
         result.forEach(row => {
           content.push(
             {
+              select: '',
               logo: '',
               box: row.sku,
               deliveryday: row.delivered,

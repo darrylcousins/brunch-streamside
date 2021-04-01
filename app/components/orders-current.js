@@ -67,6 +67,7 @@ function* CurrentOrders() {
           this.refresh();
         } else {
           const { headers, orders } = json;
+          console.log(headers);
           fetchHeaders = headers;
           fetchOrders = orders;
           loading = false;

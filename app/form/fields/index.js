@@ -63,8 +63,13 @@ function Field(props) {
   const onFocus = (ev) => {
     const el = ev.target;
     el.classList.remove("invalid");
-    el.nextSibling.innerHTML = "";
-    el.nextSibling.classList.add("hidden");
+    if (el.nextSibling) {
+      el.nextSibling.innerHTML = "";
+      el.nextSibling.classList.add("hidden");
+    }
+    if (el.previousSibling) {
+      el.previousSibling.classList.remove("fg-streamside-orange");
+    }
   };
 
   /**
@@ -78,9 +83,13 @@ function Field(props) {
   const onBlur = (ev) => {
     const el = ev.target;
     if (!el.checkValidity()) {
-      el.classList.add("invalid");
-      el.nextSibling.innerHTML = el.validationMessage;
-      el.nextSibling.classList.remove("hidden");
+      if (el.nextSibling) {
+        el.nextSibling.innerHTML = el.validationMessage;
+        el.nextSibling.classList.remove("hidden");
+      }
+      if (el.previousSibling) {
+        el.previousSibling.classList.add("fg-streamside-orange");
+      }
     }
   };
 

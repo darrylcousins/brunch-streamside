@@ -76,33 +76,25 @@ function* Form(props) {
    * @listens module:app/form/form-modal-wrapper#validateEvent
    * @fires module:app/form/form#validationEvent
    */
-  const formValidate = () => {
+  const formValidate = async () => {
     const { elements } = document.getElementById(id);
     let error = false;
+    const elementsInError = [];
     Array.from(elements).forEach((element) => {
       const el = element; // avoiding no-param-reassign eslint
       if (el.tagName !== "FIELDSET" && el.type !== "hidden") {
         if (!el.checkValidity()) {
-          el.classList.add("invalid");
-          if (el.nextSibling) {
-            el.nextSibling.innerHTML = el.validationMessage;
-            el.nextSibling.classList.remove("hidden");
-          }
-          if (el.type === "file") {
-            // file is the only generator field that needs this
-            el.dispatchEvent(
-              new CustomEvent("data.form.invalid", {
-                bubbles: true,
-                detail: { valid: false },
-              })
-            );
-          }
+
+          // error indicators done after element refresh
+          elementsInError.push(el);
           error = true;
+
         } else if (el.checkValidity()) {
           el.classList.remove("invalid");
           if (el.nextSibling) {
             el.nextSibling.innerHTML = "";
             el.nextSibling.classList.add("hidden");
+            el.previousSibling.classList.remove("fg-streamside-orange");
           }
         }
         formElements[el.name] = el;
@@ -110,7 +102,31 @@ function* Form(props) {
     });
     this.dispatchEvent(validationEvent(id, !error));
     formError = error;
-    if (formError) this.refresh();
+    if (formError) {
+
+      await this.refresh();
+
+      // after refresh update dom field elements that did not validate
+      for (const el of elementsInError) {
+        el.classList.add("invalid");
+        if (el.nextSibling) {
+          el.nextSibling.innerHTML = el.validationMessage;
+          el.nextSibling.classList.remove("hidden");
+        }
+        if (el.previousSibling) {
+          el.previousSibling.classList.add("fg-streamside-orange");
+        }
+        if (el.type === "file") {
+          // file is the only generator field that needs this
+          el.dispatchEvent(
+            new CustomEvent("data.form.invalid", {
+              bubbles: true,
+              detail: { valid: false },
+            })
+          );
+        }
+      }
+    }
   };
 
   this.addEventListener(`${id}.validate`, formValidate);

@@ -249,6 +249,9 @@ const skuTranslate = (str) => {
   if (str.toLowerCase().includes('custom')) {
     return 'Custom Box';
   };
+  if (str.toLowerCase() === 'medium vege family') {
+    return 'Medium Vege';
+  };
   return str;
 };
 

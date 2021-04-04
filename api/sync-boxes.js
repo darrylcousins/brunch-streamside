@@ -99,8 +99,9 @@ const addSKUAndSave = async (boxDocuments, collection) => {
   const final = await boxDocuments.map(async (boxDoc) => {
     const variant = await getBoxSKU(boxDoc.shopify_variant_id.toString())
       .then(res => res.variant.sku);
+    console.log("Variant", variant);
     boxDoc.shopify_sku = variant;
-    console.log(boxDoc);
+    console.log("boxDoc", boxDoc);
     await mongoInsert(boxDoc, collection);
     return boxDoc;
   });
@@ -114,10 +115,12 @@ module.exports = async function (req, res, next) {
     const variant = await getBoxSKU(boxDoc.shopify_variant_id.toString())
       .then(res => res.variant.sku);
     boxDoc.shopify_sku = variant;
-    //console.log(boxDoc);
+    console.log("variant", variant);
+    //console.log("boxDoc", boxDoc);
     const { _id, ...parts } = boxDoc;
+    console.log("_id", _id);
     const res = await collection.updateOne(
-      { _id },
+      { _id: _id+1 },
       { $setOnInsert: { ...parts } },
       { upsert: true }
     );

@@ -7,6 +7,7 @@
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
+import CollapseWrapper from "./collapse-animator";
 
 /**
  * Constructs and returns a table row for the box
@@ -25,31 +26,56 @@ import { createElement } from "@bikeshaving/crank/cjs";
  *    }
  *  <Box box={box} />
  */
-function Box({ box, index }) {
+function *Box({ box, index }) {
+
   const deliveryDate = new Date(box.delivered);
-  return (
-    <tr key={index}>
-      <td class="pv3 pr3 bb b--black-20 black-70 v-top">
-        {deliveryDate.toLocaleDateString()}
-      </td>
-      <td class="pv3 pr3 bb b--black-20 v-top">
-        <strong>{box.shopify_sku}</strong>
-      </td>
-      <td class="pv3 pr3 bb b--black-20 black-50 v-top">
-        {box.includedProducts.map((el) => (
-          <span class="db">{el.shopify_title}</span>
-        ))}
-      </td>
-      <td class="pv3 pr3 bb b--black-20 black-50 v-top">
-        {box.addOnProducts.map((el) => (
-          <span class="db">{el.shopify_title}</span>
-        ))}
-      </td>
-      <td class="pv3 pr3 bb b--black-20 rh-copy black-70 v-top">
-        ${parseFloat(box.shopify_price / 100).toFixed(2)}
-      </td>
-    </tr>
+
+  let collapsed = true;
+
+  const Products = ({products}) => (
+    products.map((el) => (
+      <span class="db">{el.shopify_title}</span>
+    ))
   );
+
+  const toggleCollapse = () => {
+    collapsed = !collapsed;
+    this.refresh();
+  };
+
+  this.addEventListener("click", toggleCollapse);
+
+  const CollapsibleProducts = CollapseWrapper(Products);
+
+  for (const props of this) {
+    yield (
+      <tr key={index}>
+        <td class="pv3 pr3 bb b--black-20 black-70 v-top">
+          {deliveryDate.toLocaleDateString()}
+        </td>
+        <td class="pv3 pr3 bb b--black-20 v-top">
+          <strong>{box.shopify_sku}</strong>
+        </td>
+        <td class="pv3 pr3 bb b--black-20 black-50 v-top">
+          <CollapsibleProducts 
+            products={box.includedProducts}
+            collapsed={collapsed}
+            id={`included-${box.shopify_product_id}`}
+          />
+        </td>
+        <td class="pv3 pr3 bb b--black-20 black-50 v-top">
+          <CollapsibleProducts 
+            products={box.addOnProducts}
+            collapsed={collapsed}
+            id={`addons-${box.shopify_product_id}`}
+          />
+        </td>
+        <td class="pv3 pr3 bb b--black-20 rh-copy black-70 v-top">
+          ${parseFloat(box.shopify_price / 100).toFixed(2)}
+        </td>
+      </tr>
+    );
+  };
 }
 
 export default Box;

@@ -108,7 +108,7 @@ function* Boxes({ boxes }) {
                         </tr>
                       </thead>
                       <tbody class="lh-copy">
-                        {sortObjectByKey(boxes[key], "shopify_sku").map(
+                        {boxes[key].map(
                           (box, idx) => (
                             <Box index={idx} box={box} />
                           )

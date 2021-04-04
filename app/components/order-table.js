@@ -29,6 +29,9 @@ const TableRow = ({ order, index }) => {
   const name = (order.name === "") ? `${order.first_name} ${order.last_name}` : order.name;
   return (
     <tr crank-key={order._id} class="striped--near-white">
+      <td class="pv1 ph1 bb b--black-20 v-top">
+        <input type="checkbox" name="order[]" />
+      </td>
       <td class="pv1 ph1 bb b--black-20 v-top">{order.sku}</td>
       <td class="pv1 ph1 bb b--black-20 v-top">{order.delivered}</td>
       <td class="pv1 ph1 bb b--black-20 v-top">{order.order_number}</td>

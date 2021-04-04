@@ -38,16 +38,19 @@ module.exports = function startServer(PORT, PATH, callback) {
   MongoClient
     .connect(mongo_uri, { useNewUrlParser: true, poolSize: 10, useUnifiedTopology: true })
     .then(client => {
-      const db = client.db('streamside');
-      dbClient = client;
-      orderCollection = db.collection('orders');
-      boxCollection = db.collection('boxes');
-      todoCollection = db.collection('todos');
+      const streamsideDB = client.db('streamside');
+      orderCollection = streamsideDB.collection('orders');
+      todoCollection = streamsideDB.collection('todos');
+
+      const southbridgeDB = client.db('southbridge');
+      boxCollection = southbridgeDB.collection('boxes');
 
       // make collection available globally
       app.locals.orderCollection = orderCollection;
       app.locals.boxCollection = boxCollection;
       app.locals.todoCollection = todoCollection;
+
+      dbClient = client;
 
       // listen for the signal interruption (ctrl-c)
       process.on('SIGINT', () => {

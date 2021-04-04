@@ -55,6 +55,7 @@ const headersFull = [
 ]
 
 const headersPartial = [
+  'Select',
   'Box',
   'Delivery Day',
   'Order #',

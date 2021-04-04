@@ -1,4 +1,6 @@
 'use strict';
+const { sortObjectByKey } = require('./queries');
+
 /**
   * @module api/current-boxes
   */
@@ -57,7 +59,11 @@ const getCurrentBoxes = async function (req, res, next) {
           response[delivery] = Array();
         };
         response[delivery].push(el);
+        // sort by price
       });
+      for (const key in response) {
+        response[key] = sortObjectByKey(response[key], "shopify_price");
+      }
       res.status(200).json(response);
     });
   } catch(e) {

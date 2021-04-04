@@ -1,4 +1,5 @@
 @import '_bar-loader.scss';
+@import '_animation.scss';
 
 /*Hide info of no checked inputs for tabbed display */
 .tabs__content input:not(:checked) ~ .tabs__content__info {

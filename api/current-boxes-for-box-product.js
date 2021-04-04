@@ -8,12 +8,11 @@
   * @function getCurrentBoxes
   * @returns {object} Arrays of boxes grouped by delivery date
   */
-const getCurrentBoxesByProduct = async function (req, res, next) {
+const getCurrentBoxesForBoxProduct = async function (req, res, next) {
   const collection = req.app.locals.boxCollection;
   const response = Object();
   const now = new Date();
-  now.setDate( now.getDate() - 3 );
-  const product_id = parseInt(req.params.product_id);
+  const box_product_id = parseInt(req.params.box_product_id, 10);
 
   /**
    * Get upcoming delivery dates to filter boxes by
@@ -48,17 +47,38 @@ const getCurrentBoxesByProduct = async function (req, res, next) {
   // TODO absolutely essential the data is unique by delivered and shopify_product_id
   // filter by dates later than now
   try {
-    collection.find({delivered: {$in: dates}, shopify_product_id: product_id}).toArray((err, result) => {
-      if (err) throw err;
-      result.forEach(el => {
-        response[el.delivered] = el;
+    collection
+      .find({
+        delivered: {$in: dates},
+        $or: [
+          { includedProducts: { $elemMatch: { shopify_product_id: box_product_id } } },
+          { addOnProducts: { $elemMatch: { shopify_product_id: box_product_id } } }
+        ]
+      })
+      /*
+      .project({
+        delivered: 1, shopify_title: 1, shopify_product_id: 1, shopify_variant_id: 1
+      })
+      */
+      .toArray((err, result) => {
+        if (err) throw err;
+        result.forEach(el => {
+          if (!response.hasOwnProperty(el.shopify_handle)) {
+            response[el.shopify_handle] = Array();
+          };
+          const item = { ...el };
+          item.includedProduct = el.includedProducts.some(prod => prod.shopify_product_id === box_product_id);
+          if (!item.includedProduct) {
+            item.addOnProduct = el.addOnProducts.some(prod => prod.shopify_product_id === box_product_id) ? true : false;
+          }
+
+          response[el.shopify_handle].push(item);
+        });
+        res.status(200).json(response);
       });
-      res.status(200).json(response);
-    });
   } catch(e) {
     res.status(400).json({ error: e.toString() });
   };
 };
 
-module.exports = getCurrentBoxesByProduct;
-
+module.exports = getCurrentBoxesForBoxProduct;

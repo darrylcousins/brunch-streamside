@@ -32,11 +32,15 @@ function *Box({ box, index }) {
 
   let collapsed = true;
 
-  const Products = ({products}) => (
-    products.map((el) => (
-      <span class="db">{el.shopify_title}</span>
-    ))
-  );
+  function *Products ({products}) {
+    for ({ products } of this) {
+      yield (
+        products.map((el) => (
+          <span class="db">{el.shopify_title}</span>
+        ))
+      );
+    };
+  };
 
   const toggleCollapse = () => {
     collapsed = !collapsed;

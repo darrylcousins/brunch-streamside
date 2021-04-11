@@ -74,7 +74,7 @@ const getOrderFields = async (delivered) => {
         type: "text",
         size: "25",
         datatype: "string",
-        required: true,
+        required: false,
       },
       "Street Address": {
         id: "address1",
@@ -109,7 +109,7 @@ const getOrderFields = async (delivered) => {
         type: "text",
         size: "25",
         datatype: "string",
-        required: true,
+        required: false,
       },
       Box: {
         id: "sku",

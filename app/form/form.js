@@ -94,6 +94,8 @@ function* Form(props) {
           if (el.nextSibling) {
             el.nextSibling.innerHTML = "";
             el.nextSibling.classList.add("hidden");
+          }
+          if (el.previousSibling && el.previousSibling.classList) {
             el.previousSibling.classList.remove("fg-streamside-orange");
           }
         }
@@ -113,7 +115,7 @@ function* Form(props) {
           el.nextSibling.innerHTML = el.validationMessage;
           el.nextSibling.classList.remove("hidden");
         }
-        if (el.previousSibling) {
+        if (el.previousSibling && el.previousSibling.classList) {
           el.previousSibling.classList.add("fg-streamside-orange");
         }
         if (el.type === "file") {

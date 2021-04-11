@@ -332,7 +332,7 @@ const orderImportXLSX = (data, delivered, collection) => {
   let count = 0;
   let targetDate = new Date(Date.parse(delivered));
   let targetString = targetDate.toLocaleDateString().replace(/-/g, '/').replace(/^0/,'');
-  _logger.info(targetString);
+  
   try {
     const wb = xlsx.read(data);
 
@@ -345,14 +345,13 @@ const orderImportXLSX = (data, delivered, collection) => {
       output.forEach(row => {
         rowObj = Object();
         row.forEach((el, index) => {
-          //console.log(headers[index], el);
           rowObj[headers[index]] = el;
         });
         result.push(rowObj);
       });
       result.forEach((row, index) => {
-        //_logger.info(JSON.stringify(row, null, 2));
         if (row.hasOwnProperty(targetString) && row[targetString] !== '') {
+          //_logger.info(JSON.stringify(row, null, 2));
           json = {
             _id: targetDate.getTime() + index,
             addons: getAttribute(row, 'Extras', '')
@@ -383,7 +382,7 @@ const orderImportXLSX = (data, delivered, collection) => {
           };
           insertOrder(collection, json);
           count = count + 1;
-          _logger.info(JSON.stringify(json, null, 2));
+          //_logger.info(JSON.stringify(json, null, 2));
         };
       });
     };

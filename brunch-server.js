@@ -46,7 +46,7 @@ module.exports = function startServer(PORT, PATH, callback) {
         const southbridgeDB = client.db('southbridge');
         boxCollection = southbridgeDB.collection('boxes');
       } else {
-        boxCollection = streamside.collection('boxes');
+        boxCollection = streamsideDB.collection('boxes');
       }
 
       // make collection available globally

@@ -27,9 +27,10 @@ import { sortObjectByKey } from "../helpers";
  */
 const TableRow = ({ order, index }) => {
   const name = (order.name === "") ? `${order.first_name} ${order.last_name}` : order.name;
+  // to re-add 'select' column to headers see api/order-lib/partialHeaders
   return (
     <tr crank-key={order._id} class="striped--near-white">
-      <td class="pv1 ph1 bb b--black-20 v-top">
+      <td class="pv1 ph1 bb b--black-20 v-top" class="dn">
         <input type="checkbox" name="order[]" />
       </td>
       <td class="pv1 ph1 bb b--black-20 v-top">{order.sku}</td>

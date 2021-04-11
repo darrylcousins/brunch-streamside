@@ -55,7 +55,7 @@ const headersFull = [
 ]
 
 const headersPartial = [
-  'Select',
+  // 'Select',
   'Box',
   'Delivery Day',
   'Order #',

@@ -266,7 +266,7 @@ function* CurrentOrders() {
                 {Object.keys(fetchOrders).map((key, index) => (
                   <div>
                     <input
-                      type="radio"
+                      type="checkbox"
                       class="dn"
                       name="sections"
                       id={key.replace(/ /g, "-")}

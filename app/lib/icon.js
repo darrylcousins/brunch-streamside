@@ -62,7 +62,20 @@ const DownloadIcon = () => (
 );
 
 /**
- * DownloadIcon component, download symbol, path borrowed from
+ * SaveAltIcon component, download symbol, path borrowed from
+ * {@link https://material.io/icons/|Material Design}. Intended to be wrapped by
+ * {@link module:app/lib/icon~Icon|Icon}
+ *
+ * @returns {Element} DOM component
+ */
+const SaveAltIcon = () => (
+  <Icon>
+    <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />
+  </Icon>
+);
+
+/**
+ * CloseIcon component, download symbol, path borrowed from
  * {@link https://material.io/icons/|Material Design}. Intended to be wrapped by
  * {@link module:app/lib/icon~Icon|Icon}
  *
@@ -136,4 +149,5 @@ export {
   AddIcon,
   ExcelIcon,
   HelpIcon,
+  SaveAltIcon,
 };

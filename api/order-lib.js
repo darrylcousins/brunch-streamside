@@ -339,7 +339,7 @@ const orderImportXLSX = (data, delivered, collection) => {
     // check through both sheets
     for (let i=0; i<2; i++) {
       // generate array of arrays
-      output = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[i]], {header:1, raw:true, defval:''});
+      output = xlsx.utils.sheet_to_json(wb.Sheets[wb.SheetNames[i]], {header:1, raw:false, defval:''});
       const headers = output.shift();
       const result = Array();
       output.forEach(row => {
@@ -348,14 +348,15 @@ const orderImportXLSX = (data, delivered, collection) => {
           rowObj[headers[index]] = el;
         });
         result.push(rowObj);
+        _logger.info(JSON.stringify(rowObj, null, 2));
       });
       result.forEach((row, index) => {
         if (row.hasOwnProperty(targetString) && row[targetString] !== '') {
-          //_logger.info(JSON.stringify(row, null, 2));
+          _logger.info(JSON.stringify(row, null, 2));
           json = {
             _id: targetDate.getTime() + index,
             addons: getAttribute(row, 'Extras', '')
-                      .split('\r\n')
+                      .split('\n')
                       .map(el => el.trim())
                       .filter(el => el !== ''),
             address1: row['Address Line'],
@@ -371,7 +372,7 @@ const orderImportXLSX = (data, delivered, collection) => {
             order_number: null,
             phone: getAttribute(row, 'Telephone', '').toString(),
             removed: getAttribute(row, 'Excluding', '')
-                      .split('\r\n')
+                      .split('\n')
                       .map(el => el.trim())
                       .filter(el => el !== ''),
             sku: row[targetString],
@@ -380,9 +381,9 @@ const orderImportXLSX = (data, delivered, collection) => {
             shop_note: getAttribute(row, 'Shop Note', ''),
             source: 'CSA'
           };
-          insertOrder(collection, json);
+          //insertOrder(collection, json);
           count = count + 1;
-          //_logger.info(JSON.stringify(json, null, 2));
+          _logger.info(JSON.stringify(json, null, 2));
         };
       });
     };

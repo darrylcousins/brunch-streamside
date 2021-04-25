@@ -17,6 +17,7 @@ import Error from "../lib/error";
 import SelectMenu from "../lib/select-menu";
 import { Fetch } from "../lib/fetch";
 import { DownloadIcon } from "../lib/icon";
+import { SaveAltIcon } from "../lib/icon";
 
 /**
  * Create a DOM representation of orders grouped using tabs by delivery date.
@@ -254,23 +255,53 @@ function* CurrentOrders() {
               </SelectMenu>
             </div>
             {selectedDate && (
-              <div class="dtc tr v-mid">
-                <AddOrderModal delivered={selectedDate} />
-                {new Date(selectedDate).toString() !== "Invalid Date" && (
-                  <a
-                    name={`${selectedDate.replace(/ /g, "-")}-key`}
-                    class="no-underline green dib"
-                    href={`/api/orders-download/${new Date(
+              <Fragment>
+                <div class="dtc tr v-bottom">
+                  <button
+                    class={`dib w-50 f6 outline-0 gray b--gray ba ba1 bg-transparent br2 br--left mv1 pointer`}
+                    title="Download picking list"
+                    type="button"
+                    onclick={() => window.location=`/api/picking-list-download/${new Date(
                       selectedDate
                     ).getTime()}`}
-                    title="Download as xlsx"
-                  >
-                    <DownloadIcon />
-                    <span class="dn">Download</span>
-                  </a>
-                )}
-                <RemoveOrders delivered={selectedDate} />
-              </div>
+                    >
+                      <span class="v-mid">Picking List</span>
+                      <span class="v-mid">
+                        <SaveAltIcon />
+                      </span>
+                  </button>
+                  <button
+                    class={`dib w-50 f6 outline-0 gray b--gray bt bb br bl-0 br2 br--right bg-transparent mv1 pointer`}
+                    title="Download packing list"
+                    type="button"
+                    onclick={() => window.location=`/api/packing-list-download/${new Date(
+                      selectedDate
+                    ).getTime()}`}
+                    >
+                      <span class="v-mid">Packing List</span>
+                      <span class="v-mid">
+                        <SaveAltIcon />
+                      </span>
+                  </button>
+                </div>
+                <div class="dtc tr v-mid">
+                  <AddOrderModal delivered={selectedDate} />
+                  {new Date(selectedDate).toString() !== "Invalid Date" && (
+                    <a
+                      name={`${selectedDate.replace(/ /g, "-")}-key`}
+                      class="no-underline green dib"
+                      href={`/api/orders-download/${new Date(
+                        selectedDate
+                      ).getTime()}`}
+                      title="Download as xlsx"
+                    >
+                      <DownloadIcon />
+                      <span class="dn">Download</span>
+                    </a>
+                  )}
+                  <RemoveOrders delivered={selectedDate} />
+                </div>
+              </Fragment>
             )}
           </div>
           {selectedDate && (

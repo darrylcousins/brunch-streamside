@@ -457,10 +457,11 @@ exports.downloadPackingList= async function (req, res, next) {
     const columns = Array();
     // make array of arrays
     const products = Object();
-    let customBoxCount;
+    let customBoxCount = 0;
     const rowkeys = Array();
     
     data.forEach(el => {
+      console.log(el.box, el.order_count)
       if (!el.box.startsWith('Custom') && el.order_count) {
         const key = el.box.toLowerCase().replace(/ /g, '-');
         products[key] = el.including.map(name => name.shopify_title.replace(/^- ?/, ''));
@@ -474,7 +475,7 @@ exports.downloadPackingList= async function (req, res, next) {
         );
         rowkeys.push(emptykey);
       } else {
-        customBoxCount = el.order_count;
+        customBoxCount += el.order_count;
       };
     });
 

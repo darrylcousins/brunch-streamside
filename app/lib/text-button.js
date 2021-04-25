@@ -30,6 +30,26 @@ const TextButton = (props) => {
       {title}
     </button>
   );
+  /*
+  return (
+    <button
+      class={`w-100 f6 ${type} outline-0 dark-gray b--gray ${borders} bg-transparent pointer pa0`}
+      title={text}
+      name={slug}
+      id={slug}
+      type="button"
+      >
+        <div
+          name={name}
+          class="dim bg-animate hover-bg-near-white pa1"
+          data-item={item}
+          data-title={text}
+        >
+          { text }
+        </div>
+      </button>
+  );
+  */
 };
 
 export default TextButton;

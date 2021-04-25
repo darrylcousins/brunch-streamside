@@ -1,7 +1,7 @@
 <header class="bg-streamside-blue w-100">
   <nav class="flex justify-between">
     <a class="link white-70 hover-white no-underline flex items-center pa3" href="/">
-      <% if(locals.header){ %><%= locals.header %><% } else{ %>Streamside Organics<% } %>
+      <% if(locals.header){ %><%- locals.header %><% } else{ %>Streamside Organics<% } %>
     </a>
     <div class="f6 fw6 ttu tracked flex-grow pa3 flex items-center">
       <a class="link dim white dib mr3" href="/orders" title="Orders">Orders</a>

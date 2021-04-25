@@ -48,7 +48,7 @@ const TableRow = ({ order, index }) => {
         <span class="db">{order.zip}</span>
       </td>
       <td class="pv1 ph1 bb b--black-20 v-top">{order.source}</td>
-      <td class="pv1 ph1 bb b--black-20 v-top">
+      <td class="pv1 ph1 bb b--black-20 v-top tr">
         <OrderModal crank-key={index} order={order} />
         <EditOrderModal order={order} delivered={order.delivered} />
         <RemoveOrderModal order={order} />

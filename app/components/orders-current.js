@@ -6,7 +6,7 @@
  * @exports CurrentOrders
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
-import { createElement } from "@bikeshaving/crank/cjs";
+import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
 import AddOrderModal from "./order-add";
 import RemoveOrders from "./orders-remove";
@@ -14,6 +14,7 @@ import HelpSection from "./order-help";
 import { TableHeader, TableBody } from "./order-table";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
+import SelectMenu from "../lib/select-menu";
 import { Fetch } from "../lib/fetch";
 import { DownloadIcon } from "../lib/icon";
 
@@ -27,11 +28,17 @@ import { DownloadIcon } from "../lib/icon";
  */
 function* CurrentOrders() {
   /**
-   * Orders fetched from api
+   * Orders fetched from api as a dictionary keyed by the delivery date
    *
    * @member {object} fetchOrders
    */
   let fetchOrders = {};
+  /**
+   * Delivery dates - the array of keys from fetchOrders
+   *
+   * @member {object} fetchDates
+   */
+  let fetchDates = []
   /**
    * If fetch returns an error
    *
@@ -50,6 +57,19 @@ function* CurrentOrders() {
    * @member {boolean} loading
    */
   let loading = true;
+  /**
+   * Select date for order display table
+   *
+   * @member {boolean} selectedDate
+   */
+  let selectedDate = null;
+  /**
+   * Display date selection menu if active
+   *
+   * @member menuSelectDate
+   * @type {boolean}
+   */
+  let menuSelectDate = false;
 
   /**
    * Fetch orders data on mounting of component
@@ -67,9 +87,10 @@ function* CurrentOrders() {
           this.refresh();
         } else {
           const { headers, orders } = json;
-          console.log(headers);
           fetchHeaders = headers;
           fetchOrders = orders;
+          fetchDates = Object.keys(orders);
+          if (fetchDates.length) selectedDate = fetchDates[0];
           loading = false;
           this.refresh();
         }
@@ -130,6 +151,26 @@ function* CurrentOrders() {
         label.classList.add(color);
         label.classList.add(bgcolor);
         label.classList.remove(opacity);
+      }
+    } else if (name === "BUTTON") {
+
+      switch(ev.target.id) {
+        case "selectDate":
+          menuSelectDate = !menuSelectDate;
+          this.refresh()
+          break;
+      }
+    } else if (name === "DIV") {
+
+      switch(ev.target.getAttribute("name")) {
+        case "selectDate":
+          const date = ev.target.getAttribute("data-item");
+          //selectBox(date);
+          console.log(fetchOrders[date]);
+          selectedDate = date;
+          menuSelectDate = false;
+          this.refresh()
+          break;
       }
     }
   };
@@ -194,104 +235,59 @@ function* CurrentOrders() {
           {!loading && (
             <div class="dtc relative">
               <HelpSection>
-                <p class="lh-copy o-70">
-                  &#x26AA; Click on the date header to display orders for that
-                  delivery date.
-                  <br />
-                  &#x26AA; The <code>download</code> symbol is a link to
-                  download the individual
-                  <code> xlsx</code> files for each delivery date.
-                  <br />
-                  <span class="pl3">
-                    (Orders which haven&apos;t recorded a delivery date will also be
-                    included.)
-                  </span>
-                  <br />
-                  &#x26AA; Packing lists for are also available for download
-                  from the link in the header menu.
-                </p>
               </HelpSection>
             </div>
           )}
         </div>
         <div class="overflow-auto">
           {fetchError && <Error msg={fetchError} />}
-          {Object.keys(fetchOrders).length > 0 && (
-            <div class="tabs center bt">
-              <div class="tabs__menu dt dt--fixed mb2 bb b--black-40">
-                {Object.keys(fetchOrders).map((key, index) => (
-                  <label
-                    name="tabs"
-                    for={key.replace(/ /g, "-")}
-                    htmlFor={key.replace(/ /g, "-")}
-                    id={`${key.replace(/ /g, "-")}-key`}
-                    class={`tabs__menu-item dtc tc pt1 pb2 pointer dib fg-streamside-maroon ${
-                      index !== 0
-                        ? "o-40 hover-bg-light-gray"
-                        : "fg-streamside-blue bg-near-white"
-                    }`}
-                  >
-                    <h2
-                      class="mv0 pa1 fw5 f6 f5-ns ttu tracked"
-                      id={`${key.replace(/ /g, "-")}-key`}
-                      data-index={index}
-                      name="tabs"
-                    >
-                      {key}&nbsp; ({getOrderCount(key)})
-                    </h2>
-                    <div
-                      class={index !== 0 ? "dn" : "dib"}
-                      name={`${key.replace(/ /g, "-")}-key`}
-                    >
-                      <AddOrderModal delivered={key} />
-                      <RemoveOrders delivered={key} />
-                      {new Date(key).toString() !== "Invalid Date" && (
-                        <a
-                          name={`${key.replace(/ /g, "-")}-key`}
-                          class="no-underline green dib"
-                          href={`/api/orders-download/${new Date(
-                            key
-                          ).getTime()}`}
-                          title="Download as xlsx"
-                        >
-                          <DownloadIcon />
-                          <span class="dn">Download</span>
-                        </a>
-                      )}
-                    </div>
-                  </label>
-                ))}
-              </div>
-              <div class="tabs__content">
-                {Object.keys(fetchOrders).map((key, index) => (
-                  <div>
-                    <input
-                      type="checkbox"
-                      class="dn"
-                      name="sections"
-                      id={key.replace(/ /g, "-")}
-                      checked={index === 0}
-                    />
-                    <div class="tabs__content__info">
-                      <table class="f6 w-100 center" cellSpacing="0">
-                        {getHeaderCount() && (
-                          <TableHeader
-                            crank-key={`${key}-th`}
-                            headers={getHeaders()}
-                          />
-                        )}
-                        {getOrderCount(key) && (
-                          <TableBody
-                            crank-key={`${key}-tb`}
-                            orders={getOrdersByKey(key)}
-                          />
-                        )}
-                      </table>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div class="w-100 dt b--black-30 br2 ba fg-streamside-maroon bg-near-white">
+            <div class="dtc tr v-mid">
+              <SelectMenu
+                id="selectDate"
+                menu={fetchDates.map(el => ({text: `${el} (${getOrderCount(el)})`, item: el}))}
+                title="Select Delivery Date"
+                active={menuSelectDate}
+                style={{border: 0}}
+              >
+                { selectedDate ? `${selectedDate} (${getOrderCount(selectedDate)})` : "Select delivery date" }&nbsp;&nbsp;&nbsp;&#9662;
+              </SelectMenu>
             </div>
+            {selectedDate && (
+              <div class="dtc tr v-mid">
+                <AddOrderModal delivered={selectedDate} />
+                {new Date(selectedDate).toString() !== "Invalid Date" && (
+                  <a
+                    name={`${selectedDate.replace(/ /g, "-")}-key`}
+                    class="no-underline green dib"
+                    href={`/api/orders-download/${new Date(
+                      selectedDate
+                    ).getTime()}`}
+                    title="Download as xlsx"
+                  >
+                    <DownloadIcon />
+                    <span class="dn">Download</span>
+                  </a>
+                )}
+                <RemoveOrders delivered={selectedDate} />
+              </div>
+            )}
+          </div>
+          {selectedDate && (
+            <table class="f6 w-100 center" cellSpacing="0">
+              {getHeaderCount() && (
+                <TableHeader
+                  crank-key={`${selectedDate}-th`}
+                  headers={getHeaders()}
+                />
+              )}
+              {getOrderCount(selectedDate) && (
+                <TableBody
+                  crank-key={`${selectedDate}-tb`}
+                  orders={getOrdersByKey(selectedDate)}
+                />
+              )}
+            </table>
           )}
         </div>
         {loading && <BarLoader />}

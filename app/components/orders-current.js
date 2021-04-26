@@ -242,63 +242,65 @@ function* CurrentOrders() {
         </div>
         <div class="overflow-auto">
           {fetchError && <Error msg={fetchError} />}
-          <div class="w-100 dt b--black-30 br2 ba fg-streamside-maroon bg-near-white">
+          <div class="w-100 dt fg-streamside-maroon bg-near-white">
             <div class="dtc tr v-mid">
               <SelectMenu
                 id="selectDate"
                 menu={fetchDates.map(el => ({text: `${el} (${getOrderCount(el)})`, item: el}))}
                 title="Select Delivery Date"
                 active={menuSelectDate}
-                style={{border: 0}}
+                style={{border: 0, color: "brown"}}
               >
                 { selectedDate ? `${selectedDate} (${getOrderCount(selectedDate)})` : "Select delivery date" }&nbsp;&nbsp;&nbsp;&#9662;
               </SelectMenu>
             </div>
             {selectedDate && (
               <Fragment>
-                <div class="dtc tr v-bottom">
-                  <button
-                    class={`dib w-50 f6 outline-0 gray b--gray ba ba1 bg-transparent br2 br--left mv1 pointer`}
-                    title="Download picking list"
-                    type="button"
-                    onclick={() => window.location=`/api/picking-list-download/${new Date(
-                      selectedDate
-                    ).getTime()}`}
-                    >
-                      <span class="v-mid">Picking List</span>
-                      <span class="v-mid">
-                        <SaveAltIcon />
-                      </span>
-                  </button>
-                  <button
-                    class={`dib w-50 f6 outline-0 gray b--gray bt bb br bl-0 br2 br--right bg-transparent mv1 pointer`}
-                    title="Download packing list"
-                    type="button"
-                    onclick={() => window.location=`/api/packing-list-download/${new Date(
-                      selectedDate
-                    ).getTime()}`}
-                    >
-                      <span class="v-mid">Packing List</span>
-                      <span class="v-mid">
-                        <SaveAltIcon />
-                      </span>
-                  </button>
-                </div>
-                <div class="dtc tr v-mid">
-                  <AddOrderModal delivered={selectedDate} />
-                  {new Date(selectedDate).toString() !== "Invalid Date" && (
-                    <a
-                      name={`${selectedDate.replace(/ /g, "-")}-key`}
-                      class="no-underline green dib"
-                      href={`/api/orders-download/${new Date(
+                {new Date(selectedDate).toString() !== "Invalid Date" && (
+                  <div class="dtc tr v-bottom">
+                    <button
+                      class={`dib w-third f6 outline-0 dark-blue b--dark-green ba ba1 bg-transparent br2 br--left mv1 pointer`}
+                      title="Download picking list"
+                      type="button"
+                      onclick={() => window.location=`/api/picking-list-download/${new Date(
                         selectedDate
                       ).getTime()}`}
-                      title="Download as xlsx"
-                    >
-                      <DownloadIcon />
-                      <span class="dn">Download</span>
-                    </a>
-                  )}
+                      >
+                        <span class="v-mid">Picking List</span>
+                        <span class="v-mid">
+                          <SaveAltIcon />
+                        </span>
+                    </button>
+                    <button
+                      class={`dib w-third f6 outline-0 blue b--dark-green bt bb br bl-0 bg-transparent mv1 pointer`}
+                      title="Download packing list"
+                      type="button"
+                      onclick={() => window.location=`/api/packing-list-download/${new Date(
+                        selectedDate
+                      ).getTime()}`}
+                      >
+                        <span class="v-mid">Packing List</span>
+                        <span class="v-mid">
+                          <SaveAltIcon />
+                        </span>
+                    </button>
+                    <button
+                      class={`dib w-third f6 outline-0 green b--dark-green bt bb br bl-0 br2 br--right bg-transparent mv1 pointer`}
+                      title="Download orders"
+                      type="button"
+                      onclick={() => window.location=`/api/orders-download/${new Date(
+                        selectedDate
+                      ).getTime()}`}
+                      >
+                        <span class="v-mid">Orders</span>
+                        <span class="v-mid">
+                          <SaveAltIcon />
+                        </span>
+                    </button>
+                  </div>
+                )}
+                <div class="dtc tr v-mid">
+                  <AddOrderModal delivered={selectedDate} />
                   <RemoveOrders delivered={selectedDate} />
                 </div>
               </Fragment>

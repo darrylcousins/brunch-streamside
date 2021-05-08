@@ -305,7 +305,6 @@ exports.importOrders = async function (req, res, next) {
     const delivered = req.body.delivered; // uploading to this date only
     const collection = req.app.locals.orderCollection;
 
-    _logger.info(`Uploading order for ${delivered} using ${orders.mimetype}`);
     if (orders.mimetype !== 'text/csv' && orders.mimetype !== 'application/vnd.ms-excel' && orders.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
       return res.status(400).json({ error: 'Could not parse data. Uploaded file should be a csv or xlxs file.' });
     };
@@ -323,7 +322,7 @@ exports.importOrders = async function (req, res, next) {
         delivered,
         success: 'Got file' }));
     } else {
-      return res.status(400).json({ error: 'Import failed. Unable to determine file type.' });
+      return res.status(400).json({ error: 'Import failed. An error occurred.' });
     }
   };
 };

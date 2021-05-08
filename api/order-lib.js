@@ -331,7 +331,15 @@ const orderImportXLSX = (data, delivered, collection) => {
   //return false;
   let count = 0;
   let targetDate = new Date(Date.parse(delivered));
-  let targetString = targetDate.toLocaleDateString().replace(/-/g, '/').replace(/^0/,'');
+
+  // at some point date cells were changed from text format to date format so I need to check for both types
+  const ops = {year: '2-digit'};
+  ops.month = ops.day = 'numeric';
+  let targetStrings = [
+    //targetDate.toLocaleDateString().replace(/-/g, '/').replace(/^0/,''),
+    new Intl.DateTimeFormat('en-NZ').format(targetDate).toString(),
+    new Intl.DateTimeFormat('en-US', ops).format(targetDate).toString()
+  ];
   
   try {
     const wb = xlsx.read(data);
@@ -348,11 +356,18 @@ const orderImportXLSX = (data, delivered, collection) => {
           rowObj[headers[index]] = el;
         });
         result.push(rowObj);
-        _logger.info(JSON.stringify(rowObj, null, 2));
       });
+      let targetString;
       result.forEach((row, index) => {
-        if (row.hasOwnProperty(targetString) && row[targetString] !== '') {
-          _logger.info(JSON.stringify(row, null, 2));
+        targetString = null;
+        // console.log(row);
+        if (row.hasOwnProperty(targetStrings[0])) {
+          targetString = targetStrings[0];
+        } else if (row.hasOwnProperty(targetStrings[1])) {
+          targetString = targetStrings[1];
+        }
+        if (targetString && row[targetString] !== '') {
+          count = count + 1;
           json = {
             _id: targetDate.getTime() + index,
             addons: getAttribute(row, 'Extras', '')
@@ -369,7 +384,7 @@ const orderImportXLSX = (data, delivered, collection) => {
             last_name: row['Last Name'],
             name: `${row['First Name']} ${row['Last Name']}`,
             note: getAttribute(row, 'Delivery Note', ''),
-            order_number: null,
+            order_number: `CSA-${targetString.replace(/\//g, '')}-${count}`,
             phone: getAttribute(row, 'Telephone', '').toString(),
             removed: getAttribute(row, 'Excluding', '')
                       .split('\n')
@@ -381,8 +396,7 @@ const orderImportXLSX = (data, delivered, collection) => {
             shop_note: getAttribute(row, 'Shop Note', ''),
             source: 'CSA'
           };
-          //insertOrder(collection, json);
-          count = count + 1;
+          insertOrder(collection, json);
           _logger.info(JSON.stringify(json, null, 2));
         };
       });

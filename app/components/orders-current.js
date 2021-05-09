@@ -166,11 +166,10 @@ function* CurrentOrders() {
       switch(ev.target.getAttribute("name")) {
         case "selectDate":
           const date = ev.target.getAttribute("data-item");
-          //selectBox(date);
-          console.log(fetchOrders[date]);
+          console.log(date, ":", fetchOrders[date]);
           selectedDate = date;
           menuSelectDate = false;
-          this.refresh()
+          this.refresh();
           break;
       }
     }
@@ -232,8 +231,13 @@ function* CurrentOrders() {
               <i class="b"> streamsideorganics.myshopify.com</i>.
               {loading && "This will take a moment."}
             </p>
+            { fetchOrders.hasOwnProperty("No delivery date") && fetchOrders["No delivery date"].length > 0 && (
+              <p class="w-95 ba br2 pa3 ma2 red bg-washed-red" role="alert">
+                <strong>Note!</strong> We have an order recorded with no delivery date, this will need attention.
+              </p>
+            )}
           </div>
-          {!loading && (
+          {!loading && false && (
             <div class="dtc relative">
               <HelpSection>
               </HelpSection>

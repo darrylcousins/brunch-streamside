@@ -211,6 +211,15 @@ function* CurrentOrders() {
    */
   const getHeaders = () => fetchHeaders;
 
+  function *RemoveOrderButton({delivered}) {
+    for ({delivered} of this) {
+      console.log('got this: ', delivered);
+      yield (
+        <RemoveOrders delivered={delivered} />
+      );
+    };
+  };
+
   while (true) {
     yield (
       <div class="f6 w-100 pb2 center">
@@ -305,7 +314,7 @@ function* CurrentOrders() {
                 )}
                 <div class="dtc tr v-mid">
                   <AddOrderModal delivered={selectedDate} />
-                  <RemoveOrders delivered={selectedDate} />
+                  <RemoveOrderButton delivered={selectedDate} />
                 </div>
               </Fragment>
             )}

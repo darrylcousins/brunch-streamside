@@ -271,7 +271,7 @@ function FormModalWrapper(Component, options) {
      */
     const getName = () => name;
 
-    while (true)
+    for (props of this) {
       yield (
         <Fragment>
           <ShowLink
@@ -327,6 +327,7 @@ function FormModalWrapper(Component, options) {
           )}
         </Fragment>
       );
+    };
   };
 }
 

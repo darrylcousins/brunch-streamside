@@ -211,15 +211,6 @@ function* CurrentOrders() {
    */
   const getHeaders = () => fetchHeaders;
 
-  function *RemoveOrderButton({delivered}) {
-    for ({delivered} of this) {
-      console.log('got this: ', delivered);
-      yield (
-        <RemoveOrders delivered={delivered} />
-      );
-    };
-  };
-
   while (true) {
     yield (
       <div class="f6 w-100 pb2 center">
@@ -242,7 +233,7 @@ function* CurrentOrders() {
             </p>
             { fetchOrders.hasOwnProperty("No delivery date") && fetchOrders["No delivery date"].length > 0 && (
               <p class="w-95 ba br2 pa3 ma2 red bg-washed-red" role="alert">
-                <strong>Note!</strong> We have an order recorded with no delivery date, this will need attention.
+                <strong>Note!</strong> We have <b>{ fetchOrders["No delivery date"].length }</b> orders recorded with no delivery date, this will need attention. Sorry Lilly!
               </p>
             )}
           </div>
@@ -314,7 +305,7 @@ function* CurrentOrders() {
                 )}
                 <div class="dtc tr v-mid">
                   <AddOrderModal delivered={selectedDate} />
-                  <RemoveOrderButton delivered={selectedDate} />
+                  <RemoveOrders delivered={selectedDate} />
                 </div>
               </Fragment>
             )}

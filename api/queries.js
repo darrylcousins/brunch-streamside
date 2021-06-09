@@ -307,7 +307,7 @@ exports.importOrders = async function (req, res, next) {
 
     _logger.info(`Uploading order for ${delivered} using ${orders.mimetype}`);
     if (orders.mimetype !== 'text/csv' && orders.mimetype !== 'application/vnd.ms-excel' && orders.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-      return res.status(400).json({ error: 'Could not parse data. Uploaded file should be a csv or xlxs file.' });
+      return res.status(400).json({ error: 'Could not parse data. Uploaded file should be a csv or xlsx file.' });
     };
     let result = true;
     _logger.info(`Uploading order for ${delivered} using ${orders.mimetype}`);

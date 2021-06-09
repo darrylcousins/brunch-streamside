@@ -55,9 +55,9 @@ const headersFull = [
 ]
 
 const headersPartial = [
-  // 'Select',
+  'Select',
   'Box',
-  'Delivery Day',
+  'Delivery/Pickup Date',
   'Order #',
   'Customer',
   'Shipping',
@@ -201,11 +201,14 @@ const processOrderJson = (json) => {
   if (removedKey in attributes) removed = attributes[removedKey]
     .split(',').map(el => el.trim()).filter(el => el !== '');
 
+  const pickup = delivered;
+
   const result = {
     _id: id,
     order_number,
     sku,
     delivered,
+    pickup,
     subtotal_price,
     contact_email,
     name,
@@ -276,6 +279,7 @@ const orderImportCSV = (data, delivered, collection) => {
             address2: row['Delivery Address Suburb'],
             city: row['Delivery Address City'],
             contact_email: row['Customer Email'],
+            pickup: delivered,
             delivered,
             including: [],
             first_name: row['Customer First Name'],
@@ -379,6 +383,7 @@ const orderImportXLSX = (data, delivered, collection) => {
             city: row['City'],
             contact_email: getAttribute(row, 'email', ''),
             delivered,
+            pickup: delivered,
             including: [],
             first_name: row['First Name'],
             last_name: row['Last Name'],

@@ -18,6 +18,7 @@ import { sortObjectByKey } from "../helpers";
 
 /**
  * Create a DOM representation of order as a table row
+ * The checkbox to select items when clicked is picked up by orders-current event listener
  *
  * @function
  * @returns {Element} DOM element displaying order detail
@@ -25,16 +26,22 @@ import { sortObjectByKey } from "../helpers";
  * @param {object} props.order The order to be displayed
  * @param {number} props.index The index of the row
  */
-const TableRow = ({ order, index }) => {
+const TableRow = ({ order, index, selected }) => {
+  //function* EditOrders({selectedOrders}) {
+
   const name = (order.name === "") ? `${order.first_name} ${order.last_name}` : order.name;
-  // to re-add 'select' column to headers see api/order-lib/partialHeaders
+
   return (
     <tr crank-key={order._id} class="striped--near-white">
-      <td class="pv1 ph1 bb b--black-20 v-top" class="dn">
-        <input type="checkbox" name="order[]" />
+      <td class="pv1 ph1 bb b--black-20 v-top">
+        <input
+          type="checkbox"
+          name="order[]"
+          id={order._id}
+        />
       </td>
       <td class="pv1 ph1 bb b--black-20 v-top">{order.sku}</td>
-      <td class="pv1 ph1 bb b--black-20 v-top">{order.delivered}</td>
+      <td class="pv1 ph1 bb b--black-20 v-top">{order.delivered}<span class="db black-40">({order.pickup})</span></td>
       <td class="pv1 ph1 bb b--black-20 v-top">{order.order_number}</td>
       <td class="pv1 ph1 bb b--black-20 v-top">
         <span class="db">{name}</span>
@@ -85,12 +92,12 @@ const TableHeader = ({ headers, index }) => (
  * @param {object} props Property object
  * @param {Array} props.orders Array of orders
  */
-const TableBody = ({ orders }) => {
+const TableBody = ({ orders, selected }) => {
   const sortedOrders = sortObjectByKey(orders, "sku");
   return (
     <tbody class="lh-copy">
       {sortedOrders.map((order, index) => (
-        <TableRow index={index} order={order} />
+        <TableRow index={index} order={order} selected={selected} />
       ))}
     </tbody>
   );

@@ -39,7 +39,7 @@ function* FilterOrders({updateFilter}) {
   /**
    * Form filter value
    *
-   * @member {boolean} filter_value
+   * @member {string} filter_value
    */
   let filter_value = "";
   /**
@@ -76,6 +76,7 @@ function* FilterOrders({updateFilter}) {
    * @function updateValue
    */
   const updateValue = async (value) => {
+    console.log('got this date:', value);
     filter_value = value;
     this.refresh();
   };
@@ -87,7 +88,8 @@ function* FilterOrders({updateFilter}) {
    */
   const setFilter = async (ev) => {
     updateFilter({
-      filter_field, filter_value,
+      filter_field,
+      filter_value: new Date(Date.parse(filter_value)).getTime(),
     });
     closeModal();
   };
@@ -141,7 +143,7 @@ function* FilterOrders({updateFilter}) {
               <fieldset class="w-100 center dark-gray tl ba b--transparent ph0 mh0">
                 <legend class="f4 fw6 ph0 mh0">Filter options</legend>
 
-                <div class="w-90">
+                <div class="fl w-50">
                   <div class="tl ph2 mt1 ml0">
                     <label class="fw6 lh-copy f6" htmlFor="field" for="field">
                       Field
@@ -158,23 +160,27 @@ function* FilterOrders({updateFilter}) {
                     </select>
                   </div>
                 </div>
-                <div class="w-90">
+                <div class="fl w-50">
                   <div class="tl ph2 mt1 ml0">
                     <label class="fw6 lh-copy f6" htmlFor="filter" for="filter">
                       Value
                     </label>
                     <input
                       class="mr1 pa2 ba bg-transparent hover-bg-near-white w-100 input-reset br2"
+                      type="date"
                       value={filter_value}
                       id="filter"
                       onchange={(ev) => updateValue(ev.target.value)}
                     />
                   </div>
                 </div>
-                <div class="w-90 tr">
-                  <Button
-                    onclick={setFilter}
-                  >Apply</Button>
+                <div class="w-100 tr">
+                  <Button type="primary" onclick={setFilter}>
+                    Apply
+                  </Button>
+                  <Button type="secondary" onclick={closeModal}>
+                    Cancel
+                  </Button>
                 </div>
               </fieldset>
             </div>

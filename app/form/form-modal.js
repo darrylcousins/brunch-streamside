@@ -141,7 +141,7 @@ function FormModalWrapper(Component, options) {
 
       console.log(data);
       /*
-      console.warn('Posting save successfully but disabled for development');
+      console.warn('Posting saved successfully but disabled for development');
       closeModal();
       return;
       */
@@ -162,7 +162,13 @@ function FormModalWrapper(Component, options) {
             success = true;
             this.refresh();
             setTimeout(() => {
-              window.location.reload();
+              //  window.location.reload();
+              this.dispatchEvent(
+                new CustomEvent("orders.reload", {
+                  bubbles: true,
+                })
+              );
+              closeModal();
             }, 2000);
           }
         })

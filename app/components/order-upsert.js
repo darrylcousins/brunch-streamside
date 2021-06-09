@@ -71,6 +71,7 @@ async function* UpsertOrderModal(props) {
         result[value.id] = "";
       }
       result.delivered = delivered;
+      result.pickup = delivered;
       result._id = new Date().getTime();
       return result;
     };

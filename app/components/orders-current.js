@@ -10,14 +10,16 @@ import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
 import AddOrderModal from "./order-add";
 import RemoveOrders from "./orders-remove";
+import FilterOrders from "./orders-filter";
+import EditOrders from "./orders-edit";
 import HelpSection from "./order-help";
 import { TableHeader, TableBody } from "./order-table";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
 import SelectMenu from "../lib/select-menu";
 import { Fetch } from "../lib/fetch";
-import { DownloadIcon } from "../lib/icon";
-import { SaveAltIcon } from "../lib/icon";
+import Button from "../lib/button";
+import { DownloadIcon, SaveAltIcon } from "../lib/icon";
 
 /**
  * Create a DOM representation of orders grouped using tabs by delivery date.
@@ -33,13 +35,19 @@ function* CurrentOrders() {
    *
    * @member {object} fetchOrders
    */
-  let fetchOrders = {};
+  let fetchOrders = [];
   /**
-   * Delivery dates - the array of keys from fetchOrders
+   * Delivery dates - the array of dates from fetchDates
    *
    * @member {object} fetchDates
    */
-  let fetchDates = []
+  let fetchDates = [];
+  /**
+   * Order counts object keyed by delivery date
+   *
+   * @member {object} orderCounts
+   */
+  let orderCounts = {};
   /**
    * If fetch returns an error
    *
@@ -71,14 +79,41 @@ function* CurrentOrders() {
    * @type {boolean}
    */
   let menuSelectDate = false;
+  /**
+   * Available form filter fields
+   *
+   * @member {boolean} filterFields
+   */
+  let filterFields = {
+    pickup: 'Pickup Date',
+  };
+  /**
+   * Form filter field
+   *
+   * @member {boolean} filterField
+   */
+  let filterField = null;
+  /**
+   * Form filter value
+   *
+   * @member {boolean} filterValue
+   */
+  let filterValue = null;
+  /**
+   * Maintain array of checked orders
+   *
+   * @member {boolean} checkedOrders
+   */
+  let checkedOrders = [];
 
   /**
-   * Fetch orders data on mounting of component
+   * Fetch available dates
    *
-   * @function getOrders
+   * @function getDates
    */
-  const getOrders = () => {
-    Fetch(`/api/current-orders`)
+  const getDates = () => {
+    const uri = `/api/current-order-dates`;
+    Fetch(uri)
       .then((result) => {
         const { error, json } = result;
         if (error !== null) {
@@ -87,12 +122,54 @@ function* CurrentOrders() {
           loading = false;
           this.refresh();
         } else {
+          console.log(json);
+          fetchDates = Object.keys(json);
+          orderCounts = json;
+          if (fetchDates.length) selectedDate = fetchDates[0];
+          getOrders();
+        }
+      })
+      .catch((err) => {
+        fetchError = err;
+        loading = false;
+        this.refresh();
+      });
+  };
+
+  /**
+   * Return updated uri for fetching if filters are set
+   *
+   * @function getUriFilters
+   */
+  const getUriFilters = (uri) => {
+    if (filterField && filterValue) {
+      uri += `?filter_field=${encodeURIComponent(filterField)}&filter_value=${encodeURIComponent(filterValue)}`;
+    };
+    return uri;
+  };
+
+  /**
+   * Fetch orders data on mounting of component use the closest next date
+   *
+   * @function getOrders
+   */
+  const getOrders = () => {
+    loading = true;
+    this.refresh();
+    let uri = getUriFilters(`/api/current-orders-by-date/${new Date(selectedDate).getTime()}`);
+    Fetch(uri)
+      .then((result) => {
+        const { error, json } = result;
+        if (error !== null) {
+          fetchError = error;
+          loading = false;
+          this.refresh();
+        } else {
           const { headers, orders } = json;
           fetchHeaders = headers;
           fetchOrders = orders;
-          fetchDates = Object.keys(orders);
-          if (fetchDates.length) selectedDate = fetchDates[0];
           loading = false;
+          console.log(fetchOrders);
           this.refresh();
         }
       })
@@ -103,25 +180,8 @@ function* CurrentOrders() {
       });
   };
 
-  getOrders();
-
-  /**
-   * Toggle the buttons displayed with tab heading, add order, remove orders and download csv file.
-   *
-   * @function
-   * @param {string} id The tabbed header id to match with button or a tag
-   * @param {Element} el The button or link tag to toggle visibility along with tab heading
-   */
-  const toggleButtons = (id, el) => {
-    const name = el.getAttribute("name");
-    if (name === id) {
-      el.classList.remove("dn");
-      el.classList.add("dib");
-    } else if (name !== id) {
-      el.classList.remove("dib");
-      el.classList.add("dn");
-    }
-  };
+  getDates();
+  //getOrders();
 
   /**
    * Switch tabs
@@ -130,33 +190,13 @@ function* CurrentOrders() {
    * @param {object} ev Click event
    * @listens window.click
    */
-  const switchTab = async (ev) => {
+  const clickEvent = async (ev) => {
     const name = ev.target.tagName;
-    if (name === "LABEL" || name === "H2") {
-      const { id } = ev.target;
-      if (id) {
-        const color = "dark-green";
-        const bgcolor = "bg-near-white";
-        const opacity = "o-40";
-        document.querySelectorAll("label[name='tabs']>div").forEach((el) => {
-          toggleButtons(id, el);
-        });
-        document.querySelectorAll("label[name='tabs']").forEach((el) => {
-          if (el.id !== id) {
-            el.classList.remove(color);
-            el.classList.remove(bgcolor);
-            el.classList.add(opacity);
-          }
-        });
-        const label = document.querySelector(`label#${id}`);
-        label.classList.add(color);
-        label.classList.add(bgcolor);
-        label.classList.remove(opacity);
-      }
-    } else if (name === "BUTTON") {
+    if (name === "BUTTON") {
 
       switch(ev.target.id) {
         case "selectDate":
+          // open and close date select dropdown
           menuSelectDate = !menuSelectDate;
           this.refresh()
           break;
@@ -165,17 +205,67 @@ function* CurrentOrders() {
 
       switch(ev.target.getAttribute("name")) {
         case "selectDate":
+          // set selected date from date select dropdown component
           const date = ev.target.getAttribute("data-item");
-          console.log(date, ":", fetchOrders[date]);
-          selectedDate = date;
           menuSelectDate = false;
-          this.refresh();
+          if (date !== selectedDate) {
+            selectedDate = date;
+            clearFilter();
+          }
           break;
       }
+    } else if (name === "INPUT") {
+      // pickes up order checkboxes
+      if (ev.target.name.startsWith("order")) {
+        if (ev.target.checked) {
+          checkedOrders.push(ev.target.id);
+        } else {
+          const idx = checkedOrders.indexOf(ev.target.id);
+          if (idx > -1) checkedOrders.splice(idx, 1);
+        };
+        this.refresh();
+      };
     }
   };
 
-  this.addEventListener("click", switchTab);
+  this.addEventListener("click", clickEvent);
+
+  /**
+   * Event handler when {@link
+   * module:form/form-modal~FormModalWrapper|FormModalWrapper} sends for data
+   *
+   * @function collectAndSendData
+   * @param {object} ev The event
+   * @listens form.data.feed
+   */
+  const reloadOrders = (ev) => {
+    getOrders();
+  };
+
+  this.addEventListener("orders.reload", reloadOrders);
+
+  /**
+   * Clear selected items
+   *
+   * @function clearSelected
+   */
+  const clearSelected = () => {
+    checkedOrders = [];
+    const s = document.querySelectorAll("input[name^=order]:checked");
+    s.forEach(el => el.checked = false);
+    this.refresh();
+  };
+
+  /**
+   * Helper method to pluralize a word
+   * Doesn't account for 'es' as pluralize
+   *
+   * @function pluralize
+   */
+  const pluralize = (count, word) => {
+    if (count === 1) return word;
+    return word + "s";
+  };
 
   /**
    * Return count for orders on delivery date for use in loop
@@ -184,16 +274,7 @@ function* CurrentOrders() {
    * @param {string} key Delivery date as key
    * @returns {number} Array length
    */
-  const getOrderCount = (key) => fetchOrders[key].length;
-
-  /**
-   * Return orders by delivery date
-   *
-   * @function getOrdersByKey
-   * @param {string} key Delivery date as key
-   * @returns {Array} Array of orders for date
-   */
-  const getOrdersByKey = (key) => fetchOrders[key];
+  const getOrderCount = (key) => orderCounts[key];
 
   /**
    * Return count of headers
@@ -211,7 +292,39 @@ function* CurrentOrders() {
    */
   const getHeaders = () => fetchHeaders;
 
-  while (true) {
+  /**
+   * Update fetch list of orders with field filter
+   *
+   * @function updateFilter
+   */
+  const updateFilter = (args) => {
+    filterField = args.filter_field;
+    filterValue = args.filter_value;
+    getOrders();
+  };
+
+  /**
+   * Clear field filter
+   *
+   * @function clearFilter
+   */
+  const clearFilter = () => {
+    filterField = null;
+    filterValue = null;
+    getOrders();
+  };
+
+  /**
+   * Normalize value if filtering on a date
+   *
+   * @function normalizeFilterValue
+   */
+  const normalizeFilterValue = (value) => {
+    const testDate = new Date(parseInt(value));
+    return (testDate === NaN) ? value : testDate.toDateString();
+  };
+
+  for (const _ of this) { // eslint-disable-line no-unused-vars
     yield (
       <div class="f6 w-100 pb2 center">
         <div class="dt dt--fixed">
@@ -231,9 +344,9 @@ function* CurrentOrders() {
               <i class="b"> streamsideorganics.myshopify.com</i>.
               {loading && "This will take a moment."}
             </p>
-            { fetchOrders.hasOwnProperty("No delivery date") && fetchOrders["No delivery date"].length > 0 && (
-              <p class="w-95 ba br2 pa3 ma2 red bg-washed-red" role="alert">
-                <strong>Note!</strong> We have <b>{ fetchOrders["No delivery date"].length }</b> orders recorded with no delivery date, this will need attention. Sorry Lilly!
+            { orderCounts.hasOwnProperty("No delivery date") && (
+              <p class="w-95 ba br2 pa3 mh2 mv1 red bg-washed-red" role="alert">
+                <strong>Note!</strong> We have <b>{ orderCounts["No delivery date"] }</b> {pluralize(orderCounts["No delivery date"], "order")} recorded with no delivery date, this will need attention. Sorry Lilly!
               </p>
             )}
           </div>
@@ -246,6 +359,20 @@ function* CurrentOrders() {
         </div>
         <div class="overflow-auto">
           {fetchError && <Error msg={fetchError} />}
+          {checkedOrders.length > 0 && (
+          <div class="ba br2 pa3 mh2 mv1 orange bg-light-yellow" role="alert">
+            <p class="fl w-50">
+              <strong>{checkedOrders.length}</strong> {pluralize(checkedOrders.length, "order")} selected.
+            </p>
+            <div class="w-50 tr dib">
+              <EditOrders selectedOrders={checkedOrders} />
+              <Button
+                type="secondary"
+                onclick={clearSelected}
+              >Clear Selected</Button>
+            </div>
+          </div>
+          )}
           <div class="w-100 dt fg-streamside-maroon bg-near-white">
             <div class="dtc tr v-mid">
               <SelectMenu
@@ -262,13 +389,14 @@ function* CurrentOrders() {
               <Fragment>
                 {new Date(selectedDate).toString() !== "Invalid Date" && (
                   <div class="dtc tr v-bottom">
+                    <FilterOrders updateFilter={updateFilter} />
                     <button
-                      class={`dib w-third f6 outline-0 dark-blue b--dark-green ba ba1 bg-transparent br2 br--left mv1 pointer`}
+                      class={`dib w-25 f6 outline-0 blue b--dark-green bt bb br bl-0 bg-transparent mv1 pointer`}
                       title="Download picking list"
                       type="button"
-                      onclick={() => window.location=`/api/picking-list-download/${new Date(
+                      onclick={() => window.location=getUriFilters(`/api/picking-list-download/${new Date(
                         selectedDate
-                      ).getTime()}`}
+                      ).getTime()}`)}
                       >
                         <span class="v-mid">Picking List</span>
                         <span class="v-mid">
@@ -276,12 +404,12 @@ function* CurrentOrders() {
                         </span>
                     </button>
                     <button
-                      class={`dib w-third f6 outline-0 blue b--dark-green bt bb br bl-0 bg-transparent mv1 pointer`}
+                      class={`dib w-25 f6 outline-0 blue b--dark-green bt bb br bl-0 bg-transparent mv1 pointer`}
                       title="Download packing list"
                       type="button"
-                      onclick={() => window.location=`/api/packing-list-download/${new Date(
+                      onclick={() => window.location=getUriFilters(`/api/packing-list-download/${new Date(
                         selectedDate
-                      ).getTime()}`}
+                      ).getTime()}`)}
                       >
                         <span class="v-mid">Packing List</span>
                         <span class="v-mid">
@@ -289,12 +417,12 @@ function* CurrentOrders() {
                         </span>
                     </button>
                     <button
-                      class={`dib w-third f6 outline-0 green b--dark-green bt bb br bl-0 br2 br--right bg-transparent mv1 pointer`}
+                      class={`dib w-25 f6 outline-0 green b--dark-green bt bb br bl-0 br2 br--right bg-transparent mv1 pointer`}
                       title="Download orders"
                       type="button"
-                      onclick={() => window.location=`/api/orders-download/${new Date(
+                      onclick={() => window.location=getUriFilters(`/api/orders-download/${new Date(
                         selectedDate
-                      ).getTime()}`}
+                      ).getTime()}`)}
                       >
                         <span class="v-mid">Orders</span>
                         <span class="v-mid">
@@ -310,6 +438,25 @@ function* CurrentOrders() {
               </Fragment>
             )}
           </div>
+          {filterField && filterValue && (
+            <div class="ba br2 pa3 ma2 orange bg-light-yellow" role="alert">
+              {fetchOrders.length ? (
+                <p class="fl w-50">
+                  Filtered <strong>{fetchOrders.length}</strong> orders by <strong>{filterFields[filterField]}</strong> for <strong>{normalizeFilterValue(filterValue)}</strong>.
+                </p>
+              ) : (
+                <p class="fl w-50">
+                  No orders found filtering on <strong>{filterFields[filterField]}</strong> by <strong>{normalizeFilterValue(filterValue)}</strong>.
+                </p>
+              )}
+              <div class="w-50 tr dib">
+                <Button
+                  type="secondary"
+                  onclick={clearFilter}
+                >Clear Filter</Button>
+              </div>
+            </div>
+          )}
           {selectedDate && (
             <table class="f6 w-100 center" cellSpacing="0">
               {getHeaderCount() && (
@@ -321,7 +468,8 @@ function* CurrentOrders() {
               {getOrderCount(selectedDate) && (
                 <TableBody
                   crank-key={`${selectedDate}-tb`}
-                  orders={getOrdersByKey(selectedDate)}
+                  orders={fetchOrders}
+                  selected={checkedOrders}
                 />
               )}
             </table>

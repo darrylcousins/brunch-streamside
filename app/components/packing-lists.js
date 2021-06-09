@@ -312,7 +312,7 @@ function* PackingLists() {
             <h3 class="pt2">
               Picking list for {selectedDate} - {fetchJson.total_boxes} boxes
               <a
-                class="no-underline dark-green dim"
+                class="no-underline dark-green dim dn"
                 href={`/api/picking-list-download/${new Date(
                   selectedDate
                 ).getTime()}`}
@@ -347,7 +347,7 @@ function* PackingLists() {
           <h3 class="pt2">
             Packing list for {selectedDate} - {fetchJson.total_boxes} boxes
             <a
-              class="no-underline dark-green dim"
+              class="no-underline dark-green dim dn"
               href={`/api/packing-list-download/${new Date(
                 selectedDate
               ).getTime()}`}

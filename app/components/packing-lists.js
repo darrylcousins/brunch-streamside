@@ -10,6 +10,7 @@ import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
 import { Fetch } from "../lib/fetch";
+import SelectMenu from "../lib/select-menu";
 import { DownloadIcon } from "../lib/icon";
 
 /**
@@ -66,6 +67,13 @@ function* PackingLists() {
    * @returns {boolean} Is fruit product?
    */
   const isFruit = (name) => Boolean(name.match(/apple|pear/gi));
+  /**
+   * Display date selection menu if active
+   *
+   * @member menuSelectDate
+   * @type {boolean}
+   */
+  let menuSelectDate = false;
 
   /**
    * Load upcoming box dates which serve as headers and divide the tab
@@ -177,9 +185,28 @@ function* PackingLists() {
    * @param {object} ev The event, if on a tab then load packing lists
    */
   const selectTab = (ev) => {
-    if (ev.target.tagName === "H2") {
+    const name = ev.target.tagName;
+    if (name === "H2") {
       const src = ev.target.innerHTML;
       loadSources(src);
+    } else if (name === "BUTTON") {
+
+      switch(ev.target.id) {
+        case "selectDate":
+          menuSelectDate = !menuSelectDate;
+          this.refresh()
+          break;
+      }
+    } else if (name === "DIV") {
+
+      switch(ev.target.getAttribute("name")) {
+        case "selectDate":
+          const date = ev.target.getAttribute("data-item");
+          menuSelectDate = false;
+          loadSources(date);
+          this.refresh();
+          break;
+      }
     }
   };
 
@@ -263,37 +290,29 @@ function* PackingLists() {
       <div class="f6 w-100 mt2 pb2 center">
         <h2 class="pt0 f5 f4-ns lh-title-ns">Picking and packing lists</h2>
         {fetchError && <Error msg={fetchError} />}
-        {fetchDates && selectedDate === null && (
-          <span class="db lh-copy mb2 f5">Select delivery date:</span>
-        )}
         {fetchDates && (
-          <div class="tabs center">
-            <div class="tabs__menu dt dt--fixed mb2 bb b--black-20">
-              {fetchDates.map(el => (
-                <label
-                  for={el.replace(/ /g, "-")}
-                  htmlFor={el.replace(/ /g, "-")}
-                  class="tabs__menu-item dtc tc bg-white pt1 pb2 bg-animate hover-bg-near-white pointer"
+          <Fragment>
+            <div class="w-100 dt fg-streamside-maroon bg-near-white">
+              <div class="dtc tr v-mid">
+                <SelectMenu
+                  id="selectDate"
+                  menu={fetchDates.map(el => ({text: el, item: el}))}
+                  title="Select Delivery Date"
+                  active={menuSelectDate}
+                  style={{border: 0, color: "brown"}}
                 >
-                  <h2
-                    class={`mv0 f6 f5-ns lh-title-ns ttu tracked ${
-                      isSelected(el) ? "dark-green" : "o-40"}`}
-                    id={`${el.replace(/ /g, "-")}-key`}
-                    name="tabs"
-                  >
-                    {el}
-                  </h2>
-                </label>
-              ))}
+                  { selectedDate ? `${selectedDate}` : "Select delivery date" }&nbsp;&nbsp;&nbsp;&#9662;
+                </SelectMenu>
+              </div>
             </div>
-          </div>
+          </Fragment>
         )}
         {fetchJson && Object.keys(fetchJson.picking).length && (
           <Fragment>
             <h3 class="pt2">
               Picking list for {selectedDate} - {fetchJson.total_boxes} boxes
               <a
-                class="no-underline dark-green dim"
+                class="no-underline dark-green dim dn"
                 href={`/api/picking-list-download/${new Date(
                   selectedDate
                 ).getTime()}`}
@@ -328,7 +347,7 @@ function* PackingLists() {
           <h3 class="pt2">
             Packing list for {selectedDate} - {fetchJson.total_boxes} boxes
             <a
-              class="no-underline dark-green dim"
+              class="no-underline dark-green dim dn"
               href={`/api/packing-list-download/${new Date(
                 selectedDate
               ).getTime()}`}

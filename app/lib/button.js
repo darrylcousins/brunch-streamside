@@ -21,7 +21,7 @@ const Button = (props) => {
   let classList;
   let hint = "";
   if (type === "secondary") {
-    classList = "b--navy bg-near-white navy hover-bg-moon-gray";
+    classList = "b--navy bg-near-white black-70 hover-bg-moon-gray";
   } else {
     classList = "b--navy bg-dark-blue white hover-bg-navy";
   }

@@ -37,11 +37,9 @@ function* Boxes({ boxes }) {
       if (id) {
         document.querySelectorAll("h2[name='tabs']").forEach((el) => {
           if (el.id !== id) {
-            console.log(el.id, "not clicked");
             el.classList.remove(color);
             el.classList.add(opacity);
           } else {
-            console.log(id, "clicked!");
             el.classList.add(color);
             el.classList.remove(opacity);
           }

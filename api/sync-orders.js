@@ -38,7 +38,7 @@ const getIds = () => {
       orders(first:100,
       ${ /* successful test comment */`` }
       query: "fulfillment_status:unshipped AND financial_status:paid"
-      ${ /* query: "name:#2019" */`` }
+      ${ /* query: "name:#2634" */`` }
       ) {
         edges {
           node {
@@ -79,7 +79,7 @@ module.exports = async function (req, res, next) {
     };
     const collection = req.app.locals.orderCollection;
     Promise.all(orders).then(values => {
-      //console.log(values);
+      console.log(values);
       const result = [];
       values.forEach(order => {
         const res = processOrderJson(order.order);

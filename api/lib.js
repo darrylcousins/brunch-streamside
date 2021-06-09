@@ -42,7 +42,7 @@ exports.getPickingList = (data) => {
   return picking;
 }
 
-exports.getBoxPromises = (boxes, deliveryDay, db) => {
+exports.getBoxPromises = (boxes, query, db) => {
   // return array of Promises to be resolved by Promises.all
   return boxes.map(async el => {
     /* map current boxes to the orders made
@@ -52,12 +52,9 @@ exports.getBoxPromises = (boxes, deliveryDay, db) => {
      * NOTE return list of promises that need to be resolved - see getData
      */
     const regex = new RegExp(`^${el.box}`)
-    const orders = await db.find({
-      sku: { $regex: regex },
-      delivered: deliveryDay
-    }).toArray();
+    query['sku'] = { $regex: regex };
+    const orders = await db.find({...query}).toArray();
     el.order_count = orders.length;
-    //el.box += ` (${orders.length})`; // doing this now in final return 
     el.extras = Object();
     orders.forEach(order => {
       if (order.addons.length) {

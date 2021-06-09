@@ -14,11 +14,15 @@ routes.get('/', function (req, res) {
 })
 
 routes.get('/current-orders', queries.getCurrentOrders);
+routes.get('/current-orders-by-date/:timestamp', queries.getCurrentOrdersByDate);
+routes.get('/current-order-dates', queries.getCurrentOrderDates);
+routes.get('/orders-by-ids', queries.getOrdersByIds);
 routes.post('/order-sources', queries.getOrderSources);
 
 routes.post('/add-order', queries.addOrder);
 routes.post('/edit-order', queries.editOrder);
 routes.post('/remove-order', queries.removeOrder);
+routes.post('/bulk-edit-orders', queries.bulkEditOrders);
 
 routes.get('/order-fields', queries.getOrderFields);
 routes.post('/remove-orders', queries.deleteOrders);

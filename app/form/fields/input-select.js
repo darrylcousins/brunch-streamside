@@ -55,7 +55,7 @@ function* InputSelectField(props) {
     yield (
       <FieldWrapper label={label} size={size} id={id}>
         <input
-          class={`mr1 pa2 ba bg-transparent hover-bg-near-white w-100 input-reset br2 ${
+          class={`mr1 pa2 ba bg-transparent hover-bg-near-white w-90 input-reset br2 ${
             !valid ? "invalid" : ""
           }`}
           {...props}

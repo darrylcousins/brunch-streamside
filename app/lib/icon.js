@@ -141,6 +141,19 @@ const DeleteIcon = () => (
   </Icon>
 );
 
+/**
+ * FilterIcon component, download symbol, path borrowed from
+ * {@link https://material.io/icons/|Material Design}. Intended to be wrapped by
+ * {@link module:app/lib/icon~Icon|Icon}
+ *
+ * @returns {Element} DOM component
+ */
+const FilterIcon = () => (
+  <Icon>
+    <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+  </Icon>
+);
+
 export {
   CloseIcon,
   DeleteIcon,
@@ -150,4 +163,5 @@ export {
   ExcelIcon,
   HelpIcon,
   SaveAltIcon,
+  FilterIcon,
 };

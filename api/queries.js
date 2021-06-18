@@ -214,6 +214,23 @@ exports.getCurrentBoxTitles = async function (req, res, next) {
   };
 };
 
+exports.getCurrentBoxesByDate = async function (req, res, next) {
+  // get current box by selected date and shopify product id
+  const collection = req.app.locals.boxCollection;
+  const response = Array();
+  const deliveryDay = getNZDeliveryDay(req.params.timestamp);
+  try {
+    collection.find({ delivered: deliveryDay })
+      .sort({shopify_price: 1})
+      .toArray((err, result) => {
+        if (err) throw err;
+        res.status(200).json(result);
+      });
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
 exports.getBoxByDateAndProduct = async function (req, res, next) {
   // get current box by selected date and shopify product id
   const collection = req.app.locals.boxCollection;

@@ -1,10 +1,15 @@
 @import '_bar-loader.scss';
 @import '_animation.scss';
+@import '_data-table.scss';
+@import '_nav.scss';
+@import '_push-menu.scss';
 
 /*Hide info of no checked inputs for tabbed display */
+/*
 .tabs__content input:not(:checked) ~ .tabs__content__info {
   display: none;
 }
+*/
 
 /* form elements */
 input:valid {

@@ -16,7 +16,7 @@ import { renderer } from "@bikeshaving/crank/cjs/dom";
 import crossroads from "crossroads";
 import Home from "./route/home";
 import Orders from "./route/orders";
-import Box from "./route/boxes";
+import Boxes from "./route/boxes";
 import Todos from "./route/todos";
 import PackingLists from "./route/packing-lists";
 
@@ -24,7 +24,7 @@ crossroads.addRoute("/", () =>
   renderer.render(<Home />, document.querySelector("#app"))
 );
 crossroads.addRoute("/boxes", () =>
-  renderer.render(<Box />, document.querySelector("#app"))
+  renderer.render(<Boxes />, document.querySelector("#app"))
 );
 crossroads.addRoute("/orders", () =>
   renderer.render(<Orders />, document.querySelector("#app"))

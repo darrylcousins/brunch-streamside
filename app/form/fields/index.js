@@ -15,6 +15,7 @@ import Hidden from "./hidden";
 import InputSelect from "./input-select";
 import InputMultipleSelect from "./input-multiple";
 import File from "./file";
+import DateField from "./date";
 import Error from "../../lib/error";
 
 /**
@@ -35,7 +36,7 @@ import Error from "../../lib/error";
  * @returns {Element} The field DOM component to be rendered
  */
 function Field(props) {
-  const { label, options, data, formElements } = props;
+  const { index, label, options, data, formElements } = props;
   const { type, size, required, datalist, datatype } = options;
   let { id } = options;
 
@@ -95,7 +96,14 @@ function Field(props) {
 
   if (type === "hidden") {
     return (
-      <Hidden value={value} name={id} type={type} id={id} datatype={datatype} />
+      <Hidden
+        value={value}
+        name={id}
+        type={type}
+        id={id}
+        datatype={datatype}
+        required={required}
+        />
     );
   }
 
@@ -143,6 +151,27 @@ function Field(props) {
         onblur={onBlur}
         datatype={datatype}
         type={type}
+      />
+    );
+  }
+
+  if (type === "date") {
+    const { min, max } = options;
+    return (
+      <DateField
+        value={value}
+        name={id}
+        label={label}
+        id={id}
+        size={size}
+        required={required}
+        valid={valid}
+        onfocus={onFocus} // addEventListener???
+        onblur={onBlur}
+        datatype={datatype}
+        type={type}
+        min={min}
+        max={max}
       />
     );
   }

@@ -6,7 +6,7 @@
  * @exports CollapseAnimator
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
-import { createElement } from "@bikeshaving/crank/cjs";
+import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
 /**
  * Wrap a crank Component and animate collapse
@@ -14,7 +14,6 @@ import { createElement } from "@bikeshaving/crank/cjs";
  * @function AnimateCollapseWrapper
  * @returns {Function} Return the wrapped component
  * @param {object} Component The component to be wrapped
- * @param {object} options Options for form and modal
  */
 function CollapseWrapper(Component) {
 
@@ -84,11 +83,13 @@ function CollapseWrapper(Component) {
     for await (const {collapsed: newCollapsed, ...props} of this) {
 
       yield (
-        <div id={`collapse-${props.id}`} class="collapsible">
-          <Component
-            {...props}
-          />
-        </div>
+        <Fragment>
+          <div id={`collapse-${props.id}`} class="collapsible">
+            <Component
+              {...props}
+            />
+          </div>
+        </Fragment>
       );
 
       if (collapsed !== newCollapsed) {

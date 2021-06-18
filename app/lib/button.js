@@ -22,8 +22,10 @@ const Button = (props) => {
   let hint = "";
   if (type === "secondary") {
     classList = "b--navy bg-near-white black-70 hover-bg-moon-gray";
-  } else {
+  } else if (type === "primary") {
     classList = "b--navy bg-dark-blue white hover-bg-navy";
+  } else if (type === "success") {
+    classList = "b--dark-green bg-green white hover-bg-dark-green";
   }
   if (typeof title === "undefined" && typeof children === "string") {
     hint = children.toString();

@@ -7,7 +7,7 @@
  * @exports OrderModal
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
-import { createElement, Fragment } from "@bikeshaving/crank/cjs";
+import { createElement, Fragment, Portal} from "@bikeshaving/crank/cjs";
 import { CloseIcon } from "../lib/icon";
 import OrderDetail from "./order-detail";
 import Button from "../lib/button";
@@ -62,39 +62,42 @@ function* OrderModal({ order }) {
 
   this.addEventListener("keyup", hideModal);
 
+  const main = document.getElementById("main");
+
   while (true)
     yield (
       <Fragment>
-        <Button>Show details</Button>
+        <Button type="primary">Show details</Button>
         {visible && (
-          <div
-            class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4"
-            style={`top: ${Math.round(window.scrollY).toString()}px;`}
-          >
-            <div class="bg-white pa4 br3">
-              <button
-                class="bn bg-transparent outline-0 mid-gray dim o-70 absolute top-1 right-1"
-                name="close"
-                onclick={closeModal}
-                style="margin-right: 30px; margin-top: 30px;"
-                title="Close info"
-                type="button"
-              >
-                <CloseIcon />
-                <span class="dn">Close add modal</span>
-              </button>
-              <OrderDetail order={order} />
-              <div class="w-100 tr">
-                <Button
-                  type="secondary"
-                  title="Close window"
+          <Portal root={main}>
+            <div
+              class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4 mt4"
+              style={`top: ${Math.round(window.scrollY).toString()}px;`}
+            >
+              <div class="bg-white f6 pa4 br3 mw8 relative center">
+                <button
+                  class="bn bg-transparent outline-0 mid-gray dim o-70 absolute top-1 right-1 pointer"
+                  name="close"
                   onclick={closeModal}
+                  title="Close info"
+                  type="button"
                 >
-                  Close
-                </Button>
+                  <CloseIcon />
+                  <span class="dn">Close add modal</span>
+                </button>
+                <OrderDetail order={order} />
+                <div class="w-100 tr">
+                  <Button
+                    type="secondary"
+                    title="Close window"
+                    onclick={closeModal}
+                  >
+                    Close
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
+          </Portal>
         )}
       </Fragment>
     );

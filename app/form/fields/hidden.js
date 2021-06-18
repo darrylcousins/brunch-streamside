@@ -17,7 +17,7 @@ import { createElement } from "@bikeshaving/crank/cjs";
  * @yields {Element} A hidden input field as DOM component
  */
 function* HiddenField(props) {
-  const { id, datatype } = props;
+  const { id, datatype, valid } = props;
 
   /**
    * Event handler when {@link

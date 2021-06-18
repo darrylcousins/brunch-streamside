@@ -6,7 +6,7 @@
  * @exports CollapseAnimator
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
-import { createElement } from "@bikeshaving/crank/cjs";
+import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 
 /**
  * Wrap a crank Component and animate collapse
@@ -65,10 +65,18 @@ function CollapseWrapper(Component) {
       let timeWas = new Date();
       let wait = setInterval(function() {
         if (f()) {
-          clearInterval(wait);
+          try {
+            clearInterval(wait);
+          } catch(e) {
+            console.log(e);
+          };
           resolve();
         } else if (new Date() - timeWas > timeoutMs) { // Timeout
-          clearInterval(wait);
+          try {
+            clearInterval(wait);
+          } catch(e) {
+            console.log(e);
+          };
           reject();
         }
         }, 20);
@@ -106,7 +114,7 @@ function CollapseWrapper(Component) {
       const element = document.querySelector(`#${el.id}`);
       if (element) {
         if (id === "included-6163982876822") {
-          console.log(id, "old", collapsed, "new", newCollapsed, "start", startCollapsed);
+          //console.log(id, "old", collapsed, "new", newCollapsed, "start", startCollapsed);
         }
         if (newCollapsed) {
           collapseElement(element);

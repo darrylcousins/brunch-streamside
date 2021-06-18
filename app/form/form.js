@@ -100,7 +100,7 @@ function* Form(props) {
           }
         }
         formElements[el.name] = el;
-      }
+      };
     });
     this.dispatchEvent(validationEvent(id, !error));
     formError = error;
@@ -141,12 +141,13 @@ function* Form(props) {
         )}
         <fieldset class="w-100 center dark-gray tl ba b--transparent ph0 mh0">
           <legend class="f4 fw6 ph0 mh0 dn">{title}</legend>
-          {Object.keys(fields).map((key) => (
+          {Object.keys(fields).map((key, idx) => (
             <Fragment>
               <Field
                 label={key}
                 options={fields[key]}
                 data={data}
+                index={idx}
                 formElements={formElements}
               />
             </Fragment>

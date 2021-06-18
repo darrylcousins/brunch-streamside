@@ -86,7 +86,6 @@ function TextButton({ text, index, array, title, name, item }) {
  */
 function *SelectMenu ({ id, active, title, menu, children, style }) {
   const type = (id.startsWith("selectDate")) ? "ttu tracked" : "";
-  console.log(style);
 
   for ({ id, active, title, menu, children, style } of this) {
     yield (

@@ -32,6 +32,7 @@ module.exports = function startServer(PORT, PATH, callback) {
   let orderCollection;
   let boxCollection;
   let todoCollection;
+  let settingCollection;
   const mongo_uri = 'mongodb://localhost';
 
   // assign the client from MongoClient
@@ -41,6 +42,7 @@ module.exports = function startServer(PORT, PATH, callback) {
       const streamsideDB = client.db('streamside');
       orderCollection = streamsideDB.collection('orders');
       todoCollection = streamsideDB.collection('todos');
+      settingCollection = streamsideDB.collection('settings');
 
       if (process.env.SERVER === 'development') {
         const southbridgeDB = client.db('southbridge');
@@ -53,6 +55,7 @@ module.exports = function startServer(PORT, PATH, callback) {
       app.locals.orderCollection = orderCollection;
       app.locals.boxCollection = boxCollection;
       app.locals.todoCollection = todoCollection;
+      app.locals.settingCollection = settingCollection;
 
       dbClient = client;
 

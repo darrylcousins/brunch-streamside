@@ -5,6 +5,7 @@
 
 /**
   * Collect current boxes from database
+  * Used by the in-store app to get boxes for a Container box
   * @function getCurrentBoxes
   * @returns {object} Arrays of boxes grouped by delivery date
   */
@@ -12,8 +13,12 @@ const getCurrentBoxesByProduct = async function (req, res, next) {
   const collection = req.app.locals.boxCollection;
   const response = Object();
   const now = new Date();
-  now.setDate( now.getDate() - 3 );
   const product_id = parseInt(req.params.product_id);
+
+  const cutOffSetting = await req.app.locals.settingCollection.findOne({handle: "cutoff-hours"});
+  const cutOffHours = parseFloat(cutOffSetting.value);
+
+  let hoursDiff;
 
   /**
    * Get upcoming delivery dates to filter boxes by
@@ -24,8 +29,13 @@ const getCurrentBoxesByProduct = async function (req, res, next) {
         if (err) return reject(err);
         const final = Array();
         data.forEach(el => {
-          const d = new Date(Date.parse(el));
-          if (d >= now) final.push(d);
+          const d = new Date(el);
+          if (d > now) {
+            hoursDiff = Math.abs(d - now) / 36e5;
+            if (cutOffHours <= hoursDiff) {
+              final.push(d);
+            };
+          };
         });
         final.sort((d1, d2) => {
           if (d1 < d2) return -1;

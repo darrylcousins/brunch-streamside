@@ -5,6 +5,8 @@
  * @module app/helpers
  */
 
+export const hasOwnProp = Object.prototype.hasOwnProperty;
+
 /**
  * Sort an object by it's keys.
  *
@@ -56,10 +58,74 @@ export const sortObjectByKey = (o, key) => {
  * @param {number} day Integer day of week, Monday -> 0
  * @returns {object} Date object
  */
-const findNextWeekday = (day) => {
+export const findNextWeekday = (day) => {
   // return the date of next Thursday as 14/01/2021 for example
   // Thursday day is 4, Saturday is 6
   const now = new Date();
   now.setDate(now.getDate() + ((day + (7 - now.getDay())) % 7));
   return now;
+};
+
+/**
+ * Get date string to pass to input[type=date], i.e. "2020-12-31"
+ *
+ * @function dateStringForInput
+ * @param {string} A date string to pass to new Date.
+ * @returns {object} Date string
+ */
+export const dateStringForInput = (str) => {
+  let d;
+  let dateString;
+  if (str) {
+    d = new Date(str);
+  } else {
+    d = new Date();
+  }
+  const zeroPad = (num, places) => String(num).padStart(places, "0");
+  const year = d.getFullYear();
+  const day = zeroPad(d.getDate(), 2);
+  const month = zeroPad(d.getMonth() + 1, 2);
+
+  return `${year}-${month}-${day}`;
+};
+
+/** Provide standard animationOptions
+ *
+ * @member {object} animationOptions
+ */
+export const animationOptions = {
+  duration: 400,
+  easing: "ease",
+  fill: "both",
+};
+
+/**
+ * Animate a fade and execute an action on end
+ *
+ * @function animateFadeForAction
+ */
+export const animateFadeForAction = (id, action) => {
+  let target;
+  if (typeof id === "string") {
+    target = document.getElementById(id);
+  } else {
+    target = id;
+  }
+  const animate = target.animate(
+    {
+      opacity: 0.1,
+    },
+    animationOptions
+  );
+  animate.addEventListener("finish", async () => {
+    if (action) {
+      await action();
+    }
+    target.animate(
+      {
+        opacity: 1,
+      },
+      animationOptions
+    );
+  });
 };

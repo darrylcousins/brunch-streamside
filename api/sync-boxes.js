@@ -80,7 +80,7 @@ const collectBoxes = async () => {
         delete boxDoc.id;
         // figure out the unique doc identifier: timestamp in days + shopify_product_id
         //boxDoc._id = parseInt(boxDoc.delivered.getTime()/(1000 * 60 * 60 * 24) + parseInt(boxDoc.shopify_product_id));
-        boxDoc._id = ObjectID();
+        boxDoc._id = new ObjectID();
         boxDoc.delivered = boxDoc.delivered.toDateString();
 
         boxDoc.shopify_product_id = parseInt(boxDoc.shopify_product_id, 10);
@@ -99,9 +99,6 @@ const collectBoxes = async () => {
           });
         boxDocuments.push(boxDoc);
 
-        // Can convert _id back to the date
-        //let milliseconds = parseInt(boxDoc._id.slice(0, 5)) * 1000 * 60 * 60 * 24;
-        //console.log(new Date(milliseconds));
       });
     });
   return boxDocuments;
@@ -111,10 +108,8 @@ const addSKUAndSave = async (boxDocuments, collection) => {
   const final = await boxDocuments.map(async (boxDoc) => {
     const variant = await getBoxSKU(boxDoc.shopify_variant_id.toString())
       .then(res => res.variant.sku);
-    console.log("Variant", variant);
     boxDoc.shopify_sku = variant;
-    console.log("boxDoc", boxDoc);
-    await mongoInsert(boxDoc, collection);
+    await mongoInsert(collection, boxDoc);
     return boxDoc;
   });
   return final;
@@ -132,7 +127,8 @@ module.exports = async function (req, res, next) {
     const { _id, ...parts } = boxDoc;
     console.log("_id", _id);
     const res = await collection.updateOne(
-      { _id: _id+1 },
+      //{ _id: _id+1 },
+      { _id: new ObjectID() },
       { $setOnInsert: { ...parts } },
       { upsert: true }
     );

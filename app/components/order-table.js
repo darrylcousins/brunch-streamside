@@ -32,30 +32,30 @@ const TableRow = ({ order, index, selected }) => {
   const name = (order.name === "") ? `${order.first_name} ${order.last_name}` : order.name;
 
   return (
-    <tr crank-key={order._id} class="striped--near-white">
-      <td class="pv1 ph1 bb b--black-20 v-top">
+    <tr crank-key={order._id}>
+      <td data-title="Select" class="pv1 bb b--black-20 v-top">
         <input
           type="checkbox"
           name="order[]"
           id={order._id}
         />
       </td>
-      <td class="pv1 ph1 bb b--black-20 v-top">{order.sku}</td>
-      <td class="pv1 ph1 bb b--black-20 v-top">{order.delivered}<span class="db black-40">({order.pickup})</span></td>
-      <td class="pv1 ph1 bb b--black-20 v-top">{order.order_number}</td>
-      <td class="pv1 ph1 bb b--black-20 v-top">
+      <td data-title="SKU" class="pv1 bb b--black-20 v-top">{order.sku}</td>
+      <td data-title="Delivered" class="pv1 bb b--black-20 v-top">{order.delivered}<span class="db black-40">({order.pickup})</span></td>
+      <td data-title="Order #" class="pv1 bb b--black-20 v-top">{order.order_number}</td>
+      <td data-title="Contact" class="pv1 bb b--black-20 v-top">
         <span class="db">{name}</span>
         <span class="db">{order.phone}</span>
         <span class="db">{order.contact_email}</span>
       </td>
-      <td class="pv1 ph1 bb b--black-20 v-top">
+      <td data-title="Address" class="pv1 bb b--black-20 v-top">
         <span class="db">{order.address1}</span>
         <span class="db">{order.address2}</span>
         <span class="db">{order.city}</span>
         <span class="db">{order.zip}</span>
       </td>
-      <td class="pv1 ph1 bb b--black-20 v-top">{order.source}</td>
-      <td class="pv1 ph1 bb b--black-20 v-top tr">
+      <td data-title="Source" class="pv1 bb b--black-20 v-top">{order.source}</td>
+      <td data-title="Actions" class="pv1 bb b--black-20 v-top tr-l">
         <OrderModal crank-key={index} order={order} />
         <EditOrderModal order={order} delivered={order.delivered} />
         <RemoveOrderModal order={order} />
@@ -77,9 +77,9 @@ const TableHeader = ({ headers, index }) => (
   <thead>
     <tr crank-key={index}>
       {headers.map(item => (
-        <th class="fw6 bb b--black-20 tl pb3 ph1 bg-white">{item}</th>
+        <th class="fw6 bb b--black-20 tl pv3 bg-white sticky">{item}</th>
       ))}
-      <th class="fw6 bb b--black-20 tl pb3 ph1 bg-white" aria-label="Empty" />
+      <th class="fw6 bb b--black-20 tl pv3 bg-white sticky" aria-label="Empty" />
     </tr>
   </thead>
 );
@@ -95,7 +95,7 @@ const TableHeader = ({ headers, index }) => (
 const TableBody = ({ orders, selected }) => {
   const sortedOrders = sortObjectByKey(orders, "sku");
   return (
-    <tbody class="lh-copy">
+    <tbody class="lh-copy" id="orders-table">
       {sortedOrders.map((order, index) => (
         <TableRow index={index} order={order} selected={selected} />
       ))}

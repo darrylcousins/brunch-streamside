@@ -1,5 +1,6 @@
 'use strict';
 const MongoClient = require('mongodb').MongoClient;
+const { ObjectID } = require('mongodb');
 const uri = 'mongodb://localhost';
 const mongoClient = new MongoClient(uri, { useUnifiedTopology: true });
 const xlsx = require('json-as-xlsx');
@@ -137,6 +138,124 @@ exports.deleteOrders = async function (req, res, next) {
   };
 };
 
+/*
+ * @function addSetting
+ *
+ * Add a setting, parameters from req.body:
+ * @param handle
+ * @param title
+ * @param value
+ * @param tag
+ * @param tag
+ */
+exports.addSetting = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+  const doc = {...req.body};
+  doc._id = ObjectID();
+  try {
+    const result = await mongoInsert(req.app.locals.settingCollection, doc);
+    res.status(200).json(result);
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+/*
+ * @function getCurrentSettings
+ *
+ * Returns all settings as a list grouped by tag
+ *
+ */
+exports.getCurrentSettings = async function (req, res, next) {
+  const collection = req.app.locals.settingCollection;
+  try {
+    collection.aggregate(
+      [{
+        $group: {
+          _id: "$tag",
+          settings: { $push: "$$ROOT" }
+        }
+      },
+      ]).toArray((err, result) => {
+        if (err) throw err;
+        res.status(200).json(result);
+    });
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+/*
+ * @function getSettingsForApp
+ *
+ * Returns all settings as a list grouped by tag
+ *
+ */
+exports.getSettingsForApp = async function (req, res, next) {
+  const collection = req.app.locals.settingCollection;
+  const response = {};
+  try {
+    collection.aggregate(
+      [{
+        $group: {
+          _id: "$tag",
+          settings: { $push: { handle: "$handle", value: "$value" } }
+        },
+      },
+      ]).toArray((err, result) => {
+        if (err) throw err;
+        result.forEach(el => {
+          response[el._id] = {};
+          el.settings.forEach(setting => {
+            response[el._id][setting.handle] = setting.value;
+          });
+        });
+        res.status(200).json(response);
+    });
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.editSetting = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+  const doc = {...req.body};
+  doc._id = ObjectID(doc._id);
+  try {
+    const result = await mongoUpdate(req.app.locals.settingCollection, doc);
+    res.status(200).json(result);
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.editSettings = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+  const response = [];
+  try {
+    await req.body.forEach(async (doc) => {
+      doc._id = ObjectID(doc._id);
+      const result = await mongoUpdate(req.app.locals.settingCollection, doc);
+      response.push(result);
+    });
+    res.status(200).json(response);
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.removeSetting = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+  const doc = {...req.body};
+  doc._id = ObjectID(doc._id);
+  try {
+    const result = await mongoRemove(req.app.locals.settingCollection, doc);
+    res.status(200).json(result);
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
 exports.getCurrentTodos = async function (req, res, next) {
   const collection = req.app.locals.todoCollection;
   const response = Object();
@@ -208,6 +327,23 @@ exports.getCurrentBoxTitles = async function (req, res, next) {
       .toArray((err, result) => {
         if (err) throw err;
         res.status(200).json(result.map(el => el.shopify_sku));
+      });
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+
+exports.getCurrentBoxesByDate = async function (req, res, next) {
+  // get current box by selected date and shopify product id
+  const collection = req.app.locals.boxCollection;
+  const response = Array();
+  const deliveryDay = getNZDeliveryDay(req.params.timestamp);
+  try {
+    collection.find({ delivered: deliveryDay })
+      .sort({shopify_price: 1})
+      .toArray((err, result) => {
+        if (err) throw err;
+        res.status(200).json(result);
       });
   } catch(e) {
     res.status(400).json({ error: e.toString() });

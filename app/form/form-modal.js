@@ -15,7 +15,7 @@
  * @requires module:app/lib/fetch~PostFetch
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
-import { createElement, Fragment } from "@bikeshaving/crank/cjs";
+import { createElement, Fragment, Portal } from "@bikeshaving/crank/cjs";
 
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
@@ -46,7 +46,7 @@ function FormModalWrapper(Component, options) {
     let success = false;
     let saving = false;
     let fetchError = null;
-    let formError = null;
+    let saveError = null;
 
     /**
      * Action which closes the modal and refreshes component. Normally attached
@@ -72,6 +72,7 @@ function FormModalWrapper(Component, options) {
     /**
      * Action which opens the modal and refreshes component, checks target for
      * closest button to ensure that event is this.event. Fired on `this.click`.
+     * Can be overridden using ShowLink if, say, a button element not used.
      *
      * @function showModalAction
      * @param {event} ev A click event on this element
@@ -81,7 +82,7 @@ function FormModalWrapper(Component, options) {
       // are we on the right target??
       if (ev.target.closest(`button[name='${id}']`)) {
         showModal();
-      }
+      };
     };
 
     this.addEventListener("click", showModalAction);
@@ -99,7 +100,7 @@ function FormModalWrapper(Component, options) {
       }
     };
 
-    this.addEventListener("keyup", hideModal);
+    window.document.addEventListener("keyup", hideModal);
 
     /**
      * Read data from the form and send to the api for saving
@@ -118,8 +119,7 @@ function FormModalWrapper(Component, options) {
 
       // check to find if we have a file upload
       Object.values(form).some((value) => {
-        if (typeof value.name === "string") {
-          // console.log('FILE:', value)
+        if (value && typeof value.name === "string") {
           hasFile = true;
           return true;
         }
@@ -146,30 +146,55 @@ function FormModalWrapper(Component, options) {
       return;
       */
 
+      const resetFields = () => {
+        loading = false;
+        saving = false;
+        fieldIds.splice(0, fieldIds.length);
+        fieldData.splice(0, fieldData.length);
+        fieldLength = 0;
+      };
+
       PostFetch({ src, data, headers })
         .then((result) => {
-          const { error, json } = result;
+          console.log('Submit result:', JSON.stringify(result, null, 2));
+          const { formError, error, json } = result;
           if (error !== null) {
             fetchError = error;
-            console.log("Fetch:", fetchError);
-            loading = false;
-            saving = false;
+            resetFields();
+            this.refresh();
+          } else if (formError !== null) {
+            saveError = formError;
+            resetFields();
             this.refresh();
           } else {
-            console.log(JSON.stringify(json));
-            loading = false;
-            saving = false;
+            resetFields();
             success = true;
             this.refresh();
             setTimeout(() => {
               //  window.location.reload();
               this.dispatchEvent(
+                new CustomEvent("listing.reload", {
+                  bubbles: true,
+                })
+              );
+              this.dispatchEvent(
                 new CustomEvent("orders.reload", {
                   bubbles: true,
                 })
               );
+              this.dispatchEvent(
+                new CustomEvent("boxes.reload", {
+                  bubbles: true,
+                })
+              );
+              this.dispatchEvent(
+                new CustomEvent("todos.reload", {
+                  bubbles: true,
+                })
+              );
+              success = false;
               closeModal();
-            }, 2000);
+            }, 1000);
           }
         })
         .catch((err) => {
@@ -185,7 +210,6 @@ function FormModalWrapper(Component, options) {
     let fieldLength
 
     this.addEventListener("form.data.feed", (ev) => {
-      // console.log('Got data back from input', ev.detail);
       if (!fieldIds.includes(ev.detail.id)) {
         console.log(ev.detail.id, 'not stored in fieldIds??', fieldIds);
       }
@@ -203,10 +227,14 @@ function FormModalWrapper(Component, options) {
      */
     const getData = () => {
       const form = document.getElementById(id);
+      //console.log('collecting data');
       Array.from(form.elements).forEach((el) => {
+        // XXX picks up checkbox-multiple - need to filter them out (el.id === el.name) didn't work
         if (el.tagName !== "FIELDSET" && el.tagName !== "BUTTON") {
+          //console.log(fieldIds, el.id);
           if (!fieldIds.includes(el.id)) {
             fieldIds.push(el.id);
+            //console.log('dispatching collect, not listened to??');
             el.dispatchEvent(
               new CustomEvent("form.data.collect", {
                 bubbles: true,
@@ -227,7 +255,7 @@ function FormModalWrapper(Component, options) {
      * @listens module:app/form/form#validationEvent
      */
     const formValid = async (ev) => {
-      // console.log("Got return event after validation", ev.detail.valid); // should be true
+      //console.log("Got return event after validation", ev.detail.valid); // should be true
       if (ev.detail.valid === true) {
         fieldLength = ev.detail.length;
         getData();
@@ -240,7 +268,7 @@ function FormModalWrapper(Component, options) {
     /**
      * Dynamic custom event to emit when requesting form object to validate
      *
-     * @event module:app/form/form-modal-wrapper#validateEvent
+     * @event module:app/form/form-modal#validateEvent
      * @param {string} formId The form id
      */
     const validateEvent = (formId) => new CustomEvent(`${formId}.validate`, {
@@ -253,7 +281,7 @@ function FormModalWrapper(Component, options) {
      * turns fires the ${id}.valid event to which `formValid` is listening for.
      *
      * @function doSave
-     * @fires module:app/form/form-modal-wrapper#validateEvent
+     * @fires module:app/form/form-modal#validateEvent
      */
     const doSave = () => {
       const form = document.getElementById(id);
@@ -263,7 +291,7 @@ function FormModalWrapper(Component, options) {
         form.dispatchEvent(validateEvent(id));
       } catch (err) {
         console.log(err);
-        formError = err;
+        fetchError = err;
         this.refresh();
       }
     };
@@ -277,6 +305,8 @@ function FormModalWrapper(Component, options) {
      */
     const getName = () => name;
 
+    const main = document.getElementById("main");
+
     for (props of this) {
       yield (
         <Fragment>
@@ -287,49 +317,50 @@ function FormModalWrapper(Component, options) {
             showModal={showModal}
           />
           {visible && (
-            <div
-              class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4"
-              style={`top: ${Math.round(window.scrollY).toString()}px;`}
-            >
-              <div class="bg-white pa4 br3">
-                <button
-                  class="bn outline-0 bg-transparent pa0 no-underline mid-gray dim o-70 absolute top-1 right-1"
-                  name="close"
-                  onclick={closeModal}
-                  type="button"
-                  style="margin-right: 30px; margin-top: 30px;"
-                  title="Close modal"
-                >
-                  <CloseIcon />
-                  <span class="dn">Close modal</span>
-                </button>
-                <div class="tc center">
-                  <h2 class="fw4 fg-streamside-maroon">{title}.</h2>
+            <Portal root={main}>
+              <div
+                class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4 mt4"
+                style={`top: ${Math.round(window.scrollY).toString()}px;`}
+              >
+                <div class="bg-white pa4 br3 f6 mw8 relative center">
+                  <button
+                    class="bn outline-0 bg-transparent pa0 no-underline mid-gray dim o-70 absolute top-1 right-1 pointer"
+                    name="close"
+                    onclick={closeModal}
+                    type="button"
+                    title="Close modal"
+                  >
+                    <CloseIcon />
+                    <span class="dn">Close modal</span>
+                  </button>
+                  <div class="tc center">
+                    <h2 class="fw4 fg-streamside-maroon">{title}.</h2>
+                  </div>
+                  {fetchError && <Error msg={fetchError} />}
+                  {saveError && <Error msg={saveError} />}
+                  {saving && (
+                    <div class="mv2 pt2 pl2 navy br3 ba b--navy bg-washed-blue">
+                      <p class="tc">{saveMsg}</p>
+                    </div>
+                  )}
+                  {success && (
+                    <div class="mv2 pt2 pl2 br3 dark-green ba b--dark-green bg-washed-green">
+                      <p class="tc">{successMsg}</p>
+                    </div>
+                  )}
+                  {loading && <BarLoader />}
+                  {!loading && !success && !fetchError && (
+                    <Component
+                      {...props}
+                      title={title}
+                      formId={id}
+                      doSave={doSave}
+                      closeModal={closeModal}
+                    />
+                  )}
                 </div>
-                {fetchError && <Error msg={fetchError} />}
-                {formError && <Error msg={formError} />}
-                {saving && (
-                  <div class="mv2 pt2 pl2 navy br3 ba b--navy bg-washed-blue">
-                    <p class="tc">{saveMsg}</p>
-                  </div>
-                )}
-                {success && (
-                  <div class="mv2 pt2 pl2 br3 dark-green ba b--dark-green bg-washed-green">
-                    <p class="tc">{successMsg}</p>
-                  </div>
-                )}
-                {loading && <BarLoader />}
-                {!loading && !success && !fetchError && (
-                  <Component
-                    {...props}
-                    title={title}
-                    formId={id}
-                    doSave={doSave}
-                    closeModal={closeModal}
-                  />
-                )}
               </div>
-            </div>
+            </Portal>
           )}
         </Fragment>
       );

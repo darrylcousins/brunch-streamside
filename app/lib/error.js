@@ -17,11 +17,19 @@ import { createElement, isElement } from "@bikeshaving/crank/cjs";
  * { error && <ErrorMsg msg="Some error message" /> }
  */
 const ErrorMsg = ({ msg }) => {
-  // console.log(msg, typeof msg, isElement(msg));
+  //console.log(msg, typeof msg, isElement(msg));
   if (typeof msg === "string" || isElement(msg)) {
     return (
       <div class="dark-red mv2 pt2 pl2 br3 ba b--dark-red bg-washed-red">
         <p class="tc">{msg}</p>
+      </div>
+    );
+  }
+
+  if (typeof msg === "object" && msg.error) {
+    return (
+      <div class="dark-red mv2 pt2 pl2 br3 ba b--dark-red bg-washed-red">
+        <p class="tc">{msg.error}</p>
       </div>
     );
   }

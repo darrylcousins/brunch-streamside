@@ -8,6 +8,20 @@
  */
 import { createElement } from "@bikeshaving/crank/cjs";
 import CollapseWrapper from "./collapse-animator";
+import AddProductToBoxModal from "./product-add";
+import RemoveBoxModal from "./box-remove";
+import Products from "./box-products";
+import { PostFetch } from "../lib/fetch";
+import {
+  CaretUpIcon,
+  CaretDownIcon,
+  CloseIcon,
+  DownloadIcon,
+  SaveAltIcon,
+  EditIcon,
+  DeleteIcon,
+} from "../lib/icon";
+import { sortObjectByKey } from "../helpers";
 
 /**
  * Constructs and returns a table row for the box
@@ -26,60 +40,96 @@ import CollapseWrapper from "./collapse-animator";
  *    }
  *  <Box box={box} />
  */
-function *Box({ box, index }) {
-
-  const deliveryDate = new Date(box.delivered);
-
+function* Box({ box, index }) {
+  /**
+   * Hold collapsed state of product listings
+   *
+   * @member {boolean} collapsed
+   */
   let collapsed = true;
 
-  function *Products ({products}) {
-    for ({ products } of this) {
-      yield (
-        products.map((el) => (
-          <span class="db">{el.shopify_title}</span>
-        ))
-      );
-    };
-  };
-
+  /*
+   * Control the collapse of product list
+   */
   const toggleCollapse = () => {
     collapsed = !collapsed;
     this.refresh();
   };
 
-  this.addEventListener("click", toggleCollapse);
-
-  const CollapsibleProducts = CollapseWrapper(Products);
-
-  for (const props of this) {
+  for ({ box } of this) { // eslint-disable-line no-unused-vars
+    const allBoxProducts = box.includedProducts.concat(box.addOnProducts);
     yield (
       <tr key={index}>
-        <td class="pv3 pr3 bb b--black-20 black-70 v-top">
-          {deliveryDate.toLocaleDateString()}
+        <td
+          data-title="Delivered"
+          class="w-10-l pv3 pr3 bb b--black-20 black-70 v-top"
+        >
+          <span class="">{new Date(box.delivered).toLocaleDateString()}</span>
         </td>
-        <td class="pv3 pr3 bb b--black-20 v-top">
+        <td data-title="SKU" class="w-20-l pv3 pr3 bb b--black-20 v-top">
           <strong>{box.shopify_sku}</strong>
         </td>
-        <td class="pv3 pr3 bb b--black-20 black-50 v-top">
-          <CollapsibleProducts 
-            products={box.includedProducts}
+        <td
+          data-title="Included"
+          class="w-30-l pv3 pr3 bb b--black-20 black-50 v-top"
+        >
+          <div
+            class="dt dt--fixed hover-dark-green pointer"
+            onclick={toggleCollapse}
+          >
+            <span class="dtc">
+              {box.includedProducts.length} included products
+            </span>
+            <span class="v-mid">
+              {collapsed ? <CaretDownIcon /> : <CaretUpIcon />}
+            </span>
+          </div>
+          <Products
+            products={sortObjectByKey(box.includedProducts, "shopify_title")}
+            allproducts={allBoxProducts}
             collapsed={collapsed}
+            type="includedProducts"
+            box={box}
             id={`included-${box.shopify_product_id}`}
           />
         </td>
-        <td class="pv3 pr3 bb b--black-20 black-50 v-top">
-          <CollapsibleProducts 
-            products={box.addOnProducts}
+        <td
+          data-title="Add Ons"
+          class="w-30-l pv3 pr3 bb b--black-20 black-50 v-top"
+        >
+          <div
+            class="dt dt--fixed hover-dark-green pointer"
+            onclick={toggleCollapse}
+          >
+            <span class="dtc">{box.addOnProducts.length} add on products</span>
+            <span class="v-mid">
+              {collapsed ? <CaretDownIcon /> : <CaretUpIcon />}
+            </span>
+          </div>
+          <Products
+            products={sortObjectByKey(box.addOnProducts, "shopify_title")}
+            allproducts={allBoxProducts}
             collapsed={collapsed}
+            type="addOnProducts"
+            box={box}
             id={`addons-${box.shopify_product_id}`}
           />
         </td>
-        <td class="pv3 pr3 bb b--black-20 rh-copy black-70 v-top">
+        <td
+          data-title="Price"
+          class="w-10-l pv3 pr3 bb b--black-20 rh-copy black-70 v-top"
+        >
           ${parseFloat(box.shopify_price / 100).toFixed(2)}
+        </td>
+        <td
+          data-title="Remove"
+          class="w-10-l pv3 pr3 bb b--black-20 rh-copy black-70 v-top"
+        >
+          <RemoveBoxModal box={box} />
         </td>
       </tr>
     );
-  };
+  }
 }
 
 export default Box;

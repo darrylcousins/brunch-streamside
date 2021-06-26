@@ -18,8 +18,9 @@ const apiMiddleware = require('./api/middleware');
 const webhooks = require('./webhooks');
 const webhookMiddleware = require('./webhooks/middleware');
 
-// make logger available globally
+// make logger and env available globally
 global._logger = winston;
+global._env = process.env;
 
 module.exports = function startServer(PORT, PATH, callback) {
   const app = express();
@@ -124,8 +125,8 @@ module.exports = function startServer(PORT, PATH, callback) {
 
   app.get('/orders', loadCrank);
   app.get('/boxes', loadCrank);
-  app.get('/todos', loadCrank);
-  app.get('/packing-lists', loadCrank);
+  app.get('/settings', loadCrank);
+  app.get('/settings-plus', loadCrank); // generally unavailable to users
   app.get('/', loadCrank);
 
   // render 404 page

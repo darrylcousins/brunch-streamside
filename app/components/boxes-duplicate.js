@@ -16,11 +16,12 @@ import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import Error from "../lib/error";
 import BarLoader from "../lib/bar-loader";
 import Button from "../lib/button";
-import { DeleteIcon } from "../lib/icon";
-import { PostFetch } from "../lib/fetch";
+import { CopyIcon } from "../lib/icon";
+import { Fetch } from "../lib/fetch";
 import IconButton from "../lib/icon-button";
 import FormModalWrapper from "../form/form-modal";
 import Form from "../form";
+import { dateStringForInput } from "../helpers";
 
 /**
  * Icon component for link to expand modal
@@ -36,7 +37,7 @@ const ShowLink = (opts) => {
   const { name, title, color } = opts;
   return (
     <IconButton color={color} title={title} name={name}>
-      <DeleteIcon />
+      <CopyIcon />
     </IconButton>
   );
 };
@@ -47,13 +48,13 @@ const ShowLink = (opts) => {
  * @member {object} options
  */
 const options = {
-  id: "remove-orders", // form id
-  title: "Remove Orders",
-  color: "dark-red",
-  src: "/api/remove-orders",
+  id: "duplicate-boxes", // form id
+  title: "Duplicate Boxes",
+  color: "fg-streamside-maroon",
+  src: "/api/duplicate-boxes",
   ShowLink,
-  saveMsg: "Removing orders ...",
-  successMsg: "Successfully removed X orders, reloading page.",
+  saveMsg: "Saving boxes ...",
+  successMsg: "Successfully duplicated boxes, reloading page.",
 };
 
 /**
@@ -63,13 +64,9 @@ const options = {
  * @param {string} delivered Delivery date as string
  * @returns {object} Error (if any) and the fields
  */
-const getRemoveFields = async (delivered) => {
-  const headers = { "Content-Type": "application/json" };
-  const { error, json } = await PostFetch({
-    src: "/api/order-sources",
-    data: { delivered },
-    headers,
-  })
+const getDuplicateFields = async (date) => {
+  const uri = `/api/current-boxes-by-date/${new Date(date).getTime()}`;
+  const { error, json } = await Fetch(uri)
     .then((result) => result)
     .catch((e) => ({
       error: e,
@@ -79,22 +76,31 @@ const getRemoveFields = async (delivered) => {
   if (!error) {
     fields.Delivered = {
       id: "delivered",
+      type: "date", // needs to be calendar select
+      size: "50",
+      datatype: "date",
+      required: true,
+      min: dateStringForInput(date),
+    };
+    fields.currentDate = {
+      id: "currentDate",
       type: "hidden",
+      required: true,
       datatype: "string",
     };
-    fields.Sources = {
-      id: "sources",
+    fields.Boxes = {
+      id: "boxes",
       type: "checkbox-multiple",
       size: "100",
       datatype: "array",
-      datalist: json,
+      datalist: json.map(el => el.shopify_sku),
     };
   }
   return { error, fields };
 };
 
 /**
- * Create a modal to remove a set of orders
+ * Create a modal to duplicate a set of boxes
  *
  * @generator
  * @yields {Element} A form and save/cancel buttons.
@@ -102,12 +108,24 @@ const getRemoveFields = async (delivered) => {
  * @param {Function} props.doSave - The save action
  * @param {Function} props.closeModal - The cancel and close modal action
  * @param {string} props.title - Form title
- * @param {object} props.order - The order (or null if adding) to be edited
- * @param {string} props.delivered - The delivery date as a string
+ * @param {string} props.delivered - The current delivery date as a string
  * @param {string} props.formId - The unique form indentifier
  */
-async function* RemoveOrders(props) {
-  const { doSave, closeModal, title, delivered, formId } = props;
+async function* DuplicateBoxes(props) {
+  const { doSave, closeModal, title, currentDate, formId } = props;
+
+  /**
+   * Hold loading state.
+   *
+   * @member {boolean} loading
+   */
+  let loading = false;
+  /**
+   * Hold error state.
+   *
+   * @member {boolean} error
+   */
+  let error = false;
 
   for await (const _ of this) { // eslint-disable-line no-unused-vars
     yield <BarLoader />;
@@ -120,12 +138,7 @@ async function* RemoveOrders(props) {
      * @see {@link module:app/components/orders-remove~getRemoveFields|getRemoveFields}
      * @member {object} fields
      */
-    /**
-     * Error if fetching box delivery dates fails
-     *
-     * @member {object|string} error
-     */
-    const { error, fields } = await getRemoveFields(delivered);
+    const { error, fields } = await getDuplicateFields(currentDate);
 
     /**
      * The initial form data - required by {@link
@@ -135,44 +148,42 @@ async function* RemoveOrders(props) {
      * @function getInitialData
      * @returns {object} The initial form data
      */
-    const getInitialData = () => ({ delivered });
+    const getInitialData = () => ({ currentDate });
 
     yield (
       <Fragment>
         {error ? (
-          <Error msg={error} />
+          <Error msg={fetchError} />
         ) : (
-          <div class="w-90 center ph1">
-            <h3>{delivered}</h3>
-            <p class="lh-copy near-black tl">
-              Use the checkboxes to filter orders by sources. Removing orders
-              here makes
-              <b class="ph1">no</b>
-              changes to the orders on Shopify nor to the original imported
-              files from BuckyBox or CSA.
-            </p>
-            <p class="lh-copy near-black tl">
-              It would not be advised to delete any orders matching
-              &apos;Shopify&apos; as they are automatically inserted when
-              created on the store and will be removed when fulfilled.
-            </p>
-            <Form
-              data={getInitialData()}
-              fields={fields}
-              title={title}
-              id={formId}
-            />
-            <Button type="primary" onclick={doSave}>
-              Delete Orders
-            </Button>
-            <Button type="secondary" onclick={closeModal}>
-              Cancel
-            </Button>
-          </div>
+          <Fragment>
+            <div class="near-black">
+              <p class="lh-copy tl dark-grey">
+                Duplicating boxes from { currentDate }.
+              </p>
+              <p class="lh-copy tl">
+                Select a delivery date for the duplicate boxes.
+              </p>
+            </div>
+            <div class="w-100 center ph1">
+              <Form
+                data={getInitialData()}
+                fields={fields}
+                title={title}
+                id={formId}
+              />
+              <Button type="primary" onclick={doSave}>
+                Duplicate Boxes
+              </Button>
+              <Button type="secondary" onclick={closeModal}>
+                Cancel
+              </Button>
+            </div>
+          </Fragment>
         )}
       </Fragment>
     );
   }
 }
 
-export default FormModalWrapper(RemoveOrders, options);
+export default FormModalWrapper(DuplicateBoxes, options);
+

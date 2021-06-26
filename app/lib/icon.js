@@ -36,6 +36,19 @@ const Icon = ({ children }) => {
 };
 
 /**
+ * CopyIcon (ContentCopy) component, excel symbol, path borrowed from
+ * {@link https://material.io/icons/|Material Design}. Intended to be wrapped by
+ * {@link module:app/lib/icon~Icon|Icon}
+ *
+ * @returns {Element} DOM component
+ */
+const CopyIcon = () => (
+  <Icon>
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+  </Icon>
+);
+
+/**
  * ExcelIcon component, excel symbol, path borrowed from
  * {@link https://material.io/icons/|Material Design}. Intended to be wrapped by
  * {@link module:app/lib/icon~Icon|Icon}
@@ -154,8 +167,48 @@ const FilterIcon = () => (
   </Icon>
 );
 
+/**
+ * MenuIcon component, the 'burger' icon
+ * {@link https://material.io/icons/|Material Design}. Intended to be wrapped by
+ * {@link module:app/lib/icon~Icon|Icon}
+ *
+ * @returns {Element} DOM component
+ */
+const MenuIcon = () => (
+  <Icon>
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+  </Icon>
+);
+
+/**
+ * CaretUpIcon component
+ * {@link https://material.io/icons/|Material Design}. Intended to be wrapped by
+ * {@link module:app/lib/icon~Icon|Icon}
+ *
+ * @returns {Element} DOM component
+ */
+const CaretUpIcon = () => (
+  <Icon>
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M7 14l5-5 5 5z"/>
+  </Icon>
+);
+
+/**
+ * CaretDownIcon component
+ * {@link https://material.io/icons/|Material Design}. Intended to be wrapped by
+ * {@link module:app/lib/icon~Icon|Icon}
+ *
+ * @returns {Element} DOM component
+ */
+const CaretDownIcon = () => (
+  <Icon>
+    <path d="M0 0h24v24H0z" fill="none"/><path d="M7 10l5 5 5-5z"/>
+  </Icon>
+);
+
 export {
   CloseIcon,
+  CopyIcon,
   DeleteIcon,
   DownloadIcon,
   EditIcon,
@@ -164,4 +217,7 @@ export {
   HelpIcon,
   SaveAltIcon,
   FilterIcon,
+  MenuIcon,
+  CaretUpIcon,
+  CaretDownIcon,
 };

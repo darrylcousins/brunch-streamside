@@ -1,9 +1,21 @@
 @import '_bar-loader.scss';
 @import '_animation.scss';
+@import '_data-table.scss';
+@import '_nav.scss';
+@import '_push-menu.scss';
 
 /*Hide info of no checked inputs for tabbed display */
+/*
 .tabs__content input:not(:checked) ~ .tabs__content__info {
   display: none;
+}
+*/
+
+.sticky {
+  position: fixed;
+  top: 50px;
+  background-color: #fff;
+  width: 55%;
 }
 
 /* form elements */
@@ -23,9 +35,6 @@ textarea.invalid {
   visibility: hidden;
 }
 
-.bg-steel-gray {
-  background-color: #212F3D;
-}
 .fg-streamside-blue {
   color: #162842;
 }

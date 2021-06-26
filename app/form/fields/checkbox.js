@@ -66,7 +66,7 @@ function* CheckboxField(props) {
           bubbles: true,
           detail: {
             id,
-            value: selected, // TODO datatype, ever but boolean?
+            value: Boolean(selected), // may be undefined
           },
         })
       );

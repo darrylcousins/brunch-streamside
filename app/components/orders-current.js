@@ -20,6 +20,7 @@ import SelectMenu from "../lib/select-menu";
 import { Fetch } from "../lib/fetch";
 import Button from "../lib/button";
 import { DownloadIcon, SaveAltIcon } from "../lib/icon";
+import { animateFadeForAction, hasOwnProp } from "../helpers";
 
 /**
  * Create a DOM representation of orders grouped using tabs by delivery date.
@@ -31,7 +32,7 @@ import { DownloadIcon, SaveAltIcon } from "../lib/icon";
  */
 function* CurrentOrders() {
   /**
-   * Orders fetched from api as a dictionary keyed by the delivery date
+   * Orders fetched from api as array for the selectedDate
    *
    * @member {object} fetchOrders
    */
@@ -107,7 +108,7 @@ function* CurrentOrders() {
   let checkedOrders = [];
 
   /**
-   * Fetch available dates
+   * Fetch available dates, includes order count by date
    *
    * @function getDates
    */
@@ -169,8 +170,11 @@ function* CurrentOrders() {
           fetchHeaders = headers;
           fetchOrders = orders;
           loading = false;
-          console.log(fetchOrders);
-          this.refresh();
+          if (document.getElementById("orders-table")) {
+            animateFadeForAction("orders-table", async () => await this.refresh());
+          } else {
+            this.refresh();
+          };
         }
       })
       .catch((err) => {
@@ -211,11 +215,14 @@ function* CurrentOrders() {
           if (date !== selectedDate) {
             selectedDate = date;
             clearFilter();
-          }
+          } else {
+            this.refresh();
+          };
           break;
       }
     } else if (name === "INPUT") {
       // pickes up order checkboxes
+      //const initialCheckedOrdersLength = checkedOrders.length;
       if (ev.target.name.startsWith("order")) {
         if (ev.target.checked) {
           checkedOrders.push(ev.target.id);
@@ -225,18 +232,41 @@ function* CurrentOrders() {
         };
         this.refresh();
       };
-    }
+    } else {
+      if (menuSelectDate) {
+        menuSelectDate = !menuSelectDate;
+        this.refresh();
+      }
+    };
   };
 
   this.addEventListener("click", clickEvent);
 
   /**
-   * Event handler when {@link
-   * module:form/form-modal~FormModalWrapper|FormModalWrapper} sends for data
+   * Hide the select dropdown on escape key
    *
-   * @function collectAndSendData
+   * @function hideModal
+   * @param {object} ev Event emitted
+   * @listens window.keyup
+   */
+  const keyEvent = async (ev) => {
+    if (ev.key && ev.key === "Escape") {
+      if (menuSelectDate) {
+        menuSelectDate = !menuSelectDate;
+        this.refresh();
+      }
+    }
+  };
+
+  this.addEventListener("keyup", keyEvent);
+
+  /**
+   * Event handler when {@link
+   * module:form/form-modal~FormModalWrapper|FormModalWrapper} saves the data
+   *
+   * @function reloadOrders
    * @param {object} ev The event
-   * @listens form.data.feed
+   * @listens orders.reload
    */
   const reloadOrders = (ev) => {
     getOrders();
@@ -327,39 +357,35 @@ function* CurrentOrders() {
   for (const _ of this) { // eslint-disable-line no-unused-vars
     yield (
       <div class="f6 w-100 pb2 center">
-        <div class="dt dt--fixed">
-          <div class="dtc">
-            <h2 class="pt0 f5 f4-ns lh-title-ns ma0 fg-streamside-maroon">
-              Current Orders
-            </h2>
-            <p class="lh-copy">
-              {loading ? (
-                <span>
-                  <i class="b">Hold tight.</i> Collecting and collating{" "}
-                </span>
-              ) : (
-                "Displaying "
-              )}
-              all <code class="b">unfulfilled</code> orders from
-              <i class="b"> streamsideorganics.myshopify.com</i>.
-              {loading && "This will take a moment."}
-            </p>
-            { orderCounts.hasOwnProperty("No delivery date") && (
-              <p class="w-95 ba br2 pa3 mh2 mv1 red bg-washed-red" role="alert">
-                <strong>Note!</strong> We have <b>{ orderCounts["No delivery date"] }</b> {pluralize(orderCounts["No delivery date"], "order")} recorded with no delivery date, this will need attention. Sorry Lilly!
-              </p>
-            )}
-          </div>
-          {!loading && false && (
-            <div class="dtc relative">
-              <HelpSection>
-              </HelpSection>
-            </div>
+        <h2 class="pt0 f5 f4-ns lh-title-ns ma0 fg-streamside-maroon">
+          Current Orders {selectedDate ? `for ${selectedDate}` : ""}
+        </h2>
+        <p class="lh-copy">
+          {loading ? (
+            <span>
+              <i class="b">Hold tight.</i> Collecting and collating{" "}
+            </span>
+          ) : (
+            "Displaying "
           )}
-        </div>
-        <div class="overflow-auto">
+          all <code class="b">unfulfilled</code> orders from
+          <i class="b"> streamsideorganics.myshopify.com</i>.
+          {loading && "This will take a moment."}
+        </p>
+        { hasOwnProp.call(orderCounts, "No delivery date") && (
+          <p class="w-95 ba br2 pa3 mh2 mv1 red bg-washed-red" role="alert">
+            <strong>Note!</strong> We have <b>{ orderCounts["No delivery date"] }</b> {pluralize(orderCounts["No delivery date"], "order")} recorded with no delivery date, this will need attention. Sorry Lilly!
+          </p>
+        )}
+        {!loading && false && (
+          <div class="relative">
+            <HelpSection>
+            </HelpSection>
+          </div>
+        )}
+        <div class="overflow-visible">
           {fetchError && <Error msg={fetchError} />}
-          {checkedOrders.length > 0 && (
+          {checkedOrders.length ? (
           <div class="ba br2 pa3 mh2 mv1 orange bg-light-yellow" role="alert">
             <p class="fl w-50">
               <strong>{checkedOrders.length}</strong> {pluralize(checkedOrders.length, "order")} selected.
@@ -372,9 +398,9 @@ function* CurrentOrders() {
               >Clear Selected</Button>
             </div>
           </div>
-          )}
-          <div class="w-100 dt fg-streamside-maroon bg-near-white">
-            <div class="dtc tr v-mid">
+          ) : "" }
+          <div class="w-100 fg-streamside-maroon">
+            <div class="w-100 w-30-l fl-l tr v-mid">
               <SelectMenu
                 id="selectDate"
                 menu={fetchDates.map(el => ({text: `${el} (${getOrderCount(el)})`, item: el}))}
@@ -388,7 +414,7 @@ function* CurrentOrders() {
             {selectedDate && (
               <Fragment>
                 {new Date(selectedDate).toString() !== "Invalid Date" && (
-                  <div class="dtc tr v-bottom">
+                  <div class="w-100 w-50-l fl-l tr v-bottom">
                     <FilterOrders updateFilter={updateFilter} />
                     <button
                       class={`dib w-25 f6 outline-0 blue b--dark-green bt bb br bl-0 bg-transparent mv1 pointer`}
@@ -398,20 +424,20 @@ function* CurrentOrders() {
                         selectedDate
                       ).getTime()}`)}
                       >
-                        <span class="v-mid">Picking List</span>
+                        <span class="v-mid dn di-ns">Picking List</span>
                         <span class="v-mid">
                           <SaveAltIcon />
                         </span>
                     </button>
                     <button
-                      class={`dib w-25 f6 outline-0 blue b--dark-green bt bb br bl-0 bg-transparent mv1 pointer`}
+                      class={`dib w-25 f6 outline-0 purple b--dark-green bt bb br bl-0 bg-transparent mv1 pointer`}
                       title="Download packing list"
                       type="button"
                       onclick={() => window.location=getUriFilters(`/api/packing-list-download/${new Date(
                         selectedDate
                       ).getTime()}`)}
                       >
-                        <span class="v-mid">Packing List</span>
+                        <span class="v-mid dn di-ns">Packing List</span>
                         <span class="v-mid">
                           <SaveAltIcon />
                         </span>
@@ -424,20 +450,21 @@ function* CurrentOrders() {
                         selectedDate
                       ).getTime()}`)}
                       >
-                        <span class="v-mid">Orders</span>
+                        <span class="v-mid dn di-ns">Orders</span>
                         <span class="v-mid">
                           <SaveAltIcon />
                         </span>
                     </button>
                   </div>
                 )}
-                <div class="dtc tr v-mid">
+                <div class="w-100 w-20-l fl-l tr v-mid">
                   <AddOrderModal delivered={selectedDate} />
                   <RemoveOrders delivered={selectedDate} />
                 </div>
               </Fragment>
             )}
           </div>
+          <div class="cf"></div>
           {filterField && filterValue && (
             <div class="ba br2 pa3 ma2 orange bg-light-yellow" role="alert">
               {fetchOrders.length ? (
@@ -458,21 +485,24 @@ function* CurrentOrders() {
             </div>
           )}
           {selectedDate && (
-            <table class="f6 w-100 center" cellSpacing="0">
-              {getHeaderCount() && (
-                <TableHeader
-                  crank-key={`${selectedDate}-th`}
-                  headers={getHeaders()}
-                />
-              )}
-              {getOrderCount(selectedDate) && (
-                <TableBody
-                  crank-key={`${selectedDate}-tb`}
-                  orders={fetchOrders}
-                  selected={checkedOrders}
-                />
-              )}
-            </table>
+            <div class="mt2">
+              <div class="cf">&nbsp;</div>
+              <table class="f6 mt3 w-100 center" cellSpacing="0">
+                {getHeaderCount() ? (
+                  <TableHeader
+                    crank-key={`${selectedDate}-th`}
+                    headers={getHeaders()}
+                  />
+                ) : null }
+                {getOrderCount(selectedDate) && (
+                  <TableBody
+                    crank-key={`${selectedDate}-tb`}
+                    orders={fetchOrders}
+                    selected={checkedOrders}
+                  />
+                )}
+              </table>
+            </div>
           )}
         </div>
         {loading && <BarLoader />}

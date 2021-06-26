@@ -57,6 +57,16 @@ const boxProducts = `
     ORDER BY "Products".shopify_title
 `;
 
+const makeProductDoc = (el) => {
+  delete el.id;
+  const prod = {...el};
+  prod._id = ObjectID();
+  prod.shopify_product_id = parseInt(el.shopify_id, 10);
+  delete prod.shopify_id;
+  prod.shopify_variant_id = parseInt(el.shopify_variant_id, 10);
+  return prod;
+};
+
 const collectBoxes = async () => {
   // Collect current boxes and push into mongodb
   let boxDocuments = [];
@@ -73,18 +83,18 @@ const collectBoxes = async () => {
         boxDoc._id = new ObjectID();
         boxDoc.delivered = boxDoc.delivered.toDateString();
 
-        boxDoc.shopify_product_id = parseInt(boxDoc.shopify_product_id);
-        boxDoc.shopify_variant_id = parseInt(boxDoc.shopify_variant_id);
+        boxDoc.shopify_product_id = parseInt(boxDoc.shopify_product_id, 10);
+        boxDoc.shopify_variant_id = parseInt(boxDoc.shopify_variant_id, 10);
 
         // get box products
         pool
           .query(boxProducts, [boxId, 't'])
           .then(res => {
-            boxDoc.addOnProducts = res.rows.map(el => ({...el}));
+            boxDoc.addOnProducts = res.rows.map(el => (makeProductDoc(el)));
             pool
               .query(boxProducts, [boxId, 'f'])
               .then(res => {
-                boxDoc.includedProducts = res.rows.map(el => ({...el}));
+                boxDoc.includedProducts = res.rows.map(el => (makeProductDoc(el)));
               });
           });
         boxDocuments.push(boxDoc);

@@ -119,7 +119,7 @@ function FormModalWrapper(Component, options) {
 
       // check to find if we have a file upload
       Object.values(form).some((value) => {
-        if (typeof value.name === "string") {
+        if (value && typeof value.name === "string") {
           hasFile = true;
           return true;
         }
@@ -172,6 +172,11 @@ function FormModalWrapper(Component, options) {
             this.refresh();
             setTimeout(() => {
               //  window.location.reload();
+              this.dispatchEvent(
+                new CustomEvent("listing.reload", {
+                  bubbles: true,
+                })
+              );
               this.dispatchEvent(
                 new CustomEvent("orders.reload", {
                   bubbles: true,

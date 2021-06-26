@@ -5,6 +5,8 @@
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 
+import { hasOwnProp } from "../helpers";
+
 /**
  * Fetch component that attempts to deal reasonably if the fetch fails. Always
  * uses a `GET` request` and expects a `json` response.
@@ -33,7 +35,7 @@ const Fetch = async (src) => {
     })
     .catch((error) => {
       console.log("Got error in GET fetch:", error);
-      if (Object.prototype.hasOwnProperty.call(error, "err")) {
+      if (hasOwnProp.call(error, "err")) {
         return { error: error.err, json: null };
       }
       return { error, json: null };
@@ -84,13 +86,13 @@ const PostFetch = async ({ src, data, headers }) => {
       return response.json();
     })
     .then((json) => {
-      if (Object.prototype.hasOwnProperty.call(json, "error")) {
+      if (hasOwnProp.call(json, "error")) {
         return { formError: json, error: null, json: null };
       };
       return { error: null, formError: null, json };
     })
     .catch((error) => {
-      if (Object.prototype.hasOwnProperty.call(error, "err")) {
+      if (hasOwnProp.call(error, "err")) {
         return { error: error.err, json: null, formError: null };
       };
       return { error, json: null, formError: null };

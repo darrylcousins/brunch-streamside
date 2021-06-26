@@ -38,7 +38,7 @@ function CollapseWrapper(Component) {
   }
 
   /*
-   * @function expandElement
+   * @function transitionElementHeight
    * from https://css-tricks.com/using-css-transitions-auto-dimensions/
    * .collapsible {
    *   overflow:hidden;
@@ -47,11 +47,15 @@ function CollapseWrapper(Component) {
    * }
    *
    */
-  const expandElement = (element) => {
+  const transitionElementHeight = (element) => {
     if (!element) return;
+    let calculatedHeight = 1;
+    // simply using el.scrollHeight can give some odd results when element is shrinking
+    element.childNodes.forEach(el => {
+      calculatedHeight += el.scrollHeight;
+    });
     const elementHeight = element.scrollHeight;
-    element.style.height = elementHeight + "px";
-    //setTimeout(() => element.style.height = "auto", 100);
+    element.style.height = calculatedHeight + "px";
   }
   
   /*
@@ -119,7 +123,7 @@ function CollapseWrapper(Component) {
         if (newCollapsed) {
           collapseElement(element);
         } else {
-          expandElement(element);
+          transitionElementHeight(element);
         }
         //element.scrollIntoView({ behavior: "smooth" });
       }

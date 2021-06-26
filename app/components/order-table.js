@@ -95,7 +95,7 @@ const TableHeader = ({ headers, index }) => (
 const TableBody = ({ orders, selected }) => {
   const sortedOrders = sortObjectByKey(orders, "sku");
   return (
-    <tbody class="lh-copy">
+    <tbody class="lh-copy" id="orders-table">
       {sortedOrders.map((order, index) => (
         <TableRow index={index} order={order} selected={selected} />
       ))}

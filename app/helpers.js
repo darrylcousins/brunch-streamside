@@ -5,6 +5,8 @@
  * @module app/helpers
  */
 
+export const hasOwnProp = Object.prototype.hasOwnProperty;
+
 /**
  * Sort an object by it's keys.
  *
@@ -78,11 +80,52 @@ export const dateStringForInput = (str) => {
     d = new Date(str);
   } else {
     d = new Date();
-  };
-  const zeroPad = (num, places) => String(num).padStart(places, '0');
+  }
+  const zeroPad = (num, places) => String(num).padStart(places, "0");
   const year = d.getFullYear();
   const day = zeroPad(d.getDate(), 2);
   const month = zeroPad(d.getMonth() + 1, 2);
 
   return `${year}-${month}-${day}`;
+};
+
+/** Provide standard animationOptions
+ *
+ * @member {object} animationOptions
+ */
+export const animationOptions = {
+  duration: 400,
+  easing: "ease",
+  fill: "both",
+};
+
+/**
+ * Animate a fade and execute an action on end
+ *
+ * @function animateFadeForAction
+ */
+export const animateFadeForAction = (id, action) => {
+  let target;
+  if (typeof id === "string") {
+    target = document.getElementById(id);
+  } else {
+    target = id;
+  }
+  const animate = target.animate(
+    {
+      opacity: 0.1,
+    },
+    animationOptions
+  );
+  animate.addEventListener("finish", async () => {
+    if (action) {
+      await action();
+    }
+    target.animate(
+      {
+        opacity: 1,
+      },
+      animationOptions
+    );
+  });
 };

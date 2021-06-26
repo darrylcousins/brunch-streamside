@@ -117,7 +117,7 @@ function* FilterOrders({updateFilter}) {
           title="Filter orders"
           type="button"
           onclick={showModal}>
-            <span class="v-mid">Filter</span>
+            <span class="v-mid dn di-ns">Filter</span>
             <span class="v-mid">
               <FilterIcon />
             </span>

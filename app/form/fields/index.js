@@ -17,6 +17,8 @@ import InputMultipleSelect from "./input-multiple";
 import File from "./file";
 import DateField from "./date";
 import Error from "../../lib/error";
+import { hasOwnProp } from "../../helpers";
+
 
 /**
  * A field component to render form elements
@@ -47,7 +49,7 @@ function Field(props) {
   let valid = true;
 
   // see https://github.com/eslint/eslint/blob/master/docs/rules/no-prototype-builtins.md
-  if (Object.prototype.hasOwnProperty.call(formElements, id)) {
+  if (hasOwnProp.call(formElements, id)) {
     valid = formElements[id].checkValidity();
     if (formElements[id].value !== "undefined") {
       value = formElements[id].value;

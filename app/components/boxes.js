@@ -47,7 +47,7 @@ function* Boxes({ boxes }) {
               </th>
             </tr>
           </thead>
-          <tbody class="lh-copy">
+          <tbody class="lh-copy" id="boxes-table">
             {boxes.map(
               (box, idx) => (
                 <Box index={idx} box={box} />

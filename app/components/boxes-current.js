@@ -18,6 +18,7 @@ import { MenuIcon, SaveAltIcon, EditIcon, DeleteIcon } from "../lib/icon";
 import SelectMenu from "../lib/select-menu";
 import Boxes from "./boxes";
 import PushMenu from "../lib/push-menu";
+import { animateFadeForAction } from "../helpers";
 
 /**
  * Uses fetch to collect current boxes from api and then passes data to
@@ -96,7 +97,11 @@ function* CurrentBoxes() {
         } else {
           loading = false;
           fetchBoxes = json;
-          this.refresh();
+          if (document.getElementById("boxes-table")) {
+            animateFadeForAction("boxes-table", async () => await this.refresh());
+          } else {
+            this.refresh();
+          };
         }
       })
       .catch((err) => {
@@ -179,6 +184,8 @@ function* CurrentBoxes() {
           menuSelectDate = false;
           if (date !== selectedDate) {
             selectedDate = date;
+          } else {
+            this.refresh();
           };
           getBoxes();
           break;
@@ -226,7 +233,7 @@ function* CurrentBoxes() {
     yield (
       <div class="f6 w-100 pb2 center">
         {loading && <BarLoader />}
-        <h2 class="pt0 f5 f4-ns lh-title-ns ma0 fg-streamside-maroon">
+        <h2 class="pt0 f5 f4-ns lh-title-ns ma0 fg-streamside-maroon" id="boxes-title">
           <PushMenu children={sideMenu} />
           Current Boxes {selectedDate ? `for ${selectedDate}` : ""}
         </h2>

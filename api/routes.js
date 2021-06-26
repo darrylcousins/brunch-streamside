@@ -39,6 +39,13 @@ routes.post('/add-todo', queries.addTodo);
 routes.post('/edit-todo', queries.editTodo);
 routes.post('/remove-todo', queries.removeTodo);
 
+routes.post('/add-setting', queries.addSetting);
+routes.get('/current-settings', queries.getCurrentSettings);
+routes.get('/settings-for-app', queries.getSettingsForApp);
+routes.post('/edit-setting', queries.editSetting);
+routes.post('/edit-settings', queries.editSettings);
+routes.post('/remove-setting', queries.removeSetting);
+
 //routes.get('/boxes', queries.getBoxes);
 routes.get('/current-boxes', getCurrentBoxes);
 routes.get('/current-boxes-by-product/:product_id', getCurrentBoxesByProduct);

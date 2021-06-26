@@ -17,8 +17,12 @@ import crossroads from "crossroads";
 import Home from "./route/home";
 import Orders from "./route/orders";
 import Boxes from "./route/boxes";
+import Settings from "./route/settings";
+import SettingsPlus from "./route/settings-plus";
+/*
 import Todos from "./route/todos";
 import PackingLists from "./route/packing-lists";
+*/
 
 crossroads.addRoute("/", () =>
   renderer.render(<Home />, document.querySelector("#app"))
@@ -29,13 +33,20 @@ crossroads.addRoute("/boxes", () =>
 crossroads.addRoute("/orders", () =>
   renderer.render(<Orders />, document.querySelector("#app"))
 );
+crossroads.addRoute("/settings", () =>
+  renderer.render(<Settings />, document.querySelector("#app"))
+);
+crossroads.addRoute("/settings-plus", () =>
+  renderer.render(<SettingsPlus />, document.querySelector("#app"))
+);
+/*
 crossroads.addRoute("/todos", () =>
   renderer.render(<Todos />, document.querySelector("#app"))
 );
 crossroads.addRoute("/packing-lists", () =>
   renderer.render(<PackingLists />, document.querySelector("#app"))
 );
-
+*/
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Initialized app");
 

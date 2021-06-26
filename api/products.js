@@ -144,7 +144,7 @@ exports.addBox = async function (req, res, next) {
   const collection = req.app.locals.boxCollection;
   const result = await collection.findOne({ delivered: deliveryDay, shopify_product_id })
   if (result) {
-    res.status(202).json({error: `${deliveryDay} already has a ${result.shopify_sku}`});
+    res.status(202).json({error: `${deliveryDay} already has ${result.shopify_sku}`});
     return;
   };
 

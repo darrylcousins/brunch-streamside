@@ -96,9 +96,9 @@ function *Settings() {
     if (fixSettings) {
       const y = fixSettings.offsetTop - 50;
       if (window.scrollY > y) {
-        fixSettings.classList.add("sticky");
+        fixSettings.classList.add("sticky-settings");
       } else {
-        fixSettings.classList.remove("sticky");
+        fixSettings.classList.remove("sticky-settings");
       };
     };
   };

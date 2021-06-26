@@ -121,7 +121,7 @@ exports.getOrderFields = async function (req, res, next) {
   res.status(200).json(orderFields);
 };
 
-exports.deleteOrders = async function (req, res, next) {
+exports.removeOrders = async function (req, res, next) {
   const collection = req.app.locals.orderCollection;
   const { sources, delivered } = req.body;
   const query = {delivered, source: {$in: sources }};

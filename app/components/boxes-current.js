@@ -11,6 +11,7 @@ import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import AddBoxModal from "./box-add";
 import BoxCoreModal from "./box-core";
 import DuplicateBoxModal from "./boxes-duplicate";
+import RemoveBoxesModal from "./boxes-remove";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
 import { Fetch } from "../lib/fetch";
@@ -256,6 +257,7 @@ function* CurrentBoxes() {
                 <div class="w-100 w-two-thirds-l fl-l tr v-mid">
                   <DuplicateBoxModal currentDate={selectedDate} />
                   <AddBoxModal delivered={selectedDate} />
+                  <RemoveBoxesModal delivered={selectedDate} />
                 </div>
               </Fragment>
             )}

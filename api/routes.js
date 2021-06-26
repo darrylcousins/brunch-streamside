@@ -26,7 +26,7 @@ routes.post('/remove-order', queries.removeOrder);
 routes.post('/bulk-edit-orders', queries.bulkEditOrders);
 
 routes.get('/order-fields', queries.getOrderFields);
-routes.post('/remove-orders', queries.deleteOrders);
+routes.post('/remove-orders', queries.removeOrders);
 routes.post('/import-orders', queries.importOrders);
 routes.get('/picking-list-download/:timestamp', queries.downloadPickingList);
 routes.get('/orders-download/:timestamp', queries.downloadOrders);
@@ -65,6 +65,7 @@ routes.post('/remove-product-from-box', products.removeProductFromBox);
 routes.post('/add-box', products.addBox);
 routes.post('/remove-box', products.removeBox);
 routes.post('/duplicate-boxes', products.duplicateBoxes);
+routes.post('/remove-boxes', products.removeBoxes);
 
 routes.get('/sync-boxes', syncBoxes);
 routes.get('/sync-orders', syncOrders);

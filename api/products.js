@@ -123,8 +123,34 @@ exports.removeBox = async function (req, res, next) {
       res.status(200).json(result);
     });
   });
-
   //res.status(202).json({error: 'This will be the error to show'});
+};
+
+/*
+ * function removeBoxes
+ * Remove all boxes for a delivery date, parameters from req.body:
+ * @param delivered delivery day as string
+ *
+ */
+exports.removeBoxes = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+
+  const collection = req.app.locals.boxCollection;
+  const { delivered } = req.body;
+  const query = {delivered};
+  const response = Object();
+  console.log(query);
+  res.status(200).json(query);
+  try {
+    collection.deleteMany(query, (err, result) => {
+      if (err) throw err;
+      _logger.info(`Removing boxes: ${result.result.n} objects deleted`);
+      res.status(200).json({ count: result.result.n });
+    });
+  } catch(e) {
+    _logger.warn(e.toString());
+    res.status(400).json({ error: e.toString() });
+  };
 };
 
 /*

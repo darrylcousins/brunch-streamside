@@ -6,6 +6,7 @@
 /**
   * Collect current boxes from database
   * Used by the in-store app to get boxes for a Container box
+  *
   * @function getCurrentBoxes
   * @returns {object} Arrays of boxes grouped by delivery date
   */
@@ -58,7 +59,11 @@ const getCurrentBoxesByProduct = async function (req, res, next) {
   // TODO absolutely essential the data is unique by delivered and shopify_product_id
   // filter by dates later than now
   try {
-    collection.find({delivered: {$in: dates}, shopify_product_id: product_id}).toArray((err, result) => {
+    collection.find({
+      delivered: {$in: dates},
+      active: true,
+      shopify_product_id: product_id
+    }).toArray((err, result) => {
       if (err) throw err;
       result.forEach(el => {
         response[el.delivered] = el;

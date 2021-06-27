@@ -50,6 +50,7 @@ const getCurrentBoxesForBoxProduct = async function (req, res, next) {
     collection
       .find({
         delivered: {$in: dates},
+        active: true,
         $or: [
           { includedProducts: { $elemMatch: { shopify_product_id: box_product_id } } },
           { addOnProducts: { $elemMatch: { shopify_product_id: box_product_id } } }

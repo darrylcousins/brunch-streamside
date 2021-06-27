@@ -66,6 +66,7 @@ routes.post('/add-box', products.addBox);
 routes.post('/remove-box', products.removeBox);
 routes.post('/duplicate-boxes', products.duplicateBoxes);
 routes.post('/remove-boxes', products.removeBoxes);
+routes.post('/toggle-box-active', products.toggleBoxActive); // accepts box_id or delivered
 
 routes.get('/sync-boxes', syncBoxes);
 routes.get('/sync-orders', syncOrders);

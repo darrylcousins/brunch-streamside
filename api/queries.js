@@ -151,7 +151,7 @@ exports.removeOrders = async function (req, res, next) {
 exports.addSetting = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
   const doc = {...req.body};
-  doc._id = ObjectID();
+  doc._id = new ObjectID();
   try {
     const result = await mongoInsert(req.app.locals.settingCollection, doc);
     res.status(200).json(result);

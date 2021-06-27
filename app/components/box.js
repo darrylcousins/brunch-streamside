@@ -15,12 +15,11 @@ import { PostFetch } from "../lib/fetch";
 import {
   CaretUpIcon,
   CaretDownIcon,
-  CloseIcon,
-  DownloadIcon,
-  SaveAltIcon,
-  EditIcon,
   DeleteIcon,
+  ToggleOnIcon,
+  ToggleOffIcon,
 } from "../lib/icon";
+import IconButton from "../lib/icon-button";
 import { sortObjectByKey } from "../helpers";
 
 /**
@@ -50,11 +49,75 @@ function* Box({ box, index }) {
 
   /*
    * Control the collapse of product list
+   * @function toggleCollapse
    */
   const toggleCollapse = () => {
     collapsed = !collapsed;
     this.refresh();
   };
+
+  /*
+   * Submit form to toggle box on/off active
+   * @function toggleBox
+   */
+  const toggleBox = async (data) => {
+    const headers = { "Content-Type": "application/json" };
+    const { error, json } = await PostFetch({
+      src: "/api/toggle-box-active",
+      data,
+      headers,
+    })
+      .then((result) => result)
+      .catch((e) => ({
+        error: e,
+        json: null,
+      }));
+    if (!error) {
+      this.dispatchEvent(
+        new CustomEvent("boxes.reload", {
+          bubbles: true,
+        })
+      );
+    }
+    // need to provide user feedback of success or failure
+    return { error, json };
+  };
+
+  /**
+   * Event listener for toggling box on/off active
+   *
+   */
+  this.addEventListener("click", async (ev) => {
+    let target = ev.target;
+    if (target.tagName.toUpperCase() === "PATH") {
+      target = target.closest("button");
+    };
+    const name = target.tagName.toUpperCase();
+    let data;
+    if (name === "BUTTON") {
+      const box_id = box._id;
+      switch(target.getAttribute("name")) {
+        case "toggle-on":
+          console.log('Toggle ON', box._id);
+          ev.stopPropagation();
+          data = {
+            box_id,
+            active: true,
+          };
+          await toggleBox(data);
+          break;
+        case "toggle-off":
+          console.log('Toggle OFF', box._id);
+          ev.stopPropagation();
+          data = {
+            box_id,
+            active: false,
+          };
+          await toggleBox(data);
+          break;
+      };
+    };
+  });
 
   for ({ box } of this) { // eslint-disable-line no-unused-vars
     const allBoxProducts = box.includedProducts.concat(box.addOnProducts);
@@ -122,9 +185,18 @@ function* Box({ box, index }) {
           ${parseFloat(box.shopify_price / 100).toFixed(2)}
         </td>
         <td
-          data-title="Remove"
-          class="w-10-l pv3 pr3 bb b--black-20 rh-copy black-70 v-top"
+          data-title="Actions"
+          class="w-10-l pt3 bb b--black-20 rh-copy black-70 v-top"
         >
+          {box.active === true ? (
+            <IconButton color="dark-green" title="Toggle box off" name="toggle-off">
+              <ToggleOnIcon />
+            </IconButton>
+          ) : (
+            <IconButton color="dark-red" title="Toggle box on" name="toggle-on">
+              <ToggleOffIcon />
+            </IconButton>
+          )}
           <RemoveBoxModal box={box} />
         </td>
       </tr>

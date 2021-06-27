@@ -60,7 +60,7 @@ const boxProducts = `
 const makeProductDoc = (el) => {
   delete el.id;
   const prod = {...el};
-  prod._id = ObjectID();
+  prod._id = new ObjectID();
   prod.shopify_product_id = parseInt(el.shopify_id, 10);
   delete prod.shopify_id;
   prod.shopify_variant_id = parseInt(el.shopify_variant_id, 10);

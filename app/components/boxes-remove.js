@@ -99,7 +99,7 @@ async function* RemoveBoxes(props) {
         <div class="w-90 center ph1">
           <h3>{delivered}</h3>
           <p class="lh-copy near-black tl">
-            Delete all boxes for this delivery date {delivered}?
+            Delete <strong>all</strong> boxes for this delivery date {delivered}?
           </p>
           <Form
             data={getInitialData()}

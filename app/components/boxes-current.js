@@ -14,12 +14,20 @@ import DuplicateBoxModal from "./boxes-duplicate";
 import RemoveBoxesModal from "./boxes-remove";
 import BarLoader from "../lib/bar-loader";
 import Error from "../lib/error";
-import { Fetch } from "../lib/fetch";
-import { MenuIcon, SaveAltIcon, EditIcon, DeleteIcon } from "../lib/icon";
+import { PostFetch, Fetch } from "../lib/fetch";
+import IconButton from "../lib/icon-button";
 import SelectMenu from "../lib/select-menu";
 import Boxes from "./boxes";
 import PushMenu from "../lib/push-menu";
 import { animateFadeForAction } from "../helpers";
+import {
+  MenuIcon,
+  SaveAltIcon,
+  EditIcon,
+  DeleteIcon,
+  ToggleOnIcon,
+  ToggleOffIcon,
+} from "../lib/icon";
 
 /**
  * Uses fetch to collect current boxes from api and then passes data to
@@ -158,6 +166,29 @@ function* CurrentBoxes() {
 
   this.addEventListener("boxes.reload", reloadBoxes);
 
+  /*
+   * Submit form to toggle boxes on/off active
+   * @function toggleBox
+   */
+  const toggleBoxes = async (data) => {
+    const headers = { "Content-Type": "application/json" };
+    const { error, json } = await PostFetch({
+      src: "/api/toggle-box-active",
+      data,
+      headers,
+    })
+      .then((result) => result)
+      .catch((e) => ({
+        error: e,
+        json: null,
+      }));
+    if (!error) {
+      reloadBoxes();
+    }
+    // need to provide user feedback of success or failure
+    return { error, json };
+  };
+
   /**
    * Switch tabs
    *
@@ -166,22 +197,45 @@ function* CurrentBoxes() {
    * @listens window.click
    */
   const clickEvent = async (ev) => {
-    const name = ev.target.tagName;
+    let target = ev.target;
+    if (target.tagName.toUpperCase() === "PATH") {
+      target = target.closest("button");
+    };
+    const name = target.tagName.toUpperCase();
     if (name === "BUTTON") {
 
-      switch(ev.target.id) {
+      switch(target.id) {
         case "selectDate":
           // open and close date select dropdown
           menuSelectDate = !menuSelectDate;
           this.refresh();
           break;
-      }
+      };
+      let data;
+      switch(target.getAttribute("name")) {
+        case "toggle-on":
+          console.log('Toggle ON');
+          data = {
+            delivered: selectedDate,
+            active: true,
+          };
+          await toggleBoxes(data);
+          break;
+        case "toggle-off":
+          console.log('Toggle OFF');
+          data = {
+            delivered: selectedDate,
+            active: false,
+          };
+          await toggleBoxes(data);
+          break;
+      };
     } else if (name === "DIV") {
 
-      switch(ev.target.getAttribute("name")) {
+      switch(target.getAttribute("name")) {
         case "selectDate":
           // set selected date from date select dropdown component
-          const date = ev.target.getAttribute("data-item");
+          const date = target.getAttribute("data-item");
           menuSelectDate = false;
           if (date !== selectedDate) {
             selectedDate = date;
@@ -193,6 +247,7 @@ function* CurrentBoxes() {
       }
     } else {
       if (menuSelectDate) {
+        // close menu on all clicks not captured
         menuSelectDate = !menuSelectDate;
         this.refresh();
       }
@@ -231,6 +286,10 @@ function* CurrentBoxes() {
   const sideMenu = [<BoxCoreModal />];
 
   for (const _ of this) { // eslint-disable-line no-unused-vars
+
+    const active = fetchBoxes.find(el => el.active === true);
+    const inactive = fetchBoxes.find(el => el.active === false);
+
     yield (
       <div class="f6 w-100 pb2 center">
         {loading && <BarLoader />}
@@ -255,6 +314,16 @@ function* CurrentBoxes() {
             {selectedDate && (
               <Fragment>
                 <div class="w-100 w-two-thirds-l fl-l tr v-mid">
+                  {active && (
+                    <IconButton color="dark-green" title="Toggle all boxes off" name="toggle-off">
+                      <ToggleOnIcon />
+                    </IconButton>
+                  )}
+                  {inactive && (
+                    <IconButton color="dark-red" title="Toggle all boxes on" name="toggle-on">
+                      <ToggleOffIcon />
+                    </IconButton>
+                  )}
                   <DuplicateBoxModal currentDate={selectedDate} />
                   <AddBoxModal delivered={selectedDate} />
                   <RemoveBoxesModal delivered={selectedDate} />

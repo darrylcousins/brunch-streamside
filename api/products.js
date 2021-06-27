@@ -93,7 +93,16 @@ exports.duplicateBoxes = async function (req, res, next) {
             if (e) _logger.info(`Got error ${e}`);
             if (!box) {
               boxDoc.delivered = delivered;
-              delete boxDoc._id;
+              boxDoc._id = new ObjectID();
+              boxDoc.addOnProducts = boxDoc.addOnProducts.map(prod => {
+                prod._id = new ObjectID();
+                return prod;
+              });
+              boxDoc.includedProducts = boxDoc.includedProducts.map(prod => {
+                prod._id = new ObjectID();
+                return prod;
+              });
+              boxDoc.active = false; // default to inactive
               _logger.info(`Inserting ${JSON.stringify(boxDoc, null, 2)}`);
               await collection.insertOne(boxDoc);
             };
@@ -139,8 +148,6 @@ exports.removeBoxes = async function (req, res, next) {
   const { delivered } = req.body;
   const query = {delivered};
   const response = Object();
-  console.log(query);
-  res.status(200).json(query);
   try {
     collection.deleteMany(query, (err, result) => {
       if (err) throw err;
@@ -205,7 +212,8 @@ exports.addBox = async function (req, res, next) {
       shopify_variant_id: product.variants[0].id,
       shopify_price: parseFloat(product.variants[0].price) * 100,
       addOnProducts: [],
-      includedProducts: []
+      includedProducts: [],
+      active: false,
     }
   };
 
@@ -224,11 +232,11 @@ exports.addBox = async function (req, res, next) {
 
   if (coreBox) {
     productDoc.addOnProducts = coreBox.addOnProducts.map(prod => {
-      prod._id = ObjectID();
+      prod._id = new ObjectID();
       return prod;
     });
     productDoc.includedProducts = coreBox.includedProducts.map(prod => {
-      prod._id = ObjectID();
+      prod._id = new ObjectID();
       return prod;
     });
   };
@@ -332,6 +340,42 @@ exports.removeProductFromBox = async function (req, res, next) {
 
     res.status(200).json(result);
   });
+};
+
+/*
+ * function toggleBoxActive
+ * Remove a product from the box, parameters from req.body:
+ * @param box_id The objectId of the box from mongo // optional, update one
+ * @param delivered Delivery date // optional, update many
+ * @param active {boolean} Required
+ */
+exports.toggleBoxActive = async function (req, res, next) {
+  _logger.info(JSON.stringify(req.body, null, 2));
+
+  const {box_id, delivered, active} = req.body;
+  const collection = req.app.locals.boxCollection;
+
+  if (box_id && !delivered) {
+    collection.updateOne(
+      {_id: ObjectID(box_id)},
+      {$set: {active}}
+      , async (e, result) => {
+      if (e) _logger.info(`Got error ${e}`);
+      _logger.info(JSON.stringify(result, null, 2));
+
+      res.status(200).json(result);
+    });
+  } else if (!box_id && delivered) {
+    collection.updateMany(
+      {delivered},
+      {$set: {active}}
+      , async (e, result) => {
+      if (e) _logger.info(`Got error ${e}`);
+      _logger.info(JSON.stringify(result, null, 2));
+
+      res.status(200).json(result);
+    });
+  }
 };
 
 /*

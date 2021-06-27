@@ -50,7 +50,7 @@ module.exports = function startServer(PORT, PATH, callback) {
         boxCollection = southbridgeDB.collection('boxes');
       } else {
         boxCollection = streamsideDB.collection('boxes');
-      }
+      };
 
       // make collection available globally
       app.locals.orderCollection = orderCollection;

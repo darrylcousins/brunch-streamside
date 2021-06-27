@@ -89,7 +89,6 @@ function* Box({ box, index }) {
    */
   this.addEventListener("click", async (ev) => {
     let target = ev.target;
-    console.log(target.tagName);
     if (["PATH", "SVG"].includes(target.tagName.toUpperCase())) {
       target = target.closest("button");
     };

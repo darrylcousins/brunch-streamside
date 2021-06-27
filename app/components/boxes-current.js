@@ -198,7 +198,7 @@ function* CurrentBoxes() {
    */
   const clickEvent = async (ev) => {
     let target = ev.target;
-    if (target.tagName.toUpperCase() === "PATH") {
+    if (["PATH", "SVG"].includes(target.tagName.toUpperCase())) {
       target = target.closest("button");
     };
     const name = target.tagName.toUpperCase();

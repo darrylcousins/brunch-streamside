@@ -85,6 +85,7 @@ const collectBoxes = async () => {
 
         boxDoc.shopify_product_id = parseInt(boxDoc.shopify_product_id, 10);
         boxDoc.shopify_variant_id = parseInt(boxDoc.shopify_variant_id, 10);
+        boxDoc.active = true;
 
         // get box products
         pool
@@ -122,22 +123,21 @@ module.exports = async function (req, res, next) {
     const variant = await getBoxSKU(boxDoc.shopify_variant_id.toString())
       .then(res => res.variant.sku);
     boxDoc.shopify_sku = variant;
-    console.log("variant", variant);
-    //console.log("boxDoc", boxDoc);
+    boxDoc._id = new ObjectID();
+    console.log("boxDoc", boxDoc);
+    const res = await req.app.locals.boxCollection.insertOne(boxDoc);
+
+    /*
     const { _id, ...parts } = boxDoc;
-    console.log("_id", _id);
+    console.log("_id", _id, variant, boxDoc.delivered);
     const res = await collection.updateOne(
-      //{ _id: _id+1 },
       { _id: new ObjectID() },
       { $setOnInsert: { ...parts } },
       { upsert: true }
     );
-    if (res.upsertId) {
-      _logger.info(`Inserted box with id: ${res.upsertedId._id}`);
-    } else {
-      _logger.info(`No box to insert, existing box with _id: ${_id}`);
-    }
+    */
+    _logger.info(res);
   });
 
-  res.status(200).json({ success: true });
+  res.status(200).json(res);
 };

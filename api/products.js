@@ -361,7 +361,7 @@ exports.toggleBoxActive = async function (req, res, next) {
       {$set: {active}}
       , async (e, result) => {
       if (e) _logger.info(`Got error ${e}`);
-      _logger.info(JSON.stringify(result, null, 2));
+      _logger.info(JSON.stringify(result.result, null, 2));
 
       res.status(200).json(result);
     });
@@ -371,7 +371,7 @@ exports.toggleBoxActive = async function (req, res, next) {
       {$set: {active}}
       , async (e, result) => {
       if (e) _logger.info(`Got error ${e}`);
-      _logger.info(JSON.stringify(result, null, 2));
+      _logger.info(JSON.stringify(result.result, null, 2));
 
       res.status(200).json(result);
     });

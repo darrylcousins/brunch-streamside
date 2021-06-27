@@ -82,7 +82,7 @@ const getProducts = async ({search}) => {
  *
  * @returns {object} Error (if any) and the fields
  */
-const getAddFields = async () => {
+const getAddFields = async (delivered) => {
   const uri = "/api/get-core-box";
   const { error, json } = await Fetch(uri)
     .then((result) => result)
@@ -129,7 +129,7 @@ const getAddFields = async () => {
  * @param {string} props.formId - The unique form indentifier
  */
 async function* AddBox(props) {
-  const { doSave, closeModal, title, formId } = props;
+  const { doSave, closeModal, title, delivered, formId } = props;
 
   /**
    * Hold loading state.
@@ -167,7 +167,7 @@ async function* AddBox(props) {
    *
    * @member {boolean} fields
    */
-  const { error, fields } = await getAddFields();
+  const { error, fields } = await getAddFields(delivered);
 
   /**
    * The initial data of the form
@@ -176,7 +176,7 @@ async function* AddBox(props) {
    * @returns {object} The initial data for the form
    */
   const getInitialData = () => {
-    return {shopify_product_id};
+    return {shopify_product_id, delivered: dateStringForInput(delivered)};
   };
 
   /**

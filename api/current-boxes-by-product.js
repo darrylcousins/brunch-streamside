@@ -38,7 +38,7 @@ const getCurrentBoxesByProduct = async function (req, res, next) {
             };
           };
         });
-        final.sort((d1, d2) => {
+        final.sort((d2, d1) => {
           if (d1 < d2) return -1;
           if (d1 > d2) return 1;
           return 0;

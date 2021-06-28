@@ -499,12 +499,12 @@ function *AppView({settings}) {
                   </div>
                   <div class="listing-title pointer"
                     data-settings-types={`["Translation"]`}
-                    data-settings-keys={`["modal-excluded-title"]`}
+                    data-settings-keys={`["modal-addons-title"]`}
                     onmouseover={mouseOverSetting}
                     onmouseout={mouseOutSetting}
                     title="Click to edit"
                     >
-                    {getSetting("Translation", "modal-excluded-title")}:
+                    {getSetting("Translation", "modal-addons-title")}:
                   </div>
                   <div class="input-wrapper">
                     <input class="input-title" type="text" readonly name="title" value="Broccoli">

@@ -38,11 +38,6 @@ const getCurrentBoxesByProduct = async function (req, res, next) {
             };
           };
         });
-        final.sort((d2, d1) => {
-          if (d1 < d2) return -1;
-          if (d1 > d2) return 1;
-          return 0;
-        });
         resolve(final.map(el => el.toDateString()));
       })
     })
@@ -54,10 +49,6 @@ const getCurrentBoxesByProduct = async function (req, res, next) {
     })
     .catch(err => res.status(400).json({ error: e.toString() }));
 
-  // consider defining fields to avoid the inner product documents
-  // https://docs.mongodb.com/drivers/node/fundamentals/crud/read-operations/project
-  // TODO absolutely essential the data is unique by delivered and shopify_product_id
-  // filter by dates later than now
   try {
     collection.find({
       delivered: {$in: dates},

@@ -9,6 +9,7 @@ const tagOrders = require('./tag-orders');
 const getCurrentBoxes = require('./current-boxes');
 const getCurrentBoxesByProduct = require('./current-boxes-by-product');
 const getCurrentBoxesForBoxProduct = require('./current-boxes-for-box-product');
+const subscribers = require('./subscribers');
 
 routes.get('/', function (req, res) {
   res.status(404).send('No index for the api');
@@ -45,6 +46,11 @@ routes.get('/settings-for-app', queries.getSettingsForApp);
 routes.post('/edit-setting', queries.editSetting);
 routes.post('/edit-settings', queries.editSettings);
 routes.post('/remove-setting', queries.removeSetting);
+
+routes.post('/add-subscriber', subscribers.addSubscriber);
+routes.get('/current-subscribers', subscribers.getCurrentSubscribers);
+routes.post('/edit-subscriber', subscribers.editSubscriber);
+routes.post('/remove-subscriber', subscribers.removeSubscriber);
 
 //routes.get('/boxes', queries.getBoxes);
 routes.get('/current-boxes', getCurrentBoxes);

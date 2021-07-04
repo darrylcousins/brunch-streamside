@@ -20,8 +20,7 @@ import FieldWrapper from "./field-wrapper";
  * @param {string} props.valid Is the current selection valid
  * @yields {Element} DOM component to render a textarea field
  */
-function* TextAreaField(props) {
-  const { label, id, value, valid, size } = props;
+function* TextAreaField({ label, id, value, valid, size, disabled, hideLabel, ...props}) {
 
   /**
    * Event handler when {@link
@@ -47,13 +46,15 @@ function* TextAreaField(props) {
 
   this.addEventListener("form.data.collect", collectAndSendData);
 
-  while (true) {
+  for ({ label, id, value, valid, size, disabled, hideLabel} of this) {
     yield (
-      <FieldWrapper label={label} size={size} id={id}>
+      <FieldWrapper label={label} size={size} id={id} hideLabel={hideLabel}>
         <textarea
           class={`mr1 pa2 ba bg-transparent hover-bg-near-white w-100 input-reset br2 ${
             !valid ? "invalid" : ""
           }`}
+          disabled={disabled}
+          id={id}
           {...props}
         >
           {value || ""}

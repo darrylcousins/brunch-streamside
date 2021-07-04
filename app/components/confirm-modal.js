@@ -3,14 +3,11 @@
  * Creates element to render a modal display in {@link
  * module:app/components/order-detail~OrderDetail|OrderDetail}
  *
- * @module app/components/order-modal
- * @exports OrderModal
+ * @module app/components/box-rules
+ * @exports BoxRulesModal
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement, Fragment, Portal} from "@bikeshaving/crank/cjs";
-import { CloseIcon } from "../lib/icon";
-import OrderDetail from "./order-detail";
-import Button from "../lib/button";
 
 /**
  * Display a modal containing {@link
@@ -21,13 +18,24 @@ import Button from "../lib/button";
  * @param {object} props Property object
  * @param {object} props.order The order to be displayed
  */
-function* OrderModal({ order }) {
+function* ConfirmModal({ }) {
+
   /**
-   * Hold visibility state.
+   * Hold visibility state of this modal
    *
    * @member {boolean} visible
    */
   let visible = false;
+
+  /**
+   * Open the modal
+   *
+   * @function openModal
+   */
+  const openModal = () => {
+    visible = true;
+    this.refresh();
+  };
 
   /**
    * Close the modal
@@ -39,35 +47,17 @@ function* OrderModal({ order }) {
     this.refresh();
   };
 
-  /**
-   * Hide the modal
-   *
-   * @function hideModal
-   * @param {object} ev Event emitted
-   * @listens window.click
-   * @listens window.keyup
-   */
-  const hideModal = async (ev) => {
-    if (ev.target && ev.target.tagName === "BUTTON") {
-      visible = !visible;
-      this.refresh();
-    }
-    if (ev.key && ev.key === "Escape") {
-      closeModal();
-      this.refresh();
-    }
-  };
-
-  this.addEventListener("click", hideModal);
-
-  this.addEventListener("keyup", hideModal);
-
-  const main = document.getElementById("modal-window");
+  const main = document.getElementById("front-modal-window");
 
   while (true)
     yield (
       <Fragment>
-        <Button type="primary">Show details</Button>
+        {loading && <BarLoader />}
+        <div onclick={openModal}>
+          <IconButton>
+            <span style="width: 250px" class="db tl link f5 white pv1 pl3 pr2">Delete box rule</span>
+          </IconButton>
+        </div>
         {visible && (
           <Portal root={main}>
             <div
@@ -79,20 +69,26 @@ function* OrderModal({ order }) {
                   class="bn bg-transparent outline-0 mid-gray dim o-70 absolute top-1 right-1 pointer"
                   name="close"
                   onclick={closeModal}
-                  title="Close info"
+                  title="Close rules"
                   type="button"
                 >
                   <CloseIcon />
-                  <span class="dn">Close add modal</span>
+                  <span class="dn">Close modal</span>
                 </button>
-                <OrderDetail order={order} />
                 <div class="w-100 tr">
                   <Button
+                    type="primary"
+                    title="Confirm"
+                    onclick={() => console.log("confirm")}
+                  >
+                    Confirm
+                  </Button>
+                  <Button
                     type="secondary"
-                    title="Close window"
+                    title="Cancel"
                     onclick={closeModal}
                   >
-                    Close
+                    Cancel
                   </Button>
                 </div>
               </div>
@@ -103,4 +99,4 @@ function* OrderModal({ order }) {
     );
 }
 
-export default OrderModal;
+export default ConfirmModal;

@@ -131,7 +131,7 @@ function* CheckboxMultiple(props) {
 
   while (true) {
     yield (
-      <FieldWrapper label={label} size={size} id={id}>
+      <FieldWrapper label={label} size={size} id={id} hideLabel={props.hideLabel}>
         <div class="mt2">
           <div class="flex items-center mb1 dark-gray">
             <button

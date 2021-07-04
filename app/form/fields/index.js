@@ -37,10 +37,10 @@ import { hasOwnProp } from "../../helpers";
  * @param {string} props.options.datatype The datatype of the returned values `string|integer|boolean`
  * @returns {Element} The field DOM component to be rendered
  */
-function Field(props) {
-  const { index, label, options, data, formElements } = props;
-  const { type, size, required, datalist, datatype } = options;
+function Field({ index, label, hideLabel, options, data, formElements, ...props}) {
+  let { type, size, required, datalist, datatype, ...fieldOptions } = options;
   let { id } = options;
+  fieldOptions.hideLabel = hideLabel;
 
   if (typeof id === "undefined") {
     id = label.toLowerCase().replace(/ /g, "-");
@@ -135,6 +135,7 @@ function Field(props) {
         onfocus={onFocus} // addEventListener???
         onblur={onBlur}
         datatype={datatype}
+        {...fieldOptions}
       />
     );
   }
@@ -153,6 +154,7 @@ function Field(props) {
         onblur={onBlur}
         datatype={datatype}
         type={type}
+        {...fieldOptions}
       />
     );
   }
@@ -172,8 +174,7 @@ function Field(props) {
         onblur={onBlur}
         datatype={datatype}
         type={type}
-        min={min}
-        max={max}
+        {...fieldOptions}
       />
     );
   }
@@ -189,6 +190,7 @@ function Field(props) {
         required={required}
         valid={valid}
         datatype={datatype}
+        {...fieldOptions}
       />
     );
   }
@@ -208,6 +210,7 @@ function Field(props) {
         onblur={onBlur}
         datalist={datalist}
         datatype={datatype}
+        {...fieldOptions}
       />
     );
   }
@@ -227,6 +230,7 @@ function Field(props) {
         onblur={onBlur}
         datalist={datalist}
         datatype={datatype}
+        {...fieldOptions}
       />
     );
   }
@@ -246,6 +250,7 @@ function Field(props) {
         onblur={onBlur}
         datalist={datalist}
         datatype={datatype}
+        {...fieldOptions}
       />
     );
   }

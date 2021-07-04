@@ -129,3 +129,23 @@ export const animateFadeForAction = (id, action) => {
     );
   });
 };
+
+/**
+ * Animate a fade
+ *
+ * @function animateFade
+ */
+export const animateFade = (id, opacity) => {
+  let target;
+  if (typeof id === "string") {
+    target = document.getElementById(id);
+  } else {
+    target = id;
+  }
+  const animate = target.animate(
+    {
+      opacity,
+    },
+    animationOptions
+  );
+};

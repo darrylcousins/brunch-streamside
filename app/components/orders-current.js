@@ -266,13 +266,13 @@ function* CurrentOrders() {
    *
    * @function reloadOrders
    * @param {object} ev The event
-   * @listens orders.reload
+   * @listens listing.reload
    */
   const reloadOrders = (ev) => {
     getOrders();
   };
 
-  this.addEventListener("orders.reload", reloadOrders);
+  this.addEventListener("listing.reload", reloadOrders);
 
   /**
    * Clear selected items

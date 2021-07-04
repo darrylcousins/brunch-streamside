@@ -17,6 +17,7 @@ import { Fetch } from "../lib/fetch";
  * @returns {object} The form fields keyed by field title string and error (null if no error)
  */
 const getOrderFields = async (delivered) => {
+
   const { error, json } = await Fetch("api/current-box-dates")
     .then(result => result)
     .catch(e => ({

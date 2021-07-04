@@ -22,8 +22,8 @@ import Field from "./fields";
  * @param {object} props.fields The fields to be displayed - described by objects
  * @param {string} props.title The form title
  */
-function* Form(props) {
-  const { id, data, fields, title } = props;
+function* Form({ id, data, fields, title, hideLabel }) {
+  //const { id, data, fields, title, hideLabel } = props;
 
   /**
    * Holds user entered data to re-render after validation failure.
@@ -133,7 +133,7 @@ function* Form(props) {
 
   this.addEventListener(`${id}.validate`, formValidate);
 
-  while (true)
+  for ({ id, data, fields, title, hideLabel } of this) {
     yield (
       <form id={id}>
         {formError && (
@@ -145,6 +145,7 @@ function* Form(props) {
             <Fragment>
               <Field
                 label={key}
+                hideLabel={hideLabel}
                 options={fields[key]}
                 data={data}
                 index={idx}
@@ -155,6 +156,7 @@ function* Form(props) {
         </fieldset>
       </form>
     );
+  };
 }
 
 export default Form;

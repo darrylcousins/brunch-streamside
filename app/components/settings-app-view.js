@@ -108,10 +108,14 @@ function *AppView({settings}) {
             <div id="container-box" class="mw6 center ba b--black80 ma1 pa2 br2">
               <div id="dateSelector">
                 <div class="notice pointer"
+                    style={{
+                      "color": getSetting("Colour", "notice-fg"),
+                      "background-color": getSetting("Colour", "notice-bg"),
+                    }}
                 >
                   <p
-                    data-settings-types={`["Translation", "Colour"]`}
-                    data-settings-keys={`["notice-choose-date", "notice-bg"]`}
+                    data-settings-types={`["Translation", "Colour", "Colour"]`}
+                    data-settings-keys={`["notice-choose-date", "notice-bg", "notice-fg"]`}
                     onmouseover={mouseOverSetting}
                     onmouseout={mouseOutSetting}
                     title="Click to edit"
@@ -134,10 +138,28 @@ function *AppView({settings}) {
                   </div>
                 </div>
                 <div class="notice pointer"
+                      style={{
+                        "color": getSetting("Colour", "warn-fg"),
+                        "background-color": getSetting("Colour", "warn-bg"),
+                      }}
+                    data-settings-types={`["Colour", "Colour"]`}
+                    data-settings-keys={`["warn-bg", "warn-fg"]`}
+                    onmouseover={mouseOverSetting}
+                    onmouseout={mouseOutSetting}
+                    title="Click to edit"
+                  >
+                    Box or weekday specific rules.
+                  <code class="red ph1 br2">boxes > ☰ > rules</code>
+                </div>
+                <div class="notice pointer"
+                      style={{
+                        "color": getSetting("Colour", "notice-fg"),
+                        "background-color": getSetting("Colour", "notice-bg"),
+                      }}
                 >
                   <p
-                    data-settings-types={`["Translation", "Colour"]`}
-                    data-settings-keys={`["notice-no-boxes", "notice-bg"]`}
+                    data-settings-types={`["Translation", "Colour", "Colour"]`}
+                    data-settings-keys={`["notice-no-boxes", "notice-bg", "notice-fg"]`}
                     onmouseover={mouseOverSetting}
                     onmouseout={mouseOutSetting}
                     title="Click to edit"
@@ -234,11 +256,16 @@ function *AppView({settings}) {
                     >
                       {getSetting("Translation", "substitute-item")}
                     </div>
-                    <div class="notice mt2">
+                    <div class="notice mt2"
+                          style={{
+                            "color": getSetting("Colour", "notice-fg"),
+                            "background-color": getSetting("Colour", "notice-bg"),
+                          }}
+                    >
                       <p
                         class="pointer"
-                        data-settings-types={`["Translation"]`}
-                        data-settings-keys={`["offer-custom-box"]`}
+                        data-settings-types={`["Translation", "Colour", "Colour"]`}
+                        data-settings-keys={`["offer-custom-box", "notice-bg", "notice-fg"]`}
                         onmouseover={mouseOverSetting}
                         onmouseout={mouseOutSetting}
                         title="Click to edit"
@@ -368,10 +395,15 @@ function *AppView({settings}) {
               </div>
               <div class="button-wrapper"
                    id="add-button-wrapper">
-                <div class="notice">
+                <div class="notice"
+                    style={{
+                      "color": getSetting("Colour", "notice-fg"),
+                      "background-color": getSetting("Colour", "notice-bg"),
+                    }}
+                >
                   <p class="pointer"
-                    data-settings-types={`["Translation"]`}
-                    data-settings-keys={`["existing-box-warn"]`}
+                    data-settings-types={`["Translation", "Colour", "Colour"]`}
+                    data-settings-keys={`["existing-box-warn", "notice-bg", "notice-fg"]`}
                     onmouseover={mouseOverSetting}
                     onmouseout={mouseOutSetting}
                     title="Click to edit"
@@ -412,6 +444,7 @@ function *AppView({settings}) {
                 <div class="relative">
                   <div class="popup-container relative"
                       style={{
+                        "color": getSetting("Colour", "warn-fg"),
                         "background-color": getSetting("Colour", "warn-bg"),
                         "opacity": 1,
                         "margin-bottom": "1em",
@@ -425,8 +458,8 @@ function *AppView({settings}) {
                     </button>
                     <div id="popup-inner-5571286696102">
                       <p class="pointer"
-                        data-settings-types={`["Translation", "Colour"]`}
-                        data-settings-keys={`["existing-box-confirm", "warn-bg"]`}
+                        data-settings-types={`["Translation", "Colour", "Colour"]`}
+                        data-settings-keys={`["existing-box-confirm", "warn-bg", "warn-fg"]`}
                         onmouseover={mouseOverSetting}
                         onmouseout={mouseOutSetting}
                         title="Click to edit"

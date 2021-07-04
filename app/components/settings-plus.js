@@ -85,7 +85,7 @@ function *SettingsPlus() {
    *
    * @function reloadBoxes
    * @param {object} ev The event
-   * @listens boxes.reload
+   * @listens listing.reload
    */
   const reloadSettings = (ev) => {
     getSettings();

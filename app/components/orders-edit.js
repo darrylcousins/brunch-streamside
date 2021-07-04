@@ -149,7 +149,7 @@ function* EditOrders({selectedOrders}) {
           this.refresh();
           setTimeout(() => {
             this.dispatchEvent(
-              new CustomEvent("orders.reload", {
+              new CustomEvent("listing.reload", {
                 bubbles: true,
               })
             );

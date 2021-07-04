@@ -7,7 +7,6 @@
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { createElement } from "@bikeshaving/crank/cjs";
-import CollapseWrapper from "./collapse-animator";
 import AddProductToBoxModal from "./product-add";
 import RemoveBoxModal from "./box-remove";
 import Products from "./box-products";
@@ -74,7 +73,7 @@ function* Box({ box, index }) {
       }));
     if (!error) {
       this.dispatchEvent(
-        new CustomEvent("boxes.reload", {
+        new CustomEvent("listing.reload", {
           bubbles: true,
         })
       );

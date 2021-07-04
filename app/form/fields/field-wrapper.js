@@ -20,11 +20,11 @@ import { createElement } from "@bikeshaving/crank/cjs";
  * @returns {Element} A wrapped label and child component
  */
 function FieldWrapper(props) {
-  const { children, label, size, id } = props;
+  const { children, label, hideLabel, size, id } = props;
   return (
     <div class={`fl w-100 w-${size}-ns`}>
       <div class="tl ph2 mt1 ml0">
-        <label class="fw6 lh-copy f6" htmlFor={id} for={id}>
+        <label class={`fw6 lh-copy f6${hideLabel && " dn"}`} htmlFor={id} for={id}>
           {label}
         </label>
         {children}

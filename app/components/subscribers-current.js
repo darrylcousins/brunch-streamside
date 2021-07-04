@@ -93,7 +93,7 @@ function *Subscribers() {
    *
    * @function reloadBoxes
    * @param {object} ev The event
-   * @listens boxes.reload
+   * @listens listing.reload
    */
   const reloadSubscribers = (ev) => {
     getSubscribers();
@@ -114,14 +114,37 @@ function *Subscribers() {
           </div>
           {Object.keys(fetchSubscribers).length > 0 && (
             <table class="f6 mt2 w-100 center table-striped" cellSpacing="0">
+              <thead>
+                <tr>
+                  {["ShopifyID", "Name", "Box", "Delivery Dates", "Likes", "Dislikes", ""].map(el => (
+                    <th class="fw6 bb b--black-20 tl pv3 pr3 bg-white sticky">
+                      {el}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
               <tbody>
                 {fetchSubscribers.map(el => (
                   <tr>
-                    <td data-title="ID" class="w-20-l pv3 pr3 bb b--black-20 v-top">
-                      {el._id}
+                    <td data-title="ID" class="w-10-l pv3 pr3 bb b--black-20 v-top">
+                      {el.shopify_customer_id} <span class="dn">{el._id}</span>
+                    </td>
+                    <td data-title="Name" class="w-10-l pv3 pr3 bb b--black-20 v-top">
+                      {el.name}
                     </td>
                     <td data-title="Name" class="w-20-l pv3 pr3 bb b--black-20 v-top">
-                      {el.name}
+                      {el.box}
+                    </td>
+                    <td data-title="Delivery Dates" class="w-20-l pv3 pr3 bb b--black-20 v-top">
+                      {el.delivery_dates.map(el => (
+                        <span class="db">{el}</span>
+                      ))}
+                    </td>
+                    <td data-title="Likes" class="w-20-l pv3 pr3 bb b--black-20 v-top">
+                      {el.likes}
+                    </td>
+                    <td data-title="Dislikes" class="w-20-l pv3 pr3 bb b--black-20 v-top">
+                      {el.dislikes}
                     </td>
                     <td data-title="Actions" class="w-10-l pv3 pr3 bb b--black-20 v-top">
                       <EditSubscriberModal subscriber={el} />

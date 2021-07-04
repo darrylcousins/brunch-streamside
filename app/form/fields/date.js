@@ -51,7 +51,7 @@ function* DateField(props) {
 
   while (true) {
     yield (
-      <FieldWrapper label={label} size={size} id={id}>
+      <FieldWrapper label={label} size={size} id={id} hideLabel={props.hideLabel}>
         <input
           class={`mr1 pa2 ba bg-transparent hover-bg-near-white w-100 input-reset br2 ${
             !valid ? "invalid" : ""

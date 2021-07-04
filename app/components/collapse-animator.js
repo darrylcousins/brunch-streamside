@@ -49,12 +49,11 @@ function CollapseWrapper(Component) {
    */
   const transitionElementHeight = (element) => {
     if (!element) return;
-    let calculatedHeight = 1;
+    let calculatedHeight = 5;
     // simply using el.scrollHeight can give some odd results when element is shrinking
     element.childNodes.forEach(el => {
       calculatedHeight += el.scrollHeight;
     });
-    const elementHeight = element.scrollHeight;
     element.style.height = calculatedHeight + "px";
   }
   
@@ -72,14 +71,12 @@ function CollapseWrapper(Component) {
           try {
             clearInterval(wait);
           } catch(e) {
-            console.log(e);
           };
           resolve();
         } else if (new Date() - timeWas > timeoutMs) { // Timeout
           try {
             clearInterval(wait);
           } catch(e) {
-            console.log(e);
           };
           reject();
         }
@@ -97,6 +94,15 @@ function CollapseWrapper(Component) {
   return async function* ({id, collapsed, ...props}) {
 
     //console.log(props);
+    const fixCollapse = () => {
+      const el= document.querySelector(`#${id}`);
+      transitionElementHeight(el);
+    };
+
+    window.addEventListener('resize', fixCollapse);
+
+    // send this event to resize wrapper (e.g. box-rules-form.js)
+    this.addEventListener('collapse.wrapper.resize', fixCollapse);
 
     for await (const {id, collapsed: newCollapsed, ...props} of this) {
 
@@ -112,13 +118,14 @@ function CollapseWrapper(Component) {
         </div>
       );
 
-      // wait until the element has rendered
+      // wait until the element has rendered, note that this fails if component
+      // is async generator and I don't know how to fix it
       await sleepUntil(() => document.querySelector(`#${el.id}`), 1000);
 
       const element = document.querySelector(`#${el.id}`);
       if (element) {
-        if (id === "included-6163982876822") {
-          //console.log(id, "old", collapsed, "new", newCollapsed, "start", startCollapsed);
+        if (id === "box-settings-form") {
+          console.log(id, "old", collapsed, "new", newCollapsed, "start", startCollapsed);
         }
         if (newCollapsed) {
           collapseElement(element);

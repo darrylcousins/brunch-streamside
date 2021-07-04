@@ -11,6 +11,47 @@ const isFruit = (str) => Boolean(str.match(/apple|pear/gi));
 exports.isBread = isBread;
 exports.isFruit = isFruit;
 
+exports.sortObjectByKeys = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
+
+exports.sortObjectByKey = (o, key) => {
+  o.sort((a, b) => {
+    let nameA = a[key];
+    let nameB = b[key];
+    if (!Number.isInteger) {
+      nameA = a[key].toUpperCase(); // ignore upper and lowercase
+      nameB = b[key].toUpperCase(); // ignore upper and lowercase
+    }
+    if (nameA < nameB) return -1;
+    if (nameA > nameB) return 1;
+    return 0;
+  });
+  return o;
+};
+
+exports.conformSKU = (str) => {
+  // mixed up titles with Big Veg on Shopify and Big Vege elsewhere
+  if (str && str.startsWith('Big')) return 'Big Vege';
+  return str;
+};
+
+exports.getQueryFilters = (req, query) => {
+  // get query parameters
+  let filter_field = null;
+  let filter_value = null;
+  if (Object.keys(req.query).length) {
+    if (Object.hasOwnProperty.call(req.query, 'filter_field')) {
+      filter_field = req.query.filter_field;
+    };
+    if (Object.hasOwnProperty.call(req.query, 'filter_value')) {
+      const testDate = new Date(parseInt(req.query.filter_value));
+      filter_value = (testDate === NaN) ? req.query.filter_value : testDate.toDateString();
+    };
+  };
+  if (filter_field && filter_value) {
+    query[filter_field] = filter_value;
+  };
+  return query;
+};
 
 exports.makeShopQuery = async ({shop, path, limit, query, fields}) => {
   // shop one of 'SO', 'SD'
@@ -34,41 +75,6 @@ exports.makeShopQuery = async ({shop, path, limit, query, fields}) => {
   })
     .then(response => response.json())
 };
-
-exports.getPickingList = (data) => {
-  const picking = Object();
-  data.forEach(box => {
-    box.including.forEach(el => {
-      const product = el.shopify_title.replace(/^- ?/, '');
-      if (!picking.hasOwnProperty(product)) {
-        picking[product] = Object();
-      }
-      if (!picking[product].hasOwnProperty('standard')) {
-        picking[product].standard = 0;
-      }
-      if (!picking[product].hasOwnProperty('total')) {
-        picking[product].total = 0;
-      }
-      picking[product].standard += box.order_count;
-      picking[product].total += box.order_count;
-    });
-    Object.keys(box.extras).forEach(key => {
-      const product = key.replace(/^- ?/, '');
-      if (!picking.hasOwnProperty(product)) {
-        picking[product] = Object();
-      }
-      if (!picking[product].hasOwnProperty('extras')) {
-        picking[product].extras = 0;
-      }
-      if (!picking[product].hasOwnProperty('total')) {
-        picking[product].total = 0;
-      }
-      picking[product].extras += box.extras[key];
-      picking[product].total += box.extras[key];
-    });
-  });
-  return picking;
-}
 
 exports.getBoxPromises = (boxes, query, db) => {
   // return array of Promises to be resolved by Promises.all

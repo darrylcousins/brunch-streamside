@@ -232,16 +232,16 @@ function* BoxCoreModal() {
    *
    * @function reloadBoxes
    * @param {object} ev The event
-   * @listens boxes.reload
+   * @listens listing.reload
    */
   const reloadBox = (ev) => {
     getCoreBox();
   };
 
-  this.addEventListener("boxes.reload", reloadBox);
+  this.addEventListener("listing.reload", reloadBox);
 
   // use as root for the element
-  const main = document.getElementById("main");
+  const main = document.getElementById("modal-window");
 
   getCoreBox();
 

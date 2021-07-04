@@ -47,7 +47,7 @@ function *Products ({box, products, type, allproducts}) {
       //this.refresh(); // does not change the list on the next yield
       // call on the parent to refresh, which turns out to be a simple and elegant solution that 'just works'
       this.dispatchEvent(
-        new CustomEvent("boxes.reload", {
+        new CustomEvent("listing.reload", {
           bubbles: true,
         })
       );

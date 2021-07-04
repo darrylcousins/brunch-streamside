@@ -104,6 +104,7 @@ function *Settings() {
   };
 
   window.addEventListener("scroll", onScroll);
+
   /**
    * Fetch settings data on mounting of component
    *
@@ -164,7 +165,7 @@ function *Settings() {
    *
    * @function reloadBoxes
    * @param {object} ev The event
-   * @listens boxes.reload
+   * @listens listing.reload
    */
   const reloadSettings = (ev) => {
     getSettings();

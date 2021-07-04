@@ -27,24 +27,11 @@ function* Boxes({ boxes }) {
         <table class="f6 mt2 w-100 center" cellSpacing="0">
           <thead>
             <tr>
-              <th class="fw6 bb b--black-20 tl pv3 pr3 bg-white sticky">
-                Delivery
-              </th>
-              <th class="fw6 bb b--black-20 tl pv3 pr3 bg-white sticky">
-                Title
-              </th>
-              <th class="fw6 bb b--black-20 tl pv3 pr3 bg-white sticky">
-                Including
-              </th>
-              <th class="fw6 bb b--black-20 tl pv3 pr3 bg-white sticky">
-                Extras
-              </th>
-              <th class="fw6 bb b--black-20 tl pv3 pr3 bg-white sticky">
-                Price
-              </th>
-              <th class="fw6 bb b--black-20 tl pv3 pr3 bg-white sticky">
-                &nbsp;
-              </th>
+              {["Delivery", "Title", "Including", "Extras", "Price", ""].map(el => (
+                <th class="fw6 bb b--black-20 tl pv3 pr3 bg-white sticky">
+                  {el}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody class="lh-copy" id="boxes-table">

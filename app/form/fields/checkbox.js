@@ -77,7 +77,7 @@ function* CheckboxField(props) {
 
   while (true) {
     yield (
-      <FieldWrapper label={label} size={size} id={id}>
+      <FieldWrapper label={label} size={size} id={id} hideLabel={props.hideLabel}>
         <input
           class="mr1 pa2 ba bg-transparent hover-bg-near-white br2 db"
           type="checkbox"

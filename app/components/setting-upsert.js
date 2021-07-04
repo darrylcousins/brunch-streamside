@@ -55,7 +55,6 @@ function* UpsertSettingModal(props) {
     },
     Note: {
       type: "textarea",
-      size: "100",
       size: "two-thirds",
       datatype: "string",
       required: true,

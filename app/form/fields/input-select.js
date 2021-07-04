@@ -24,8 +24,7 @@ import FieldWrapper from "./field-wrapper";
  * using datalist attribute
  *
  */
-function* InputSelectField(props) {
-  const { label, id, size, valid, datalist } = props;
+function* InputSelectField({ label, id, value, size, valid, datatype, datalist, disabled, hideLabel, ...props}) {
 
   /**
    * Event handler when {@link
@@ -51,13 +50,33 @@ function* InputSelectField(props) {
 
   this.addEventListener("form.data.collect", collectAndSendData);
 
-  while (true) {
+  /**
+   * Event handler on focus, remove value to allow dropdown
+   *
+   * @function onFocus
+   * @param {object} ev The event
+   * @listens focus
+   */
+  const onClick = (ev) => {
+    if (!disabled) {
+      const el = document.querySelector(`input[name='${props.name}']`);
+      el.value = "";
+      //el.select();
+    }
+  };
+
+  this.addEventListener("click", onClick);
+
+  for ({ label, id, value, size, valid, datalist, datatype, disabled, hideLabel } of this) {
     yield (
-      <FieldWrapper label={label} size={size} id={id}>
+      <FieldWrapper label={label} size={size} id={id} hideLabel={hideLabel}>
         <input
           class={`mr1 pa2 ba bg-transparent hover-bg-near-white w-90 input-reset br2 ${
             !valid ? "invalid" : ""
           }`}
+          disabled={disabled}
+          value={value}
+          id={id}
           {...props}
           list={`${id}s`}
         />

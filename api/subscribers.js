@@ -80,3 +80,29 @@ exports.removeSubscriber = async function (req, res, next) {
   };
 };
 
+/*
+ * Get the subscribers with a delivery date matching date
+ */
+exports.getCurrentSubscribersByDate = async function (req, res, next) {
+
+  const deliveryDay = getNZDeliveryDay(req.params.timestamp);
+  const collection = req.app.locals.subscriberCollection;
+  const response = Object();
+
+  let query = getQueryFilters(req, {
+    delivered: deliveryDay
+  });
+
+  try {
+    collection.find(query).toArray((err, result) => {
+      if (err) throw err;
+
+      response.orders = sortObjectByKey(result, 'sku');
+      response.headers = headersPartial;
+      res.status(200).json(result);
+    });
+  } catch(e) {
+    res.status(400).json({ error: e.toString() });
+  };
+};
+

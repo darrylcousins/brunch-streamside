@@ -10,6 +10,7 @@
 import { createElement, Fragment } from "@bikeshaving/crank/cjs";
 import AddBoxModal from "./box-add";
 import BoxCoreModal from "./box-core";
+import BoxRulesModal from "./box-rules";
 import DuplicateBoxModal from "./boxes-duplicate";
 import RemoveBoxesModal from "./boxes-remove";
 import BarLoader from "../lib/bar-loader";
@@ -158,13 +159,14 @@ function* CurrentBoxes() {
    *
    * @function reloadBoxes
    * @param {object} ev The event
-   * @listens boxes.reload
+   * @listens listing.reload
    */
   const reloadBoxes = (ev) => {
+    console.log('still have the date', selectedDate);
     getDates();
   };
 
-  this.addEventListener("boxes.reload", reloadBoxes);
+  this.addEventListener("listing.reload", reloadBoxes);
 
   /*
    * Submit form to toggle boxes on/off active
@@ -283,7 +285,7 @@ function* CurrentBoxes() {
    * @member sideMenu
    * @type {array}
    */
-  const sideMenu = [<BoxCoreModal />];
+  const sideMenu = [<BoxCoreModal />, <BoxRulesModal />];
 
   for (const _ of this) { // eslint-disable-line no-unused-vars
 
@@ -311,7 +313,7 @@ function* CurrentBoxes() {
                 { selectedDate ? selectedDate : "Select delivery date" }&nbsp;&nbsp;&nbsp;&#9662;
               </SelectMenu>
             </div>
-            {selectedDate && (
+            {selectedDate ? (
               <Fragment>
                 <div class="w-100 w-two-thirds-l fl-l tr v-mid">
                   {active && (
@@ -329,6 +331,10 @@ function* CurrentBoxes() {
                   <RemoveBoxesModal delivered={selectedDate} />
                 </div>
               </Fragment>
+            ) : (
+              <div class="w-100 w-two-thirds-l fl-l tr v-mid">
+                <AddBoxModal delivered={null} />
+              </div>
             )}
           </div>
           {fetchBoxes.length > 0 && (

@@ -39,7 +39,7 @@ function FormModalWrapper(Component, options) {
    * @param {object} props Property object
    */
   return function* (props) {
-    const { id, title, src, ShowLink, color, saveMsg, successMsg } = options;
+    const { id, title, src, ShowLink, color, saveMsg, successMsg, portal } = options;
     const name = title.toLowerCase().replace(/ /g, "-");
     let visible = false;
     let loading = false;
@@ -139,7 +139,7 @@ function FormModalWrapper(Component, options) {
         data = form;
       }
 
-      console.log(data);
+      //console.log(data);
       /*
       console.warn('Posting saved successfully but disabled for development');
       closeModal();
@@ -156,7 +156,7 @@ function FormModalWrapper(Component, options) {
 
       PostFetch({ src, data, headers })
         .then((result) => {
-          console.log('Submit result:', JSON.stringify(result, null, 2));
+          //console.log('Submit result:', JSON.stringify(result, null, 2));
           const { formError, error, json } = result;
           if (error !== null) {
             fetchError = error;
@@ -177,28 +177,13 @@ function FormModalWrapper(Component, options) {
                   bubbles: true,
                 })
               );
-              this.dispatchEvent(
-                new CustomEvent("orders.reload", {
-                  bubbles: true,
-                })
-              );
-              this.dispatchEvent(
-                new CustomEvent("boxes.reload", {
-                  bubbles: true,
-                })
-              );
-              this.dispatchEvent(
-                new CustomEvent("todos.reload", {
-                  bubbles: true,
-                })
-              );
               success = false;
               closeModal();
             }, 1000);
           }
         })
         .catch((err) => {
-          console.err("ERROR:", err);
+          console.warn("ERROR:", err);
           fetchError = err;
           loading = false;
           this.refresh();
@@ -211,7 +196,7 @@ function FormModalWrapper(Component, options) {
 
     this.addEventListener("form.data.feed", (ev) => {
       if (!fieldIds.includes(ev.detail.id)) {
-        console.log(ev.detail.id, 'not stored in fieldIds??', fieldIds);
+        console.warn(ev.detail.id, 'not stored in fieldIds??', fieldIds);
       }
       fieldData.push(ev.detail);
       if (fieldData.length === fieldLength) {
@@ -227,14 +212,12 @@ function FormModalWrapper(Component, options) {
      */
     const getData = () => {
       const form = document.getElementById(id);
-      //console.log('collecting data');
       Array.from(form.elements).forEach((el) => {
         // XXX picks up checkbox-multiple - need to filter them out (el.id === el.name) didn't work
         if (el.tagName !== "FIELDSET" && el.tagName !== "BUTTON") {
-          //console.log(fieldIds, el.id);
+          console.log(fieldIds, el.id, el);
           if (!fieldIds.includes(el.id)) {
             fieldIds.push(el.id);
-            //console.log('dispatching collect, not listened to??');
             el.dispatchEvent(
               new CustomEvent("form.data.collect", {
                 bubbles: true,
@@ -305,7 +288,7 @@ function FormModalWrapper(Component, options) {
      */
     const getName = () => name;
 
-    const main = document.getElementById("main");
+    const main = document.getElementById(`${portal ? portal : "modal-window"}`);
 
     for (props of this) {
       yield (
@@ -319,7 +302,7 @@ function FormModalWrapper(Component, options) {
           {visible && (
             <Portal root={main}>
               <div
-                class="db absolute left-0 w-100 h-100 z-1 bg-black-90 pa4 mt4"
+                class="db absolute absolute--fill w-100 h-100 z-1 bg-black-90 pa4 mt4"
                 style={`top: ${Math.round(window.scrollY).toString()}px;`}
               >
                 <div class="bg-white pa4 br3 f6 mw8 relative center">

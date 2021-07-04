@@ -34,6 +34,7 @@ module.exports = function startServer(PORT, PATH, callback) {
   let boxCollection;
   let todoCollection;
   let settingCollection;
+  let subscriberCollection;
   const mongo_uri = 'mongodb://localhost';
 
   // assign the client from MongoClient
@@ -44,6 +45,7 @@ module.exports = function startServer(PORT, PATH, callback) {
       orderCollection = streamsideDB.collection('orders');
       todoCollection = streamsideDB.collection('todos');
       settingCollection = streamsideDB.collection('settings');
+      subscriberCollection = streamsideDB.collection('subscribers');
 
       if (process.env.SERVER === 'development') {
         const southbridgeDB = client.db('southbridge');
@@ -57,6 +59,7 @@ module.exports = function startServer(PORT, PATH, callback) {
       app.locals.boxCollection = boxCollection;
       app.locals.todoCollection = todoCollection;
       app.locals.settingCollection = settingCollection;
+      app.locals.subscriberCollection = subscriberCollection;
 
       dbClient = client;
 
@@ -114,7 +117,7 @@ module.exports = function startServer(PORT, PATH, callback) {
 
   const loadCrank = (req, res, next) => {
     //if (!req.user) return res.redirect('/login');
-    res.locals.header = (PORT === 3335) ? "Streamside Organics <span class='red pl1 b'>DEVELOPMENT SITE</span>" : null;
+    res.locals.header = (PORT === 3335) ? "Streamside Organics <span class='red pl1 b'>DEV</span>" : null;
     res.render('pages/index',
       (err, html) => {
         if (err) next(err);
@@ -126,6 +129,7 @@ module.exports = function startServer(PORT, PATH, callback) {
   app.get('/orders', loadCrank);
   app.get('/boxes', loadCrank);
   app.get('/settings', loadCrank);
+  app.get('/subscribers', loadCrank);
   app.get('/settings-plus', loadCrank); // generally unavailable to users
   app.get('/', loadCrank);
 

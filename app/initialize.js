@@ -18,6 +18,7 @@ import Home from "./route/home";
 import Orders from "./route/orders";
 import Boxes from "./route/boxes";
 import Settings from "./route/settings";
+import Subscribers from "./route/subscribers";
 import SettingsPlus from "./route/settings-plus";
 /*
 import Todos from "./route/todos";
@@ -35,6 +36,9 @@ crossroads.addRoute("/orders", () =>
 );
 crossroads.addRoute("/settings", () =>
   renderer.render(<Settings />, document.querySelector("#app"))
+);
+crossroads.addRoute("/subscribers", () =>
+  renderer.render(<Subscribers />, document.querySelector("#app"))
 );
 crossroads.addRoute("/settings-plus", () =>
   renderer.render(<SettingsPlus />, document.querySelector("#app"))

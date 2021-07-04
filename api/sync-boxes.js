@@ -70,18 +70,21 @@ const makeProductDoc = (el) => {
 const collectBoxes = async () => {
   // Collect current boxes and push into mongodb
   let boxDocuments = [];
+  let targetDelivered = "Thu Jul 08 2021";
   await pool
     .query(currentBoxes)
-    //.query(productAddOns, [271, 't'])
     .then(res => {
       res.rows.forEach(async (row) => {
         let boxDoc = row;
         let boxId = boxDoc.id;
+        let delivered = boxDoc.delivered.toDateString();
+        console.log(delivered);
+
+        if (delivered !== targetDelivered) return;
+
         delete boxDoc.id;
-        // figure out the unique doc identifier: timestamp in days + shopify_product_id
-        //boxDoc._id = parseInt(boxDoc.delivered.getTime()/(1000 * 60 * 60 * 24) + parseInt(boxDoc.shopify_product_id));
         boxDoc._id = new ObjectID();
-        boxDoc.delivered = boxDoc.delivered.toDateString();
+        boxDoc.delivered = delivered;
 
         boxDoc.shopify_product_id = parseInt(boxDoc.shopify_product_id, 10);
         boxDoc.shopify_variant_id = parseInt(boxDoc.shopify_variant_id, 10);

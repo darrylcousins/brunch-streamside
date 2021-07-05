@@ -13,7 +13,6 @@ const { sortObjectByKey } = require('./queries');
 const getCurrentBoxes = async function (req, res, next) {
   const collection = req.app.locals.boxCollection;
   const response = Object();
-  const now = new Date();
 
   /**
    * Get upcoming delivery dates to filter boxes by
@@ -25,7 +24,7 @@ const getCurrentBoxes = async function (req, res, next) {
         const final = Array();
         data.forEach(el => {
           const d = new Date(Date.parse(el));
-          if (d >= now) final.push(d);
+          final.push(d);
         });
         final.sort((d1, d2) => {
           if (d1 < d2) return -1;

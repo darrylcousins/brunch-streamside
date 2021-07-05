@@ -73,7 +73,7 @@ exports.getCurrentBoxDates = async function (req, res, next) {
       if (err) throw err;
       result.forEach(el => {
         const d = new Date(Date.parse(el));
-        //if (d >= now) response.push(d);
+        //if (d >= now) response.push(d); // no, just get them all
         response.push(d);
       });
       response.sort((d1, d2) => {

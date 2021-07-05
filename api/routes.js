@@ -62,7 +62,7 @@ routes.post('/edit-subscriber', subscribers.editSubscriber);
 routes.post('/remove-subscriber', subscribers.removeSubscriber);
 
 //routes.get('/boxes', queries.getBoxes);
-routes.get('/current-boxes', getCurrentBoxes);
+routes.get('/current-boxes', getCurrentBoxes); // no longer used??
 routes.get('/current-boxes-by-product/:product_id', getCurrentBoxesByProduct);
 routes.get('/current-boxes-for-box-product/:box_product_id', getCurrentBoxesForBoxProduct);
 routes.get('/box-by-date-and-product/:product_id/:timestamp', boxes.getBoxByDateAndProduct);

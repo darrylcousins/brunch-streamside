@@ -109,9 +109,12 @@ function *Subscribers() {
         {loading && <BarLoader />}
         <div class="mt3" id="subscribers-table">
           {fetchError && <Error msg={fetchError} />}
-          <div class="tr">
-            <AddSubscriberModal />
-          </div>
+          <h2 class="pt0 f5 f4-ns lh-title-ns ma0 fg-streamside-maroon" id="boxes-title">
+            Current Subscribers
+            <div class="tr">
+              <AddSubscriberModal />
+            </div>
+          </h2>
           {Object.keys(fetchSubscribers).length > 0 && (
             <table class="f6 mt2 w-100 center table-striped" cellSpacing="0">
               <thead>

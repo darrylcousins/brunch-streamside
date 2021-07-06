@@ -21,7 +21,6 @@ const webhookMiddleware = require('./webhooks/middleware');
 // make logger and env available globally
 global._logger = winston;
 global._env = process.env;
-console.log(process.env["SO_SHOP_NAME"])
 
 module.exports = function startServer(PORT, PATH, callback) {
   const app = express();
@@ -42,18 +41,12 @@ module.exports = function startServer(PORT, PATH, callback) {
   MongoClient
     .connect(mongo_uri, { useNewUrlParser: true, poolSize: 10, useUnifiedTopology: true })
     .then(client => {
-      const streamsideDB = client.db('streamside');
-      orderCollection = streamsideDB.collection('orders');
-      todoCollection = streamsideDB.collection('todos');
-      settingCollection = streamsideDB.collection('settings');
-      subscriberCollection = streamsideDB.collection('subscribers');
-
-      if (process.env.SERVER === 'development') {
-        const southbridgeDB = client.db('southbridge');
-        boxCollection = southbridgeDB.collection('boxes');
-      } else {
-        boxCollection = streamsideDB.collection('boxes');
-      };
+      const DB = client.db(process.env.DB_NAME);
+      orderCollection = DB.collection('orders');
+      todoCollection = DB.collection('todos');
+      settingCollection = DB.collection('settings');
+      subscriberCollection = DB.collection('subscribers');
+      boxCollection = DB.collection('boxes');
 
       // make collection available globally
       app.locals.orderCollection = orderCollection;

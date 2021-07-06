@@ -215,7 +215,6 @@ function FormModalWrapper(Component, options) {
       Array.from(form.elements).forEach((el) => {
         // XXX picks up checkbox-multiple - need to filter them out (el.id === el.name) didn't work
         if (el.tagName !== "FIELDSET" && el.tagName !== "BUTTON") {
-          console.log(fieldIds, el.id, el);
           if (!fieldIds.includes(el.id)) {
             fieldIds.push(el.id);
             el.dispatchEvent(

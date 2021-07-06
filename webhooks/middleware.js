@@ -12,7 +12,7 @@ module.exports = function (options) {
   return async function (req, res, next) {
     // Implement the middleware function based on the options object
 
-    const secret = process.env.SHOPIFY_WEBHOOK_KEY;
+    const secret = process.env.WEBHOOK_KEY;
     const hmac = req.get('X-Shopify-Hmac-SHA256');
 
     const hash = crypto

@@ -139,20 +139,6 @@ function *AppView({settings}) {
                 </div>
                 <div class="notice pointer"
                       style={{
-                        "color": getSetting("Colour", "warn-fg"),
-                        "background-color": getSetting("Colour", "warn-bg"),
-                      }}
-                    data-settings-types={`["Colour", "Colour"]`}
-                    data-settings-keys={`["warn-bg", "warn-fg"]`}
-                    onmouseover={mouseOverSetting}
-                    onmouseout={mouseOutSetting}
-                    title="Click to edit"
-                  >
-                    Box or weekday specific rules.
-                  <code class="red ph1 br2">boxes > ☰ > rules</code>
-                </div>
-                <div class="notice pointer"
-                      style={{
                         "color": getSetting("Colour", "notice-fg"),
                         "background-color": getSetting("Colour", "notice-bg"),
                       }}
@@ -164,6 +150,20 @@ function *AppView({settings}) {
                     onmouseout={mouseOutSetting}
                     title="Click to edit"
                     >{getSetting("Translation", "notice-no-boxes")}</p>
+                </div>
+                <div class="notice pointer"
+                      style={{
+                        "color": getSetting("Colour", "notice-fg"),
+                        "background-color": getSetting("Colour", "notice-bg"),
+                      }}
+                    data-settings-types={`["Colour", "Colour"]`}
+                    data-settings-keys={`["notice-bg", "notice-fg"]`}
+                    onmouseover={mouseOverSetting}
+                    onmouseout={mouseOutSetting}
+                    title="Click to edit"
+                  >
+                    <p>Box or weekday specific rules. Edit these in boxes: </p>
+                  <code class="red ph1 br2">Boxes > ☰ > Rules</code>
                 </div>
               </div>
               <div id="defaultbox-5571286794406"

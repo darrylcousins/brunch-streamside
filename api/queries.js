@@ -5,7 +5,6 @@ const uri = 'mongodb://localhost';
 const mongoClient = new MongoClient(uri, { useUnifiedTopology: true });
 const xlsx = require('json-as-xlsx');
 const Excel = require('exceljs');
-const syncBoxes = require('./sync-boxes');
 const {
   matchNumberedString,
   getNZDeliveryDay,

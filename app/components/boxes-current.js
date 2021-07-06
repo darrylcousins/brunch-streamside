@@ -162,7 +162,6 @@ function* CurrentBoxes() {
    * @listens listing.reload
    */
   const reloadBoxes = (ev) => {
-    console.log('still have the date', selectedDate);
     getDates();
   };
 
@@ -202,6 +201,7 @@ function* CurrentBoxes() {
     let target = ev.target;
     if (["PATH", "SVG"].includes(target.tagName.toUpperCase())) {
       target = target.closest("button");
+      if (!target) return;
     };
     const name = target.tagName.toUpperCase();
     if (name === "BUTTON") {

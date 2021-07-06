@@ -1,8 +1,6 @@
 'use strict';
 
 const routes = require('express').Router();
-const syncOrders = require('./sync-orders');
-const syncBoxes = require('./sync-boxes');
 const tagOrders = require('./tag-orders');
 
 const getCurrentBoxes = require('./current-boxes');
@@ -84,8 +82,6 @@ routes.post('/duplicate-boxes', products.duplicateBoxes);
 routes.post('/remove-boxes', products.removeBoxes);
 routes.post('/toggle-box-active', products.toggleBoxActive); // accepts box_id or delivered
 
-routes.get('/sync-boxes', syncBoxes);
-routes.get('/sync-orders', syncOrders);
 routes.get('/tag-orders', tagOrders);
 
 module.exports = routes;

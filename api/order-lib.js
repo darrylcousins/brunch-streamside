@@ -71,7 +71,7 @@ const updateOrderTag = async (id, tags) => {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'X-Shopify-Access-Token': process.env.SHOPIFY_API_PASSWORD 
+      'X-Shopify-Access-Token': process.env.API_PASSWORD 
     },
     body: JSON.stringify({ order: { id, tags }}),
   })

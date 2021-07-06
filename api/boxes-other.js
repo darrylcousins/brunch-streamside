@@ -7,9 +7,6 @@
 
 const { ObjectID } = require('mongodb');
 const {
-  makeShopQuery,
-} = require('./lib');
-const {
   getNZDeliveryDay,
 } = require('./order-lib');
 

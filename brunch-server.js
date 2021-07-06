@@ -21,6 +21,7 @@ const webhookMiddleware = require('./webhooks/middleware');
 // make logger and env available globally
 global._logger = winston;
 global._env = process.env;
+console.log(process.env["SO_SHOP_NAME"])
 
 module.exports = function startServer(PORT, PATH, callback) {
   const app = express();

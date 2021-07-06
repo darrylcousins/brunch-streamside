@@ -193,7 +193,6 @@ exports.addBox = async function (req, res, next) {
   };
 
   // first collect the product details from shopify
-  const shop = "SD";
   const path = "products.json";
   const fields = ["id", "title", "handle", "sku", "variants"];
   const limit = 3;
@@ -217,7 +216,7 @@ exports.addBox = async function (req, res, next) {
     }
   };
 
-  const productDoc = await makeShopQuery({shop, path, limit, query, fields})
+  const productDoc = await makeShopQuery({path, limit, query, fields})
     .then(async ({products}) => {
       if (products.length === 0) {
         _logger.info('no product found on shop');
@@ -261,7 +260,6 @@ exports.addProductToBox = async function (req, res, next) {
   const {box_id, shopify_product_id, product_type} = req.body;
 
   // first collect the product details from shopify
-  const shop = "SD";
   const path = "products.json";
   const fields = ["id", "title", "handle", "variants"];
   const limit = 3;
@@ -280,7 +278,7 @@ exports.addProductToBox = async function (req, res, next) {
     }
   };
 
-  const productDoc = await makeShopQuery({shop, path, limit, query, fields})
+  const productDoc = await makeShopQuery({path, limit, query, fields})
     .then(async ({products}) => {
       if (products.length === 0) {
         _logger.info('no product found on shop');
@@ -306,9 +304,9 @@ exports.addProductToBox = async function (req, res, next) {
       {$push: pushCmd}
       , async (e, result) => {
       if (e) _logger.info(`Got error ${e}`);
-      _logger.info(JSON.stringify(result, null, 2));
+      _logger.info(JSON.stringify(result.result, null, 2));
 
-      res.status(200).json(result);
+      res.status(200).json(result.result);
     });
   } else {
       res.status(202).json({error: "Unable to add product"});
@@ -336,9 +334,9 @@ exports.removeProductFromBox = async function (req, res, next) {
     {$pull: pullCmd}
     , async (e, result) => {
     if (e) _logger.info(`Got error ${e}`);
-    _logger.info(JSON.stringify(result, null, 2));
+    _logger.info(JSON.stringify(result.result, null, 2));
 
-    res.status(200).json(result);
+    res.status(200).json(result.result);
   });
 };
 
@@ -363,7 +361,7 @@ exports.toggleBoxActive = async function (req, res, next) {
       if (e) _logger.info(`Got error ${e}`);
       _logger.info(JSON.stringify(result.result, null, 2));
 
-      res.status(200).json(result);
+      res.status(200).json(result.result);
     });
   } else if (!box_id && delivered) {
     collection.updateMany(
@@ -373,7 +371,7 @@ exports.toggleBoxActive = async function (req, res, next) {
       if (e) _logger.info(`Got error ${e}`);
       _logger.info(JSON.stringify(result.result, null, 2));
 
-      res.status(200).json(result);
+      res.status(200).json(result.result);
     });
   }
 };
@@ -385,7 +383,6 @@ exports.toggleBoxActive = async function (req, res, next) {
  */
 const queryStore = async function (search, product_type) {
 
-  const shop = "SD"; // which store?? this is set in .env and global _env object
   const path = "products.json";
   const fields = ["id", "title"];
   const limit = 100; // need to sort out paging, perhaps using 'since_id', not so successful, just relying on search terms
@@ -394,7 +391,7 @@ const queryStore = async function (search, product_type) {
     ["status", "active"],
   ];
 
-  return await makeShopQuery({shop, path, limit, query, fields})
+  return await makeShopQuery({path, limit, query, fields})
     .then(async ({products}) => {
       return products.filter(({title}) => new RegExp(search, 'gi').test(title));
     });

@@ -110,7 +110,7 @@ function *Subscribers() {
         <div class="mt3" id="subscribers-table">
           {fetchError && <Error msg={fetchError} />}
           <h2 class="pt0 f5 f4-ns lh-title-ns ma0 fg-streamside-maroon" id="boxes-title">
-            Current Subscribers
+            Current Subscribers (under development)
             <div class="tr">
               <AddSubscriberModal />
             </div>

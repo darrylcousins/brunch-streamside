@@ -53,10 +53,7 @@ exports.getQueryFilters = (req, query) => {
   return query;
 };
 
-exports.makeShopQuery = async ({shop, path, limit, query, fields}) => {
-  // shop one of 'SO', 'SD'
-  const shop_name = `${shop}_SHOP_NAME`;
-  const passwd = `${shop}_API_PASSWORD`;
+exports.makeShopQuery = async ({path, limit, query, fields}) => {
   const fieldString = fields ? `?fields=${fields.join(',')}` : "";
   const start = fields ? "&" : "?";
   const searchString = query ? start + query.reduce((acc, curr, idx) => {
@@ -64,13 +61,14 @@ exports.makeShopQuery = async ({shop, path, limit, query, fields}) => {
     return acc + `${ idx > 0 ? "&" : ""}${key}=${value}`;
   }, "") : "";
   const count = limit ? `&limit=${limit}` : "";
+  _logger.info(_env.SHOP_NAME);
   
-  const url = `https://${_env[shop_name]}.myshopify.com/admin/api/${_env.API_VERSION}/${path}${fieldString}${searchString}${count}`;
-  _logger.info(url);
+  const url = `https://${_env.SHOP_NAME}.myshopify.com/admin/api/${_env.API_VERSION}/${path}${fieldString}${searchString}${count}`;
+  _logger.info(`Query store: ${url}`);
   return await fetch(encodeURI(url), {
     method: 'GET',
     headers: {
-      'X-Shopify-Access-Token': _env[passwd] 
+      'X-Shopify-Access-Token': _env.API_PASSWORD 
     }
   })
     .then(response => response.json())

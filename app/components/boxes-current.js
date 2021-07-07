@@ -137,7 +137,7 @@ function* CurrentBoxes() {
           loading = false;
           this.refresh();
         } else {
-          fetchDates = json;
+          fetchDates = json.filter(el => el.toUpperCase() !== "INVALID DATE");
           if (!selectedDate) {
             if (fetchDates.length) selectedDate = fetchDates[0];
           } else {

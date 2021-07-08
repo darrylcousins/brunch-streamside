@@ -146,8 +146,9 @@ function *Products ({box, products, type, allproducts}) {
    */
   const dragStart = (ev) => {
     const shopify_product_id = ev.target.getAttribute("data-id");
+    const product_type = ev.target.getAttribute("data-type");
     document.getElementById(`${shopify_product_id}`).classList.add("o-30");
-    ev.dataTransfer.setData("text", shopify_product_id);
+    ev.dataTransfer.setData("text", `${product_type}:${shopify_product_id}`);
   };
 
   /**
@@ -157,18 +158,17 @@ function *Products ({box, products, type, allproducts}) {
    */
   const drop = async (ev) => {
     ev.preventDefault();
-    const shopify_product_id = parseInt(ev.dataTransfer.getData("text"));
-    const product_type = document.getElementById(shopify_product_id).getAttribute("data-type");
+    const [product_type, product_id] = ev.dataTransfer.getData("text").split(":");
 
     const nearest = ev.target.querySelector("div[draggable=true]");
     const target = nearest ? nearest : ev.target;
     const target_type = target.getAttribute("data-type");
 
     if (product_type !== target_type) {
+      const shopify_product_id = parseInt(product_id);
       await addProduct({shopify_product_id, product_type: target_type});
       removeProduct({shopify_product_id, product_type});
     };
-    [...document.getElementsByClassName("bg-black-10")].forEach(el => el.classList.remove("bg-black-10"));
 
   };
 

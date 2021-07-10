@@ -205,7 +205,7 @@ const processOrderJson = (json) => {
 
   const result = {
     _id: id,
-    order_number,
+    order_number: order_number.toString(),
     sku,
     delivered,
     pickup,

@@ -64,7 +64,7 @@ function* OrderModal({ order }) {
 
   const main = document.getElementById("modal-window");
 
-  while (true)
+  for ({ order } of this) { // eslint-disable-line no-unused-vars
     yield (
       <Fragment>
         <Button type="primary">Show details</Button>
@@ -101,6 +101,7 @@ function* OrderModal({ order }) {
         )}
       </Fragment>
     );
+  };
 }
 
 export default OrderModal;

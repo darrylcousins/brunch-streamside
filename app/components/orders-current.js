@@ -269,7 +269,7 @@ function* CurrentOrders() {
    * @listens listing.reload
    */
   const reloadOrders = (ev) => {
-    getOrders();
+    getDates();
   };
 
   this.addEventListener("listing.reload", reloadOrders);

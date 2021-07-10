@@ -21,8 +21,7 @@ import FieldWrapper from "./field-wrapper";
  * @param {string} props.value The current value
  * @yields {Element} DOM component to render input text field
  */
-function* DateField(props) {
-  const { label, id, size, valid, datatype } = props;
+function* DateField({ label, id, value, size, valid, datatype, disabled, hideLabel, ...props }) {
 
   /**
    * Event handler when {@link
@@ -49,13 +48,16 @@ function* DateField(props) {
 
   this.addEventListener("form.data.collect", collectAndSendData);
 
-  while (true) {
+  for ({ label, id, value, size, valid, datatype, disabled, hideLabel } of this) {
     yield (
-      <FieldWrapper label={label} size={size} id={id} hideLabel={props.hideLabel}>
+      <FieldWrapper label={label} size={size} id={id} hideLabel={hideLabel}>
         <input
           class={`mr1 pa2 ba bg-transparent hover-bg-near-white w-100 input-reset br2 ${
             !valid ? "invalid" : ""
           }`}
+          disabled={disabled}
+          value={value}
+          id={id}
           {...props}
         />
         <span class={`small mt1 fg-streamside-orange ${valid ? "hidden" : ""}`}>

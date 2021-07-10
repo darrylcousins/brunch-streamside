@@ -17,6 +17,7 @@ import Error from "../lib/error";
 import BarLoader from "../lib/bar-loader";
 import Form from "../form";
 import getOrderFields from "./order-fields";
+import { dateStringForInput } from "../helpers";
 
 /**
  * Create a modal to add or edit an order..
@@ -64,14 +65,16 @@ async function* UpsertOrderModal(props) {
      */
     const getInitialData = () => {
       if (typeof order !== "undefined") {
+        order.delivered = dateStringForInput(order.delivered);
+        order.pickup = dateStringForInput(order.pickup);
         return order;
       }
       const result = {};
       for (const value of Object.values(fields)) {
         result[value.id] = "";
       }
-      result.delivered = delivered;
-      result.pickup = delivered;
+      result.delivered = dateStringForInput(delivered);
+      result.pickup = dateStringForInput(delivered);
       result._id = new Date().getTime();
       return result;
     };

@@ -7,6 +7,7 @@
  * @author Darryl Cousins <darryljcousins@gmail.com>
  */
 import { Fetch } from "../lib/fetch";
+import { dateStringForInput } from "../helpers";
 
 /**
  * The order form fields keyed by field title string - required by {@link
@@ -128,18 +129,29 @@ const getOrderFields = async (delivered) => {
       },
       "Pickup Date": {
         id: "pickup",
+        type: "date", // needs to be calendar select
+        size: "25",
+        datatype: "date",
+        required: true,
+        min: dateStringForInput(),
+        /*
         type: "text",
         size: "25",
         datatype: "string",
-        required: false,
+        */
       },
       Delivered: {
         id: "delivered",
-        type: "input-select",
+        type: "date", // needs to be calendar select
         size: "25",
-        datatype: "string",
+        datatype: "date",
         required: true,
+        min: dateStringForInput(),
+        /*
+        type: "input-select",
+        datatype: "string",
         datalist: json,
+        */
       },
       Extras: {
         id: "addons",

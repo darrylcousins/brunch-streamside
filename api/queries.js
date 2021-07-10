@@ -46,8 +46,11 @@ exports.getOrderSources = async function (req, res, next) {
 
 exports.addOrder = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
+  const data = {...req.body};
+  data.delivered = getNZDeliveryDay(new Date(data.delivered).getTime());
+  data.pickup = getNZDeliveryDay(new Date(data.pickup).getTime());
   try {
-    const result = await mongoInsert(req.app.locals.orderCollection, req.body);
+    const result = await mongoInsert(req.app.locals.orderCollection, data);
     res.status(200).json(result);
   } catch(e) {
     res.status(400).json({ error: e.toString() });
@@ -56,15 +59,18 @@ exports.addOrder = async function (req, res, next) {
 
 exports.editOrder = async function (req, res, next) {
   _logger.info(JSON.stringify(req.body, null, 2));
+  const data = {...req.body};
+  data.delivered = getNZDeliveryDay(new Date(data.delivered).getTime());
+  data.pickup = getNZDeliveryDay(new Date(data.pickup).getTime());
   // are we updating the date?
   try {
-    const result = await mongoUpdate(req.app.locals.orderCollection, req.body);
+    const result = await mongoUpdate(req.app.locals.orderCollection, data);
     if (req.body.source === 'Shopify') {
-      _logger.info(`Updating order tag for ${req.body.delivered}`);
+      _logger.info(`Updating order tag for ${data.delivered}`);
       // TODO actually not good enough XXX sorted - May 2021?
       // 1. will add new tag and not replace tag
       // 2. not checking for actual change in value
-      updateOrderTag(req.body._id.toString(), req.body.delivered);
+      updateOrderTag(req.body._id.toString(), data.delivered);
     }
     res.status(200).json(result);
   } catch(e) {

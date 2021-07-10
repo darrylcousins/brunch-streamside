@@ -139,7 +139,7 @@ function FormModalWrapper(Component, options) {
         data = form;
       }
 
-      //console.log(data);
+      console.log(data);
       /*
       console.warn('Posting saved successfully but disabled for development');
       closeModal();

@@ -13,10 +13,14 @@ const packinglist = require('./packing-list');
 const settings = require('./settings');
 const subscribers = require('./subscribers');
 const todos = require('./todos');
+const syncOrders = require('./sync-orders');
 
 routes.get('/', function (req, res) {
   res.status(404).send('No index for the api');
 })
+
+// for testing??
+routes.get('/sync-orders', syncOrders);
 
 routes.get('/current-orders', queries.getCurrentOrders);
 routes.get('/current-orders-by-date/:timestamp', queries.getCurrentOrdersByDate);

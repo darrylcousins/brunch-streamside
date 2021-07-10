@@ -8,8 +8,8 @@ const { parse } = require('@fast-csv/parse');
 const LABELKEYS = [
   'Delivery Date', 
   'Including', 
-  'Add on items', 
-  'Removed items', 
+  'Add on Items', 
+  'Removed Items', 
   'Subscription',
   'Add on product to',
   'ShopID',

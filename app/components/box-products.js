@@ -189,7 +189,7 @@ function *Products ({box, products, type, allproducts}) {
           ondragover={dragOver}
           ondragenter={dragEnter}
           ondragleave={dragLeave}
-          style={{height: products.length ? "auto" : "200px"}}
+          style={{height: products.length ? "auto" : "100px"}}
         >
         {products.map((el) => (
             <div
